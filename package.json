@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@auth/drizzle-adapter": "^1.11.1",
+    "@clerk/nextjs": "^6.36.2",
     "@neondatabase/serverless": "^1.0.2",
     "cookie": "^1.1.1",
     "dotenv": "^17.2.3",
@@ -18,6 +20,7 @@
     "next-auth": "^4.24.13",
     "next-pwa": "^5.6.0",
     "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.11",
     "open-graph-scraper": "^6.11.0",
     "react": "19.2.1",
     "react-dom": "19.2.1",
@@ -25,7 +28,9 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/estree": "^1.0.8",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

@@ -1,21 +1,24 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../api/auth/[...nextauth]/route';
+import { currentUser } from '@clerk/nextjs/server';
 import { db } from '@/db';
 import { items } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import Link from 'next/link';
 
 export default async function InboxPage() {
-  const session = await getServerSession(authOptions);
+  const user = await currentUser();
 
-  if (!session || !session.user) {
+  if (!user) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-24">
         <h1>You need to be signed in to view your inbox.</h1>
+        <Link href="/" className="mt-4 text-blue-600 hover:underline">
+          Go to Home
+        </Link>
       </div>
     );
   }
 
-  const userItems = await db.select().from(items).where(eq(items.userId, session.user.id!));
+  const userItems = await db.select().from(items).where(eq(items.userId, user.id));
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
