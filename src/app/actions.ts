@@ -147,6 +147,28 @@ export async function snoozeReminder(reminderId: string, minutes: number) {
     revalidatePath('/settings');
 }
 
+export async function updateReminder(
+    reminderId: string,
+    date: Date,
+    recurrence: 'none' | 'daily' | 'weekly' | 'monthly' = 'none',
+    title?: string
+) {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+
+    await db
+        .update(reminders)
+        .set({
+            scheduledAt: date,
+            recurrence,
+            title: title || null,
+        })
+        .where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+
+    revalidatePath('/inbox');
+    revalidatePath('/settings');
+}
+
 export async function getReminders(itemId: string) {
     const { userId } = await auth();
     if (!userId) return [];

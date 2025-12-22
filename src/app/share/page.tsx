@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { createItem } from '../actions';
-import { SignInButton, useUser } from '@clerk/nextjs';
+import { SignInButton, useUser, SignedOut } from '@clerk/nextjs';
 import Image from 'next/image';
 
 function ShareContent() {
@@ -100,11 +100,13 @@ function ShareContent() {
                     <p className="text-zinc-900 dark:text-white font-medium">{message}</p>
                     {!isSignedIn && isLoaded && (
                         <div className="mt-4">
-                            <SignInButton mode="modal">
-                                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium">
-                                    Sign In
-                                </button>
-                            </SignInButton>
+                            <SignedOut>
+                                <SignInButton mode="modal">
+                                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium">
+                                        Sign In
+                                    </button>
+                                </SignInButton>
+                            </SignedOut>
                         </div>
                     )}
                     <button

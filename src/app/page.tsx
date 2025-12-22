@@ -1,4 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
+import { SignedOut } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
 import { SignInButton, SignOutButton } from "@/components/clerk-buttons";
@@ -23,25 +24,47 @@ export default async function Home() {
           Save articles, videos, and more to read when you have time.
         </p>
 
-        <div className="flex gap-4">
+        <div className="mt-8 p-8 rounded-2xl glass border border-zinc-200 dark:border-zinc-800 w-full max-w-sm mx-auto shadow-2xl backdrop-blur-xl">
           {user ? (
-            <>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-center mb-6">
+                <div className="flex flex-col items-center">
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium tracking-wide !m-0">WELCOME BACK</p>
+                  <p className="text-xl font-semibold text-zinc-900 dark:text-white !m-0">{user.firstName || 'User'}</p>
+                </div>
+              </div>
+
               <Link
                 href="/inbox"
-                className="rounded-full bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition-colors"
+                className="group relative w-full rounded-xl bg-blue-600 p-4 text-center text-white transition-all hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98]"
               >
-                Go to Inbox
+                <div className="flex items-center justify-center gap-2 font-medium">
+                  <span>Launch DayOS</span>
+                  <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
               </Link>
-              <Link
-                href="/settings"
-                className="rounded-full bg-zinc-200 px-6 py-3 text-black hover:bg-zinc-300 transition-colors dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
-              >
-                Settings
-              </Link>
-              <SignOutButton />
-            </>
+
+              <div className="grid grid-cols-2 gap-3 mt-1">
+                <Link
+                  href="/settings"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white/50 p-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900/50 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+                >
+                  Configure
+                </Link>
+                <div className="[&>span]:w-full">
+                  <SignOutButton />
+                </div>
+              </div>
+            </div>
           ) : (
-            <SignInButton />
+            <div className="flex flex-col gap-4">
+              <p className="text-zinc-500 dark:text-zinc-400 text-sm">Sign in to sync your reading list across devices.</p>
+              <SignedOut>
+                <SignInButton />
+              </SignedOut>
+            </div>
           )}
         </div>
       </main>

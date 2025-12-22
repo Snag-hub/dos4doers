@@ -27,7 +27,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     const pathname = usePathname();
 
     const sidebarContent = (
-        <div className="flex h-full flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="flex h-full flex-col glass-sidebar">
             {/* Logo */}
             <div className="flex h-16 items-center justify-between px-6">
                 <Link href="/" className="flex items-center gap-2 font-bold text-xl text-zinc-900 dark:text-white">

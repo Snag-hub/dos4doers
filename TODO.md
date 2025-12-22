@@ -44,6 +44,11 @@ This TODO list is based on the "Read-later Engine — Full Project Canvas.pdf" d
 - [x] Create `popup.js`
 
 ## 5. Deployment & Testing
+- [x] **Notification System**
+  - [x] Create email sending utility (Nodemailer) `[src/lib/email.ts]`
+  - [x] Configure environment variables
+  - [x] Create template for reminders
+  - [x] **Test Email Sending** `[src/app/api/test/send-email/route.ts]`
 - [ ] Create NeonDB project and database
 - [ ] Create Vercel project and connect to GitHub repo
 - [ ] Add environment variables in Vercel dashboard
@@ -74,11 +79,11 @@ This TODO list is based on the "Read-later Engine — Full Project Canvas.pdf" d
 ## 2.2. UI/UX Overhaul ("Best Design")
 - [ ] **App Shell Layout**
     - [ ] Create responsive Sidebar navigation (Inbox, Favorites, Later, Settings)
-    - [ ] **Mobile Navigation Upgrade**:
-        - [ ] Convert sidebar to bottom tab bar on mobile (WhatsApp style)
-        - [ ] Limit to 4 main tabs (Idea: Inbox, Favorites, Archive, Search/Tags)
-        - [ ] Move Settings and less used tabs to sidebar/drawer or "More" tab
-        - [ ] Add User Profile icon (top-right) for Sign Out and Account Management
+    - [x] **Mobile Navigation Upgrade**:
+        - [x] Convert sidebar to bottom tab bar on mobile (WhatsApp style)
+        - [x] Limit to 4 main tabs (Idea: Inbox, Favorites, Archive, Search/Tags)
+        - [x] Move Settings and less used tabs to sidebar/drawer or "More" tab
+        - [x] Add User Profile icon (top-right) for Sign Out and Account Management
     - [ ] Implement "App Layout" component to wrap pages
 - [ ] **Item Cards & Grid**
     - [ ] Design rich "Article Card" (Image, Title, Site, Time, Actions)
@@ -111,9 +116,9 @@ This TODO list is based on the "Read-later Engine — Full Project Canvas.pdf" d
 
 ## 2.5. Final Polish & Suggestions
 - [ ] **Polishing**
-    - [ ] Add official Favicon to website
+    - [x] Add official Favicon to website
     - [ ] Dynamic Web Page Titles (e.g. "Inbox (3) - DayOS")
-    - [ ] **Dark Mode Assets**: Create specific icons/assets optimized for dark mode.
+    - [x] **Dark Mode Assets**: Create specific icons/assets optimized for dark mode.
 - [ ] **User Experience Improvements**
     - [ ] **Open Graph Tags**: Ensure sharing DayOS links looks good on social media.
     - [ ] **Custom PWA Install Button**: A visible "Install App" button.

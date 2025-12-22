@@ -38,7 +38,7 @@ export function ItemCard({ item }: { item: Item }) {
 
     return (
         <>
-            <div className={`group relative flex flex-row sm:flex-col overflow-hidden rounded-xl bg-white border border-zinc-200 shadow-sm transition-all hover:shadow-md dark:bg-zinc-900 dark:border-zinc-800 ${isPending ? 'opacity-50 pointer-events-none' : ''} h-32 sm:h-auto`}>
+            <div className={`group relative flex flex-row sm:flex-col overflow-hidden rounded-xl bg-white border border-zinc-200 shadow-sm transition-all hover:shadow-md dark:bg-zinc-900 dark:border-zinc-800 ${isPending ? 'opacity-50 pointer-events-none' : ''} min-h-[8rem] sm:h-auto`}>
 
                 {/* Image Section */}
                 {item.image && (
@@ -93,7 +93,7 @@ export function ItemCard({ item }: { item: Item }) {
                             href={item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block text-sm sm:text-base font-semibold leading-tight text-zinc-900 hover:text-blue-600 dark:text-zinc-100 dark:hover:text-blue-400 line-clamp-2 sm:line-clamp-none"
+                            className="block text-sm sm:text-base font-semibold leading-tight text-zinc-900 hover:text-blue-600 dark:text-zinc-100 dark:hover:text-blue-400 line-clamp-2"
                         >
                             {item.title || item.url}
                         </a>
@@ -106,7 +106,7 @@ export function ItemCard({ item }: { item: Item }) {
                     </div>
 
                     {/* Actions - Compact on mobile */}
-                    <div className="mt-1 flex items-center justify-end gap-1 sm:gap-2 sm:mt-auto sm:pt-2">
+                    <div className="mt-auto flex items-center justify-between sm:justify-end gap-0.5 sm:gap-2 pt-2">
                         <button
                             onClick={handleFavorite}
                             className={`rounded-full p-1.5 sm:p-2 transition-colors ${item.isFavorite ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' : 'text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300'}`}
@@ -120,6 +120,8 @@ export function ItemCard({ item }: { item: Item }) {
                         >
                             <BellIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                         </button>
+
+                        <div className="flex-1 sm:hidden"></div>
 
                         <button
                             onClick={handleArchive}
