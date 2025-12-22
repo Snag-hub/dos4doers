@@ -18,6 +18,7 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
     const [copied, setCopied] = useState(false);
     const [showToken, setShowToken] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [testStatus, setTestStatus] = useState('');
 
     useEffect(() => {
         setMounted(true);
@@ -227,12 +228,14 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                         </div>
                         <button
                             onClick={async () => {
-                                if (!('serviceWorker' in navigator)) return alert('Service Worker not supported');
+                                setTestStatus('Checking Permission...');
+                                if (!('serviceWorker' in navigator)) return setTestStatus('Error: Service Worker not supported');
 
                                 const perm = await Notification.requestPermission();
-                                if (perm !== 'granted') return alert('Permission denied');
+                                if (perm !== 'granted') return setTestStatus('Error: Permission denied');
 
                                 try {
+                                    setTestStatus('Subscribing...');
                                     const registration = await navigator.serviceWorker.ready;
                                     const sub = await registration.pushManager.subscribe({
                                         userVisibleOnly: true,
@@ -240,14 +243,13 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                                     });
 
                                     // Dynamically import to avoid server-side issues if any
-
                                     const { savePushSubscription: saveSub } = await import('@/app/actions');
 
                                     await saveSub(JSON.stringify(sub));
-                                    alert('Subscribed to notifications!');
+                                    setTestStatus('Success: Subscribed! Now try "Send Test".');
                                 } catch (e) {
                                     console.error(e);
-                                    alert('Failed to subscribe: ' + e);
+                                    setTestStatus('Error Subscribing: ' + e);
                                 }
                             }}
                             className="shrink-0 px-4 py-2 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
@@ -257,16 +259,19 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                         <button
                             onClick={async () => {
                                 try {
+                                    setTestStatus('Starting Test...');
                                     const registration = await navigator.serviceWorker.ready;
+                                    setTestStatus('SW Ready. Checking Sub...');
                                     const sub = await registration.pushManager.getSubscription();
-                                    if (!sub) return alert('Enable notifications first!');
+                                    if (!sub) return setTestStatus('Error: No Subscription found. Click Enable first.');
 
+                                    setTestStatus('Calling Server Action...');
                                     const { sendTestNotification } = await import('@/app/actions');
                                     await sendTestNotification(JSON.stringify(sub));
-                                    alert('Test sent! Check your notifications.');
-                                } catch (e) {
+                                    setTestStatus('Success! Server sent notification. Check your phone.');
+                                } catch (e: any) {
                                     console.error(e);
-                                    alert('Test failed: ' + e);
+                                    setTestStatus('Error: ' + (e.message || e));
                                 }
                             }}
                             className="shrink-0 px-4 py-2 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full text-sm font-medium transition-colors"
@@ -274,6 +279,13 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                             Send Test
                         </button>
                     </div>
+
+                    {/* Status Log */}
+                    {testStatus && (
+                        <div className={`mt-4 p-3 rounded-lg text-sm font-medium ${testStatus.startsWith('Error') ? 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400' : 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'}`}>
+                            {testStatus}
+                        </div>
+                    )}
 
                     {/* Debug Info */}
                     <div className="mt-6 p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl font-mono text-xs text-zinc-500 overflow-x-auto">

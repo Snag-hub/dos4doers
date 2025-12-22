@@ -308,6 +308,10 @@ export async function sendTestNotification(subscription: string) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
+    if (!process.env.VAPID_PRIVATE_KEY) {
+        throw new Error('Server Error: VAPID_PRIVATE_KEY is missing in Vercel Environment Variables.');
+    }
+
     const sub = JSON.parse(subscription);
     const payload = JSON.stringify({
         title: '🔔 Test Notification',
