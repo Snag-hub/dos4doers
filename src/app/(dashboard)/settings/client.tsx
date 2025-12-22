@@ -235,9 +235,26 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                                 if (perm !== 'granted') return setTestStatus('Error: Permission denied');
 
                                 try {
-                                    setTestStatus('Waiting for SW Ready...');
-                                    const registration = await navigator.serviceWorker.ready;
-                                    setTestStatus('SW Ready. converting key...');
+                                    setTestStatus('Checking Service Worker...');
+
+                                    // 1. Ensure SW is registered
+                                    let registration = await navigator.serviceWorker.getRegistration();
+                                    if (!registration) {
+                                        setTestStatus('Registering Service Worker...');
+                                        registration = await navigator.serviceWorker.register('/sw.js');
+                                    }
+
+                                    setTestStatus('Waiting for Active SW...');
+                                    await navigator.serviceWorker.ready;
+
+                                    // 2. Refresh registration handle
+                                    registration = await navigator.serviceWorker.getRegistration();
+
+                                    if (!registration || !registration.active) {
+                                        throw new Error('Service Worker registered but not active. Try reloading.');
+                                    }
+
+                                    setTestStatus('SW Ready. Converting key...');
 
                                     const urlBase64ToUint8Array = (base64String: string) => {
                                         const padding = '='.repeat((4 - base64String.length % 4) % 4);
