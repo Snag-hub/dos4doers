@@ -296,28 +296,6 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                         >
                             Enable Notifications
                         </button>
-                        <button
-                            onClick={async () => {
-                                try {
-                                    setTestStatus('Starting Test...');
-                                    const registration = await navigator.serviceWorker.ready;
-                                    setTestStatus('SW Ready. Checking Sub...');
-                                    const sub = await registration.pushManager.getSubscription();
-                                    if (!sub) return setTestStatus('Error: No Subscription found. Click Enable first.');
-
-                                    setTestStatus('Calling Server Action...');
-                                    const { sendTestNotification } = await import('@/app/actions');
-                                    await sendTestNotification(JSON.stringify(sub));
-                                    setTestStatus('Success! Server sent notification. Check your phone.');
-                                } catch (e: any) {
-                                    console.error(e);
-                                    setTestStatus('Error: ' + (e.message || e));
-                                }
-                            }}
-                            className="shrink-0 px-4 py-2 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full text-sm font-medium transition-colors"
-                        >
-                            Send Test
-                        </button>
                     </div>
 
                     {/* Status Log */}
@@ -326,162 +304,137 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                             {testStatus}
                         </div>
                     )}
-
-                    {/* Debug Info */}
-                    <div className="mt-6 p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl font-mono text-xs text-zinc-500 overflow-x-auto">
-                        <p className="font-bold mb-2">Debug Info:</p>
-                        <ul className="space-y-1">
-                            <li>Supported: {mounted && 'serviceWorker' in navigator && 'PushManager' in window ? 'Yes' : 'No'}</li>
-                            <li>Permission: {mounted && typeof Notification !== 'undefined' ? Notification.permission : 'Unknown'}</li>
-                            <li>HTTPS: {mounted && window.location.protocol === 'https:' ? 'Yes' : 'No (Required for Push)'}</li>
-                            <li>VAPID Public Key: {process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ? 'Present' : 'Missing (Check Env Vars)'}</li>
-                        </ul>
-                        <button
-                            onClick={async () => {
-                                if ('serviceWorker' in navigator) {
-                                    const regs = await navigator.serviceWorker.getRegistrations();
-                                    for (let reg of regs) {
-                                        await reg.unregister();
-                                    }
-                                    alert('Service Workers Unregistered. Reloading...');
-                                    window.location.reload();
-                                }
-                            }}
-                            className="mt-4 text-xs text-red-500 hover:text-red-700 underline"
-                        >
-                            Hard Reset Service Worker
-                        </button>
-                    </div>
                 </div>
-            </section>
+        </div>
+            </section >
 
-            {/* General Reminders Section */}
-            <section className="relative overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-sm">
-                <div className="p-6 sm:p-8">
-                    <div className="mb-6">
-                        <h2 className="text-xl font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-                            <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 p-1.5 rounded-lg">
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                            </span>
-                            Smart Reminders
-                        </h2>
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">
-                            Quickly set personal reminders or habits. We'll email you when it's time.
-                        </p>
-                    </div>
+        {/* General Reminders Section */ }
+        < section className = "relative overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-sm" >
+            <div className="p-6 sm:p-8">
+                <div className="mb-6">
+                    <h2 className="text-xl font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                        <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 p-1.5 rounded-lg">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                        </span>
+                        Smart Reminders
+                    </h2>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">
+                        Quickly set personal reminders or habits. We'll email you when it's time.
+                    </p>
+                </div>
 
-                    {/* Quick Add Form */}
-                    <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl p-4 mb-6 border border-zinc-100 dark:border-zinc-800/50 transition-all focus-within:ring-2 focus-within:ring-purple-500/10">
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <input
-                                type="text"
-                                placeholder="Remind me to..."
-                                value={reminderTitle}
-                                onChange={(e) => setReminderTitle(e.target.value)}
-                                className="flex-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-500 transition-all placeholder:text-zinc-400"
-                            />
-                            <input
-                                type="datetime-local"
-                                value={reminderTime}
-                                onChange={(e) => setReminderTime(e.target.value)}
-                                className="sm:w-48 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-purple-500 transition-all text-zinc-600 dark:text-zinc-300"
-                            />
+                {/* Quick Add Form */}
+                <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl p-4 mb-6 border border-zinc-100 dark:border-zinc-800/50 transition-all focus-within:ring-2 focus-within:ring-purple-500/10">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <input
+                            type="text"
+                            placeholder="Remind me to..."
+                            value={reminderTitle}
+                            onChange={(e) => setReminderTitle(e.target.value)}
+                            className="flex-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-500 transition-all placeholder:text-zinc-400"
+                        />
+                        <input
+                            type="datetime-local"
+                            value={reminderTime}
+                            onChange={(e) => setReminderTime(e.target.value)}
+                            className="sm:w-48 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-purple-500 transition-all text-zinc-600 dark:text-zinc-300"
+                        />
 
-                            <select
-                                value={recurrence}
-                                onChange={(e) => setRecurrence(e.target.value as 'none' | 'daily' | 'weekly' | 'monthly')}
-                                className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-purple-500 transition-all text-zinc-600 dark:text-zinc-300"
-                            >
-                                <option value="none">One-time</option>
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
-                            </select>
+                        <select
+                            value={recurrence}
+                            onChange={(e) => setRecurrence(e.target.value as 'none' | 'daily' | 'weekly' | 'monthly')}
+                            className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-purple-500 transition-all text-zinc-600 dark:text-zinc-300"
+                        >
+                            <option value="none">One-time</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
 
-                            {editingId ? (
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={handleAddQuickReminder}
-                                        disabled={!reminderTitle || !reminderTime || addingReminder}
-                                        className="flex-1 px-4 py-2.5 bg-purple-600 text-white font-medium text-sm rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 shadow-lg shadow-purple-500/20"
-                                    >
-                                        {addingReminder ? 'Updating...' : 'Update'}
-                                    </button>
-                                    <button
-                                        onClick={handleCancelEdit}
-                                        className="px-4 py-2.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-medium text-sm rounded-xl hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            ) : (
+                        {editingId ? (
+                            <div className="flex gap-2">
                                 <button
                                     onClick={handleAddQuickReminder}
                                     disabled={!reminderTitle || !reminderTime || addingReminder}
-                                    className="px-6 py-2.5 bg-zinc-900 dark:bg-white text-white dark:text-black font-medium text-sm rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-zinc-500/10"
+                                    className="flex-1 px-4 py-2.5 bg-purple-600 text-white font-medium text-sm rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 shadow-lg shadow-purple-500/20"
                                 >
-                                    {addingReminder ? 'Setting...' : 'Set Reminder'}
+                                    {addingReminder ? 'Updating...' : 'Update'}
                                 </button>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Active Reminders List */}
-                    <div className="space-y-3">
-                        <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-4 pl-1">Run Sheet</h3>
-
-                        {loadingReminders ? (
-                            <div className="flex flex-col gap-3">
-                                {[1, 2].map(i => (
-                                    <div key={i} className="h-14 bg-zinc-100 dark:bg-zinc-800/50 rounded-xl animate-pulse"></div>
-                                ))}
-                            </div>
-                        ) : generalReminders.length === 0 ? (
-                            <div className="text-center py-12 rounded-2xl border-2 border-dashed border-zinc-100 dark:border-zinc-800/50">
-                                <div className="text-zinc-300 dark:text-zinc-600 mb-2">
-                                    <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                </div>
-                                <p className="text-zinc-400 dark:text-zinc-500 text-sm">No active reminders.</p>
+                                <button
+                                    onClick={handleCancelEdit}
+                                    className="px-4 py-2.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-medium text-sm rounded-xl hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
+                                >
+                                    Cancel
+                                </button>
                             </div>
                         ) : (
-                            generalReminders.map((reminder) => (
-                                <div key={reminder.id} className={`group flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border ${editingId === reminder.id ? 'border-purple-500 ring-1 ring-purple-500 bg-purple-50/10' : 'border-zinc-100 dark:border-zinc-800'} rounded-xl hover:border-purple-200 dark:hover:border-purple-900/50 transition-all shadow-sm`}>
-                                    <div className="flex items-center gap-4 cursor-pointer flex-1" onClick={() => handleEdit(reminder)}>
-                                        <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-zinc-900 dark:text-zinc-100">{reminder.title}</p>
-                                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 flex items-center gap-2">
-                                                <span>Due: <span className="text-zinc-700 dark:text-zinc-300">{new Date(reminder.scheduledAt).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span></span>
-                                                <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide ${reminder.recurrence !== 'none' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'}`}>
-                                                    {reminder.recurrence === 'none' ? 'One-time' : reminder.recurrence}
-                                                </span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            onClick={() => handleEdit(reminder)}
-                                            className="p-2 text-zinc-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
-                                            title="Edit"
-                                        >
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); handleDeleteReminder(reminder.id); }}
-                                            className="p-2 text-zinc-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
-                                            title="Delete"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
+                            <button
+                                onClick={handleAddQuickReminder}
+                                disabled={!reminderTitle || !reminderTime || addingReminder}
+                                className="px-6 py-2.5 bg-zinc-900 dark:bg-white text-white dark:text-black font-medium text-sm rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-zinc-500/10"
+                            >
+                                {addingReminder ? 'Setting...' : 'Set Reminder'}
+                            </button>
                         )}
                     </div>
                 </div>
-            </section>
-        </div>
+
+                {/* Active Reminders List */}
+                <div className="space-y-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-4 pl-1">Run Sheet</h3>
+
+                    {loadingReminders ? (
+                        <div className="flex flex-col gap-3">
+                            {[1, 2].map(i => (
+                                <div key={i} className="h-14 bg-zinc-100 dark:bg-zinc-800/50 rounded-xl animate-pulse"></div>
+                            ))}
+                        </div>
+                    ) : generalReminders.length === 0 ? (
+                        <div className="text-center py-12 rounded-2xl border-2 border-dashed border-zinc-100 dark:border-zinc-800/50">
+                            <div className="text-zinc-300 dark:text-zinc-600 mb-2">
+                                <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                            <p className="text-zinc-400 dark:text-zinc-500 text-sm">No active reminders.</p>
+                        </div>
+                    ) : (
+                        generalReminders.map((reminder) => (
+                            <div key={reminder.id} className={`group flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border ${editingId === reminder.id ? 'border-purple-500 ring-1 ring-purple-500 bg-purple-50/10' : 'border-zinc-100 dark:border-zinc-800'} rounded-xl hover:border-purple-200 dark:hover:border-purple-900/50 transition-all shadow-sm`}>
+                                <div className="flex items-center gap-4 cursor-pointer flex-1" onClick={() => handleEdit(reminder)}>
+                                    <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-zinc-900 dark:text-zinc-100">{reminder.title}</p>
+                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 flex items-center gap-2">
+                                            <span>Due: <span className="text-zinc-700 dark:text-zinc-300">{new Date(reminder.scheduledAt).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span></span>
+                                            <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide ${reminder.recurrence !== 'none' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'}`}>
+                                                {reminder.recurrence === 'none' ? 'One-time' : reminder.recurrence}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={() => handleEdit(reminder)}
+                                        className="p-2 text-zinc-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
+                                        title="Edit"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleDeleteReminder(reminder.id); }}
+                                        className="p-2 text-zinc-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                                        title="Delete"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+            </section >
+        </div >
     );
 }
