@@ -456,11 +456,9 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                                             <p className="font-medium text-zinc-900 dark:text-zinc-100">{reminder.title}</p>
                                             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 flex items-center gap-2">
                                                 <span>Due: <span className="text-zinc-700 dark:text-zinc-300">{new Date(reminder.scheduledAt).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span></span>
-                                                {reminder.recurrence !== 'none' && (
-                                                    <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide">
-                                                        {reminder.recurrence}
-                                                    </span>
-                                                )}
+                                                <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide ${reminder.recurrence !== 'none' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'}`}>
+                                                    {reminder.recurrence === 'none' ? 'One-time' : reminder.recurrence}
+                                                </span>
                                             </p>
                                         </div>
                                     </div>
