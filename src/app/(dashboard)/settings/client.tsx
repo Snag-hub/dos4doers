@@ -235,7 +235,7 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                                     });
 
                                     // Dynamically import to avoid server-side issues if any
-                                    const { savePushSubscription } = await import('./actions'); // Actually getting from global actions but let's check import
+
                                     const { savePushSubscription: saveSub } = await import('@/app/actions');
 
                                     await saveSub(JSON.stringify(sub));
