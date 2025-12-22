@@ -120,3 +120,16 @@ export const reminders = pgTable('reminders', {
   recurrence: recurrenceEnum('recurrence').default('none').notNull(),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
 });
+
+export const pushSubscriptions = pgTable('push_subscriptions', {
+  id: text('id')
+    .notNull()
+    .primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  endpoint: text('endpoint').notNull().unique(),
+  p256dh: text('p256dh').notNull(),
+  auth: text('auth').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+});

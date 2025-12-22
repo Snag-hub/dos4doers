@@ -2,7 +2,7 @@
 
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
-import { items, reminders } from '@/db/schema';
+import { items, reminders, pushSubscriptions } from '@/db/schema';
 import { eq, and, desc, sql, ilike, or } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { v4 as uuidv4 } from 'uuid';
@@ -275,4 +275,20 @@ export async function createItem(url: string, title?: string, description?: stri
         console.error('Create Item Error:', error);
         throw new Error('Failed to create item');
     }
+}
+
+
+export async function savePushSubscription(subscription: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+
+    const sub = JSON.parse(subscription);
+
+    await db.insert(pushSubscriptions).values({
+        id: uuidv4(),
+        userId,
+        endpoint: sub.endpoint,
+        p256dh: sub.keys.p256dh,
+        auth: sub.keys.auth,
+    }).onConflictDoNothing(); // Prevent duplicate subscriptions
 }

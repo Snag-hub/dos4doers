@@ -205,6 +205,54 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                 </div>
             </section>
 
+            {/* Push Notification Section */}
+            <section className="relative overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-sm">
+                <div className="p-6 sm:p-8">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                        <div>
+                            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                                <span className="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-1.5 rounded-lg">
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                                </span>
+                                Push Notifications
+                            </h2>
+                            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 max-w-lg leading-relaxed">
+                                Get instant alerts for your smart reminders directly on your device.
+                            </p>
+                        </div>
+                        <button
+                            onClick={async () => {
+                                if (!('serviceWorker' in navigator)) return alert('Service Worker not supported');
+
+                                const perm = await Notification.requestPermission();
+                                if (perm !== 'granted') return alert('Permission denied');
+
+                                try {
+                                    const registration = await navigator.serviceWorker.ready;
+                                    const sub = await registration.pushManager.subscribe({
+                                        userVisibleOnly: true,
+                                        applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+                                    });
+
+                                    // Dynamically import to avoid server-side issues if any
+                                    const { savePushSubscription } = await import('./actions'); // Actually getting from global actions but let's check import
+                                    const { savePushSubscription: saveSub } = await import('@/app/actions');
+
+                                    await saveSub(JSON.stringify(sub));
+                                    alert('Subscribed to notifications!');
+                                } catch (e) {
+                                    console.error(e);
+                                    alert('Failed to subscribe: ' + e);
+                                }
+                            }}
+                            className="shrink-0 px-4 py-2 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
+                        >
+                            Enable Notifications
+                        </button>
+                    </div>
+                </div>
+            </section>
+
             {/* General Reminders Section */}
             <section className="relative overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-sm">
                 <div className="p-6 sm:p-8">

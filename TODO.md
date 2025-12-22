@@ -101,10 +101,13 @@ This TODO list is based on the "Read-later Engine — Full Project Canvas.pdf" d
     - [ ] Configure Mailjet client
     - [ ] Design HTML email template for "Daily Digest"
     - [ ] Implement email sending logic
-- [ ] **Push Notifications (Web/Android)**
-    - [ ] Update Service Worker for `push` events
-    - [ ] Implement VAPID key generation and subscription logic
-    - [ ] Build "Enable Notifications" UI
+- [/] **Push Notifications (Web/Android)**
+    - [x] Install `web-push` and generate VAPID keys
+    - [x] Create `push_subscriptions` table
+    - [x] Create `sw.js` push listener
+    - [x] Create API route for subscription (Server Action)
+    - [x] Add "Enable Notifications" button in Settings
+    - [x] Integrate with Cron Job
 
 ## 2.4. Features & Polish
 - [ ] **Import/Export**

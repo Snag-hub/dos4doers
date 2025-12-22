@@ -1,8 +1,17 @@
 import { db } from '@/db';
-import { items, users } from '@/db/schema';
+import { items, users, pushSubscriptions } from '@/db/schema';
 import { eq, and, lt, isNotNull } from 'drizzle-orm';
 import { sendEmail } from '@/lib/email';
 import { NextResponse } from 'next/server';
+import webpush from 'web-push';
+
+if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+        `mailto:${process.env.EMAIL_FROM || 'test@example.com'}`,
+        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+        process.env.VAPID_PRIVATE_KEY
+    );
+}
 
 // Prevent vercel from caching this route forever
 export const dynamic = 'force-dynamic';
@@ -89,6 +98,38 @@ export async function GET() {
                 subject: `You have ${userGroup.items.length} reminder${userGroup.items.length > 1 ? 's' : ''} due in DayOS`,
                 html,
             });
+
+            // 4. Send Push Notifications
+            try {
+                // Get user ID from the first item (all items in group belong to same user/email basically, assuming 1:1)
+                const userId = userGroup.items[0].userId;
+
+                const subs = await db
+                    .select()
+                    .from(pushSubscriptions)
+                    .where(eq(pushSubscriptions.userId, userId));
+
+                for (const sub of subs) {
+                    try {
+                        const payload = JSON.stringify({
+                            title: `DayOS: ${userGroup.items.length} Reminder(s) Due`,
+                            body: userGroup.items.map(i => i.title).join(', '),
+                            url: '/inbox',
+                        });
+
+                        await webpush.sendNotification({
+                            endpoint: sub.endpoint,
+                            keys: { p256dh: sub.p256dh, auth: sub.auth }
+                        }, payload);
+                    } catch (err) {
+                        console.error('Push failed for sub', sub.id, err);
+                        // If 410 Gone, we should delete the subscription
+                        // await db.delete(pushSubscriptions).where(eq(pushSubscriptions.id, sub.id));
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to process push notifications', error);
+            }
 
             // Clear reminders in DB for these specific items
             // Optimization: Could do bulk update where ID in [...]

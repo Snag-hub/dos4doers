@@ -22,27 +22,27 @@ if (!self.define) {
   const singleRequire = (uri, parentUri) => {
     uri = new URL(uri + ".js", parentUri).href;
     return registry[uri] || (
-      
-        new Promise(resolve => {
-          if ("document" in self) {
-            const script = document.createElement("script");
-            script.src = uri;
-            script.onload = resolve;
-            document.head.appendChild(script);
-          } else {
-            nextDefineUri = uri;
-            importScripts(uri);
-            resolve();
-          }
-        })
-      
-      .then(() => {
-        let promise = registry[uri];
-        if (!promise) {
-          throw new Error(`Module ${uri} didn’t register its module`);
+
+      new Promise(resolve => {
+        if ("document" in self) {
+          const script = document.createElement("script");
+          script.src = uri;
+          script.onload = resolve;
+          document.head.appendChild(script);
+        } else {
+          nextDefineUri = uri;
+          importScripts(uri);
+          resolve();
         }
-        return promise;
       })
+
+        .then(() => {
+          let promise = registry[uri];
+          if (!promise) {
+            throw new Error(`Module ${uri} didn’t register its module`);
+          }
+          return promise;
+        })
     );
   };
 
@@ -67,7 +67,8 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-e43f5367'], (function (workbox) { 'use strict';
+define(['./workbox-e43f5367'], (function (workbox) {
+  'use strict';
 
   importScripts();
   self.skipWaiting();
@@ -97,4 +98,39 @@ define(['./workbox-e43f5367'], (function (workbox) { 'use strict';
     plugins: []
   }), 'GET');
 
+
+  self.addEventListener('push', function (event) {
+    if (event.data) {
+      const data = event.data.json();
+      const options = {
+        body: data.body,
+        icon: data.icon || '/icon-192.png',
+        badge: '/icon-192.png', // Android small icon
+        vibrate: [100, 50, 100],
+        data: {
+          url: data.url || '/'
+        }
+      };
+      event.waitUntil(self.registration.showNotification(data.title, options));
+    }
+  });
+
+  self.addEventListener('notificationclick', function (event) {
+    event.notification.close();
+    event.waitUntil(
+      clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+        // Check if there is already a window/tab open with the target URL
+        for (let i = 0; i < windowClients.length; i++) {
+          const client = windowClients[i];
+          if (client.url === event.notification.data.url && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // If not, open a new window
+        if (clients.openWindow) {
+          return clients.openWindow(event.notification.data.url);
+        }
+      })
+    );
+  });
 }));
