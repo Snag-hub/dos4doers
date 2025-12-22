@@ -125,11 +125,7 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
 
     return (
         <div className="space-y-8 max-w-4xl mx-auto pb-20">
-            {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">Settings</h1>
-                <p className="text-zinc-500 dark:text-zinc-400 mt-2">Manage your API access and preferences.</p>
-            </div>
+
 
             {/* API Token Section - Glass Card */}
             <section className="relative overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-sm">
