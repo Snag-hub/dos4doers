@@ -269,6 +269,17 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
                             Send Test
                         </button>
                     </div>
+
+                    {/* Debug Info */}
+                    <div className="mt-6 p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl font-mono text-xs text-zinc-500 overflow-x-auto">
+                        <p className="font-bold mb-2">Debug Info:</p>
+                        <ul className="space-y-1">
+                            <li>Supported: {'serviceWorker' in navigator && 'PushManager' in window ? 'Yes' : 'No'}</li>
+                            <li>Permission: {typeof Notification !== 'undefined' ? Notification.permission : 'Unknown'}</li>
+                            <li>HTTPS: {typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'Yes' : 'No (Required for Push)'}</li>
+                            <li>VAPID Public Key: {process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ? 'Present' : 'Missing (Check Env Vars)'}</li>
+                        </ul>
+                    </div>
                 </div>
             </section>
 

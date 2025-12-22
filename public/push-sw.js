@@ -1,4 +1,5 @@
 self.addEventListener('push', function (event) {
+    console.log('[Service Worker] Push Received.', event.data);
     if (event.data) {
         const data = event.data.json();
         const options = {
