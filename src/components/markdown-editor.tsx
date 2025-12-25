@@ -7,7 +7,7 @@ import { Eye, Edit3, Bold, Italic, Link as LinkIcon, List } from 'lucide-react';
 
 type MarkdownEditorProps = {
     value: string;
-    onChange: (value: string) => void;
+    onChange: (value: string);
     placeholder?: string;
     autoFocus?: boolean;
 };
@@ -78,8 +78,8 @@ export function MarkdownEditor({ value, onChange, placeholder, autoFocus }: Mark
                 <button
                     onClick={() => setIsPreview(!isPreview)}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm font-medium transition-colors ${isPreview
-                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                        : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'
+                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                            : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'
                         }`}
                     type="button"
                 >
@@ -100,7 +100,7 @@ export function MarkdownEditor({ value, onChange, placeholder, autoFocus }: Mark
             {/* Editor/Preview */}
             <div className="flex-1 overflow-y-auto">
                 {isPreview ? (
-                    <div className="p-4 prose prose-zinc dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:text-base prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-code:text-sm prose-pre:bg-zinc-100 dark:prose-pre:bg-zinc-900">
+                    <div className="p-4 markdown-preview">
                         {value ? (
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                 {value}
@@ -108,6 +108,65 @@ export function MarkdownEditor({ value, onChange, placeholder, autoFocus }: Mark
                         ) : (
                             <p className="text-zinc-400 italic">Nothing to preview</p>
                         )}
+                        <style jsx global>{`
+                            .markdown-preview h1 {
+                                font-size: 2em;
+                                font-weight: bold;
+                                margin-top: 0.67em;
+                                margin-bottom: 0.67em;
+                            }
+                            .markdown-preview h2 {
+                                font-size: 1.5em;
+                                font-weight: bold;
+                                margin-top: 0.83em;
+                                margin-bottom: 0.83em;
+                            }
+                            .markdown-preview h3 {
+                                font-size: 1.17em;
+                                font-weight: bold;
+                                margin-top: 1em;
+                                margin-bottom: 1em;
+                            }
+                            .markdown-preview p {
+                                margin-top: 1em;
+                                margin-bottom: 1em;
+                            }
+                            .markdown-preview ul, .markdown-preview ol {
+                                margin-top: 1em;
+                                margin-bottom: 1em;
+                                padding-left: 2em;
+                            }
+                            .markdown-preview li {
+                                margin-top: 0.5em;
+                                margin-bottom: 0.5em;
+                            }
+                            .markdown-preview a {
+                                color: #3b82f6;
+                                text-decoration: underline;
+                            }
+                            .markdown-preview code {
+                                background-color: #f4f4f5;
+                                padding: 0.2em 0.4em;
+                                border-radius: 0.25em;
+                                font-size: 0.875em;
+                            }
+                            .markdown-preview pre {
+                                background-color: #f4f4f5;
+                                padding: 1em;
+                                border-radius: 0.5em;
+                                overflow-x: auto;
+                            }
+                            .markdown-preview pre code {
+                                background-color: transparent;
+                                padding: 0;
+                            }
+                            .markdown-preview strong {
+                                font-weight: bold;
+                            }
+                            .markdown-preview em {
+                                font-style: italic;
+                            }
+                        `}</style>
                     </div>
                 ) : (
                     <textarea
