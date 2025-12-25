@@ -272,13 +272,13 @@ export default function SettingsClient({
 
                     {/* Token Field */}
                     <div className="group relative bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-1 transition-colors focus-within:ring-2 focus-within:ring-blue-500/20">
-                        <div className="flex items-center">
-                            <div className="flex-1 px-4 py-3 font-mono text-sm text-zinc-600 dark:text-zinc-300 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <div className="flex items-start gap-2">
+                            <div className="flex-1 px-4 py-3 font-mono text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 break-all min-w-0">
                                 {token ? (showToken ? token : '•'.repeat(token.length > 20 ? 40 : token.length)) : 'No active token'}
                             </div>
 
                             {token && (
-                                <div className="flex items-center gap-1 pr-1">
+                                <div className="flex items-center gap-1 pr-1 flex-shrink-0">
                                     <button
                                         onClick={() => setShowToken(!showToken)}
                                         className="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-white dark:hover:bg-zinc-800 rounded-lg transition-colors"
