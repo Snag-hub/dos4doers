@@ -48,7 +48,7 @@ export default async function SettingsPage() {
     }
 
     return (
-        <main className="p-4 md:p-8 max-w-4xl mx-auto w-full">
+        <main className="p-4 md:p-8">
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-4xl font-bold tracking-tight text-black dark:text-white">
