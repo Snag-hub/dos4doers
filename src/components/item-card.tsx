@@ -6,6 +6,7 @@ import { toggleFavorite, updateStatus } from '@/app/actions';
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { ReminderScheduler } from '@/components/reminder-scheduler';
+import { EditItemDialog } from '@/components/edit-item-dialog';
 
 type Item = InferSelectModel<typeof items>;
 
@@ -13,6 +14,7 @@ export function ItemCard({ item }: { item: Item }) {
     const [isPending, setIsPending] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showReminderDialog, setShowReminderDialog] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
 
     const handleFavorite = async (e: React.MouseEvent) => {
         e.preventDefault();
@@ -115,6 +117,13 @@ export function ItemCard({ item }: { item: Item }) {
                         </button>
 
                         <button
+                            onClick={() => setShowEditDialog(true)}
+                            className="rounded-full p-1.5 sm:p-2 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors"
+                        >
+                            <PencilIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                        </button>
+
+                        <button
                             onClick={() => setShowReminderDialog(true)}
                             className={`rounded-full p-1.5 sm:p-2 transition-colors ${item.reminderAt ? 'text-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300'}`}
                         >
@@ -157,8 +166,21 @@ export function ItemCard({ item }: { item: Item }) {
             {showReminderDialog && (
                 <ReminderScheduler itemId={item.id} onClose={() => setShowReminderDialog(false)} />
             )}
+
+            {/* Edit Dialog */}
+            {showEditDialog && (
+                <EditItemDialog item={item} onClose={() => setShowEditDialog(false)} />
+            )}
         </>
     );
+}
+
+function PencilIcon({ className }: { className?: string }) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+        </svg>
+    )
 }
 
 function BellIcon({ className }: { className?: string }) {

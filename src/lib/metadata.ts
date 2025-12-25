@@ -13,9 +13,25 @@ export interface Metadata {
 }
 
 export async function getMetadata(url: string): Promise<Metadata> {
+  const timeoutMs = 5000; // 5 second timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
   try {
-    const options = { url, fetch: nodeFetch as any };
+    // Custom fetch wrapper with timeout and user-agent
+    const customFetch = async (input: any) => {
+      return nodeFetch(input, {
+        signal: controller.signal as any,
+        headers: {
+          'User-Agent': 'DayOS-Bot/1.0 (+https://dayos.app)', // Identify ourselves
+        }
+      });
+    };
+
+    const options = { url, fetch: customFetch as any };
+    // ogs doesn't support signal directly in options for all versions, but passing custom fetch wraps it
     const { result } = await ogs(options);
+    clearTimeout(timeoutId);
 
     // Determine type
     let type: Metadata['type'] = 'other';
@@ -28,7 +44,13 @@ export async function getMetadata(url: string): Promise<Metadata> {
     }
 
     // Get favicon (using Google's service as reliable fallback)
-    const domain = new URL(url).hostname;
+    let domain = '';
+    try {
+      domain = new URL(url).hostname;
+    } catch {
+      domain = 'unknown'; // fallback if URL is weirdly malformed but ogs somehow worked
+    }
+
     const favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 
     return {
@@ -37,21 +59,28 @@ export async function getMetadata(url: string): Promise<Metadata> {
       image: result.ogImage?.[0]?.url || result.twitterImage?.[0]?.url,
       siteName: result.ogSiteName || domain,
       favicon,
-      author: result.author, // ogs might not catch all authors, but it's a start
+      author: result.author,
       type,
     };
   } catch (error) {
-    console.error('Error fetching metadata:', error);
-    // Return basic info if scraping fails
+    clearTimeout(timeoutId);
+    console.error(`Metadata fetch failed for ${url}:`, error);
+
+    // SAFE FALLBACK - Never throw
     try {
-      const domain = new URL(url).hostname;
+      const u = new URL(url);
       return {
-        siteName: domain,
-        favicon: `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
+        title: 'Untitled Link',
+        siteName: u.hostname,
+        favicon: `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=128`,
         type: 'other'
       };
     } catch {
-      return { type: 'other' };
+      // If even URL parsing fails, return bare minimum
+      return {
+        title: 'Invalid Link',
+        type: 'other'
+      };
     }
   }
 }

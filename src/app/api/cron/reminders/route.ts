@@ -123,11 +123,16 @@ export async function GET() {
         </div>
       `;
 
-            await sendEmail({
-                to: email,
-                subject: `DayOS: ${userGroup.items.length} Reminder(s)`,
-                html,
-            });
+            try {
+                await sendEmail({
+                    to: email,
+                    subject: `DayOS: ${userGroup.items.length} Reminder(s)`,
+                    html,
+                });
+            } catch (emailError) {
+                console.error(`Failed to send email to ${email}:`, emailError);
+                // Continue execution to try Push, or at least not crash the loop for other users
+            }
 
             // Push Notifications
             try {
