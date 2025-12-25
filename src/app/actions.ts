@@ -232,6 +232,26 @@ export async function updateStatus(itemId: string, status: 'inbox' | 'reading' |
     revalidatePath('/trash');
 }
 
+export async function updateItem(
+    itemId: string,
+    data: { title?: string; reminderAt?: Date | null }
+) {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+
+    await db
+        .update(items)
+        .set({
+            title: data.title,
+            reminderAt: data.reminderAt,
+        })
+        .where(and(eq(items.id, itemId), eq(items.userId, userId)));
+
+    revalidatePath('/inbox');
+    revalidatePath('/favorites');
+    revalidatePath('/archive');
+}
+
 export async function deleteItem(itemId: string) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
@@ -261,7 +281,15 @@ export async function createItem(url: string, title?: string, description?: stri
             .limit(1);
 
         if (existingItem.length > 0) {
-            return { success: true, message: 'Item already exists', item: existingItem[0] };
+            // Idempotency: Move to top (Bump) instead of duplicating
+            const updatedItem = await db
+                .update(items)
+                .set({ createdAt: new Date(), status: 'inbox' }) // Reset to inbox if archived? Optional, but safer to just bump.
+                .where(eq(items.id, existingItem[0].id))
+                .returning();
+
+            revalidatePath('/inbox');
+            return { success: true, message: 'Item already exists. Moved to top.', item: updatedItem[0] };
         }
 
         const metadata = await getMetadata(url);
