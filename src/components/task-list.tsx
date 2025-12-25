@@ -5,8 +5,9 @@ import { InferSelectModel } from 'drizzle-orm';
 import { TaskCard } from './task-card';
 import { CreateTaskDialog } from './create-task-dialog';
 import { CreateProjectDialog } from './create-project-dialog';
+import { ManageProjectsDialog } from './manage-projects-dialog';
 import { useState } from 'react';
-import { PlusIcon, FolderPlus } from 'lucide-react';
+import { PlusIcon, FolderPlus, Settings2 } from 'lucide-react';
 
 type Task = InferSelectModel<typeof tasks> & {
     project?: {
@@ -18,6 +19,7 @@ type Task = InferSelectModel<typeof tasks> & {
 export function TaskList({ initialTasks, projects = [] }: { initialTasks: Task[], projects?: any[] }) {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showProjectDialog, setShowProjectDialog] = useState(false);
+    const [showManageProjectsDialog, setShowManageProjectsDialog] = useState(false);
 
     // Filter into groups
     const pending = initialTasks.filter(t => t.status !== 'done' && t.status !== 'archived');
@@ -34,6 +36,13 @@ export function TaskList({ initialTasks, projects = [] }: { initialTasks: Task[]
                     >
                         <FolderPlus className="h-4 w-4" />
                         <span className="hidden sm:inline">New Project</span>
+                    </button>
+                    <button
+                        onClick={() => setShowManageProjectsDialog(true)}
+                        className="flex items-center gap-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 px-3 py-2 text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                        title="Manage Projects"
+                    >
+                        <Settings2 className="h-4 w-4" />
                     </button>
                     <button
                         onClick={() => setShowCreateDialog(true)}
@@ -79,6 +88,10 @@ export function TaskList({ initialTasks, projects = [] }: { initialTasks: Task[]
 
             {showProjectDialog && (
                 <CreateProjectDialog onClose={() => setShowProjectDialog(false)} />
+            )}
+
+            {showManageProjectsDialog && (
+                <ManageProjectsDialog onClose={() => setShowManageProjectsDialog(false)} projects={projects} />
             )}
         </div>
     );
