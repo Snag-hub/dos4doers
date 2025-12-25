@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Inbox, Star, Archive, Settings, CheckSquare, Calendar, MoreHorizontal, X } from 'lucide-react';
+import { Inbox, Star, Archive, Settings, CheckSquare, Calendar, MoreHorizontal, X, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -11,6 +11,7 @@ const navItems = [
     { href: '/meetings', label: 'Meetings', icon: Calendar },
     { href: '/favorites', label: 'Favorites', icon: Star },
     { href: '/archive', label: 'Archive', icon: Archive },
+    { href: '/trash', label: 'Trash', icon: Trash2 },
     { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
