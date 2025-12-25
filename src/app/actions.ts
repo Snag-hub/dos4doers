@@ -457,3 +457,146 @@ export async function getUserStats() {
         mostViewed,
     };
 }
+
+// Timeline: Get all events for a specific day
+export async function getTimelineEvents(date: Date = new Date()) {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+
+    // Get day bounds
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+
+    const dayEnd = new Date(date);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    // Fetch meetings for the day
+    const { meetings } = await import('@/db/schema');
+    const todayMeetings = await db
+        .select()
+        .from(meetings)
+        .where(
+            and(
+                eq(meetings.userId, userId),
+                sql`${meetings.startTime} >= ${dayStart}`,
+                sql`${meetings.startTime} <= ${dayEnd}`
+            )
+        )
+        .orderBy(meetings.startTime);
+
+    // Fetch tasks with due dates for the day
+    const { tasks } = await import('@/db/schema');
+    const todayTasks = await db
+        .select()
+        .from(tasks)
+        .where(
+            and(
+                eq(tasks.userId, userId),
+                sql`${tasks.dueDate} >= ${dayStart}`,
+                sql`${tasks.dueDate} <= ${dayEnd}`,
+                sql`${tasks.status} != 'done'`
+            )
+        )
+        .orderBy(tasks.dueDate);
+
+    // Fetch items with reminders for the day
+    const todayItems = await db
+        .select()
+        .from(items)
+        .where(
+            and(
+                eq(items.userId, userId),
+                sql`${items.reminderAt} >= ${dayStart}`,
+                sql`${items.reminderAt} <= ${dayEnd}`
+            )
+        )
+        .orderBy(items.reminderAt);
+
+    // Fetch general reminders for the day
+    const todayReminders = await db
+        .select()
+        .from(reminders)
+        .where(
+            and(
+                eq(reminders.userId, userId),
+                sql`${reminders.scheduledAt} >= ${dayStart}`,
+                sql`${reminders.scheduledAt} <= ${dayEnd}`
+            )
+        )
+        .orderBy(reminders.scheduledAt);
+
+    // Transform to timeline events
+    const events: any[] = [];
+
+    // Add meetings
+    for (const meeting of todayMeetings) {
+        events.push({
+            id: meeting.id,
+            type: 'meeting',
+            title: meeting.title,
+            startTime: meeting.startTime,
+            endTime: meeting.endTime,
+            duration: meeting.endTime
+                ? Math.round((meeting.endTime.getTime() - meeting.startTime.getTime()) / (1000 * 60))
+                : 60, // Default 1 hour
+            metadata: {
+                meetingLink: meeting.link,
+                meetingType: meeting.type,
+                interviewStage: meeting.stage,
+            },
+        });
+    }
+
+    // Add tasks
+    for (const task of todayTasks) {
+        events.push({
+            id: task.id,
+            type: 'task',
+            title: task.title,
+            startTime: task.dueDate,
+            duration: 30, // Default 30 min for tasks
+            status: task.status,
+            metadata: {
+                projectId: task.projectId,
+                priority: task.priority,
+                taskType: task.type,
+            },
+        });
+    }
+
+    // Add items
+    for (const item of todayItems) {
+        events.push({
+            id: item.id,
+            type: 'item',
+            title: item.title || 'Untitled',
+            startTime: item.reminderAt!,
+            duration: 15, // Default 15 min for reading
+            url: item.url,
+            favicon: item.favicon,
+            metadata: {
+                itemType: item.type,
+                siteName: item.siteName,
+            },
+        });
+    }
+
+    // Add reminders
+    for (const reminder of todayReminders) {
+        events.push({
+            id: reminder.id,
+            type: 'reminder',
+            title: reminder.title,
+            startTime: reminder.scheduledAt,
+            duration: 5, // Default 5 min for reminders
+            metadata: {
+                recurrence: reminder.recurrence,
+                meetingId: reminder.meetingId,
+                taskId: reminder.taskId,
+                itemId: reminder.itemId,
+            },
+        });
+    }
+
+    return events;
+}
