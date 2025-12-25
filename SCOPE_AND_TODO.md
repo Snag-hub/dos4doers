@@ -2,14 +2,14 @@
 
 ## 🗺 Roadmap
 
-### ✅ Phase 0: Stabilization (Current Focus)
+### ✅ Phase 0: Stabilization (COMPLETE!)
 **Goal:** Make the system boringly reliable.
-- [ ] **Failure Handling**:
-    - [ ] Robust Metadata Fetching (Graceful fallbacks for missing OG tags).
-    - [ ] Notification Failure Logging (Detect silent failures).
+- [x] **Failure Handling**:
+    - [x] Robust Metadata Fetching (Graceful fallbacks for missing OG tags).
+    - [x] Notification Failure Logging (Detect silent failures).
 - [x] **Idempotency**: Prevent duplicate URL saves.
 - [x] **Edit Capability**: Allow editing Titles/Times of saved items.
-- [ ] **Analytics**: Basic internal tracking (Saved Count, Read Count).
+- [x] **Analytics**: Basic internal tracking (Saved Count, Read Count).
 
 ### ⏳ Phase 1: Tasks (Action Layer)
 **Goal:** Move from "Reading" to "Doing".
@@ -39,16 +39,18 @@
 
 ---
 
-## 📝 Immediate Todo (Phase 0)
+## 📝 Immediate Todo (Phase 3 - Notes)
 
-### Hardening
-- [ ] **Fix Metadata Crashes**:
-    - Ensure `fetchMetadata` never throws, returns default "Untitled" + Placeholder Image.
-- [x] **Duplicate Detection**:
-    - Check if URL exists in DB before Insert. If exists -> Update timestamp or warn.
-- [x] **Edit Modal**:
-    - Add "Edit" button to Reminder Cards.
-    - Dialog to change Title and Due Date.
+### Core Features
+- [ ] **Markdown Editor**:
+    - Simple, fast note-taking interface.
+    - Support for basic markdown formatting.
+- [ ] **Note Attachments**:
+    - Attach notes to Tasks, Meetings, and Articles.
+    - Link notes to specific items.
+- [ ] **Search**:
+    - Instant retrieval of notes.
+    - Full-text search across all notes.
 
 ### Polish
 - [x] **Empty States**: "All caught up" screens for empty Inbox/Archives.
