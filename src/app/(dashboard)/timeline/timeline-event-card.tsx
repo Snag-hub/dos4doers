@@ -1,28 +1,33 @@
 'use client';
 
+import { useState } from 'react';
 import { TimelineEvent, formatTime, formatDuration } from '@/lib/timeline-utils';
-import { Clock, Calendar, CheckSquare, BookOpen, Bell, ExternalLink } from 'lucide-react';
+import { Clock, Calendar, CheckSquare, BookOpen, Bell, ExternalLink, Check, X } from 'lucide-react';
+import { updateStatus } from '@/app/actions';
+import { updateTaskStatus } from '@/app/task-actions';
 
 type TimelineEventCardProps = {
     event: TimelineEvent;
 };
 
 export function TimelineEventCard({ event }: TimelineEventCardProps) {
+    const [isPending, setIsPending] = useState(false);
+
     // Get icon based on event type
     const getIcon = () => {
         switch (event.type) {
             case 'meeting':
-                return <Calendar className="w-4 h-4" />;
+                return <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />;
             case 'task':
-                return <CheckSquare className="w-4 h-4" />;
+                return <CheckSquare className="w-3 h-3 sm:w-4 sm:h-4" />;
             case 'item':
-                return <BookOpen className="w-4 h-4" />;
+                return <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />;
             case 'reminder':
-                return <Bell className="w-4 h-4" />;
+                return <Bell className="w-3 h-3 sm:w-4 sm:h-4" />;
             case 'free-time':
-                return <Clock className="w-4 h-4" />;
+                return <Clock className="w-3 h-3 sm:w-4 sm:h-4" />;
             default:
-                return <Clock className="w-4 h-4" />;
+                return <Clock className="w-3 h-3 sm:w-4 sm:h-4" />;
         }
     };
 
@@ -89,40 +94,62 @@ export function TimelineEventCard({ event }: TimelineEventCardProps) {
         }
     };
 
+    // Quick action: Mark task as done
+    const handleMarkDone = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (event.type === 'task') {
+            setIsPending(true);
+            await updateTaskStatus(event.id, 'done');
+            setIsPending(false);
+        }
+    };
+
+    // Quick action: Archive item
+    const handleArchive = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (event.type === 'item') {
+            setIsPending(true);
+            await updateStatus(event.id, 'archived');
+            setIsPending(false);
+        }
+    };
+
     return (
         <div
             onClick={handleClick}
             className={`
-                relative p-3 rounded-lg border transition-all
+                relative p-2 sm:p-3 rounded-lg border transition-all group
                 ${colors.bg} ${colors.border}
                 ${event.type === 'item' && event.url ? 'cursor-pointer hover:shadow-md' : ''}
                 ${event.type === 'free-time' ? 'opacity-60' : ''}
+                ${isPending ? 'opacity-50 pointer-events-none' : ''}
+                min-w-0
             `}
         >
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2 sm:gap-3 min-w-0">
                 {/* Icon */}
-                <div className={`p-1.5 rounded ${colors.iconBg} ${colors.text} flex-shrink-0`}>
+                <div className={`p-1 sm:p-1.5 rounded ${colors.iconBg} ${colors.text} flex-shrink-0`}>
                     {icon}
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start justify-between gap-2 min-w-0">
                         <div className="flex-1 min-w-0">
                             {/* Title */}
-                            <h4 className={`font-medium text-sm ${colors.text} truncate`}>
+                            <h4 className={`font-medium text-xs sm:text-sm ${colors.text} truncate`}>
                                 {event.title}
                             </h4>
 
                             {/* Time and duration */}
-                            <div className="flex items-center gap-2 mt-1">
-                                <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                            <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 sm:mt-1">
+                                <span className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
                                     {timeRange}
                                 </span>
                                 {event.duration && (
                                     <>
                                         <span className="text-zinc-300 dark:text-zinc-700">•</span>
-                                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                                        <span className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
                                             {formatDuration(event.duration)}
                                         </span>
                                     </>
@@ -131,11 +158,11 @@ export function TimelineEventCard({ event }: TimelineEventCardProps) {
 
                             {/* Metadata */}
                             {event.metadata?.siteName && (
-                                <div className="flex items-center gap-1 mt-1">
+                                <div className="flex items-center gap-1 mt-0.5 sm:mt-1">
                                     {event.favicon && (
-                                        <img src={event.favicon} alt="" className="w-3 h-3 rounded" />
+                                        <img src={event.favicon} alt="" className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded" />
                                     )}
-                                    <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                                    <span className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate">
                                         {event.metadata.siteName}
                                     </span>
                                 </div>
@@ -146,14 +173,38 @@ export function TimelineEventCard({ event }: TimelineEventCardProps) {
                                     href={event.metadata.meetingLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 mt-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                                    className="inline-flex items-center gap-1 mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 hover:underline"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     Join meeting
-                                    <ExternalLink className="w-3 h-3" />
+                                    <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                                 </a>
                             )}
                         </div>
+
+                        {/* Quick Actions - Show on hover/touch */}
+                        {event.type !== 'free-time' && (
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                {event.type === 'task' && event.status !== 'done' && (
+                                    <button
+                                        onClick={handleMarkDone}
+                                        className="p-1 sm:p-1.5 rounded bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/60 transition-colors"
+                                        title="Mark as done"
+                                    >
+                                        <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                    </button>
+                                )}
+                                {event.type === 'item' && (
+                                    <button
+                                        onClick={handleArchive}
+                                        className="p-1 sm:p-1.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                        title="Archive"
+                                    >
+                                        <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
