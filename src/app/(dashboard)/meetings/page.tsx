@@ -3,6 +3,7 @@ import { getMeetings } from '@/app/meeting-actions';
 import { MeetingCard } from '@/components/meeting-card';
 import Link from 'next/link';
 import { Calendar } from 'lucide-react';
+import { NewMeetingButton } from '@/components/new-meeting-button';
 
 export default async function MeetingsPage() {
     const user = await currentUser();
@@ -38,10 +39,7 @@ export default async function MeetingsPage() {
                         Manage your schedule and interviews
                     </p>
                 </div>
-                <button disabled className="flex items-center gap-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-400 dark:text-zinc-500 cursor-not-allowed">
-                    <Calendar className="h-4 w-4" />
-                    New Meeting (Coming Soon)
-                </button>
+                <NewMeetingButton />
             </div>
 
             <div className="space-y-8">

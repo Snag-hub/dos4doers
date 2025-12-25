@@ -103,6 +103,27 @@ export async function createProject(name: string, color: string) {
     revalidatePath('/tasks');
 }
 
+export async function updateProject(projectId: string, name: string, color: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+
+    await db.update(projects)
+        .set({ name, color })
+        .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
+
+    revalidatePath('/tasks');
+}
+
+export async function deleteProject(projectId: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+
+    await db.delete(projects)
+        .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
+
+    revalidatePath('/tasks');
+}
+
 export async function getProjects() {
     const { userId } = await auth();
     if (!userId) return [];
