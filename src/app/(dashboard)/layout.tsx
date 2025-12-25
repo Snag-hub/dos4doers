@@ -38,7 +38,7 @@ export default function DashboardLayout({
                 </header>
 
                 {/* Scrollable Content Area */}
-                <main className="flex-1 overflow-y-auto overflow-x-hidden p-0 pb-20 md:pb-0 scroll-smooth">
+                <main className="flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0 scroll-smooth">
                     {children}
                 </main>
             </div>
