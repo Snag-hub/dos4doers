@@ -4,6 +4,8 @@ import { ItemGrid } from '@/components/item-grid';
 import Link from 'next/link';
 
 import { SearchFilterBar } from '@/components/search-filter-bar';
+import { EmptyState } from '@/components/empty-state';
+import { Inbox } from 'lucide-react';
 
 export default async function InboxPage({
   searchParams,
@@ -54,8 +56,13 @@ export default async function InboxPage({
         status="inbox"
         search={search}
         type={type as 'all' | 'article' | 'video'}
-        emptyTitle={search ? `No results for "${search}"` : "No items yet"}
-        emptyDescription={search ? "Try checking your spelling or use different keywords." : "Save some links to get started!"}
+        emptyState={
+          <EmptyState
+            icon={Inbox}
+            title={search ? `No results for "${search}"` : "No items yet"}
+            description={search ? "Try checking your spelling or use different keywords." : "Save some links to get started!"}
+          />
+        }
       />
     </main>
   );

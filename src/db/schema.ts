@@ -32,6 +32,8 @@ export const users = pgTable('user', {
   createdAt: timestamp('createdAt')
     .notNull()
     .defaultNow(),
+  emailNotifications: boolean('emailNotifications').default(true).notNull(),
+  pushNotifications: boolean('pushNotifications').default(true).notNull(),
 });
 
 export const accounts = pgTable(

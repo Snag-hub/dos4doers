@@ -2,7 +2,7 @@
 'use client';
 
 import { generateApiToken } from './actions';
-import { getGeneralReminders, addReminder, deleteReminder, updateReminder } from '@/app/actions';
+import { getGeneralReminders, addReminder, deleteReminder, updateReminder, updatePreferences } from '@/app/actions';
 import { useState, useEffect } from 'react';
 import { ReminderScheduler } from '@/components/reminder-scheduler';
 import { InferSelectModel } from 'drizzle-orm';
@@ -11,10 +11,42 @@ import { reminders } from '@/db/schema';
 
 type Reminder = InferSelectModel<typeof reminders>;
 
-export default function SettingsClient({ apiToken, userId }: { apiToken?: string | null; userId: string }) {
+export default function SettingsClient({
+    apiToken,
+    userId,
+    initialPreferences
+}: {
+    apiToken?: string | null;
+    userId: string;
+    initialPreferences?: { emailNotifications: boolean; pushNotifications: boolean };
+}) {
     // Token State
     const [token, setToken] = useState(apiToken);
     const [loadingToken, setLoadingToken] = useState(false);
+
+    // Preferences State
+    const [emailEnabled, setEmailEnabled] = useState(initialPreferences?.emailNotifications ?? true);
+    const [pushEnabled, setPushEnabled] = useState(initialPreferences?.pushNotifications ?? true);
+
+    const togglePreference = async (type: 'email' | 'push') => {
+        const newEmail = type === 'email' ? !emailEnabled : emailEnabled;
+        const newPush = type === 'push' ? !pushEnabled : pushEnabled;
+
+        setEmailEnabled(newEmail);
+        setPushEnabled(newPush);
+
+        try {
+            await updatePreferences({
+                emailNotifications: newEmail,
+                pushNotifications: newPush,
+            });
+        } catch (error) {
+            console.error('Failed to update preferences', error);
+            // Revert on error
+            setEmailEnabled(emailEnabled);
+            setPushEnabled(pushEnabled);
+        }
+    };
     const [copied, setCopied] = useState(false);
     const [showToken, setShowToken] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -126,6 +158,46 @@ export default function SettingsClient({ apiToken, userId }: { apiToken?: string
     return (
         <div className="space-y-8 max-w-4xl mx-auto pb-20">
 
+
+            {/* Preferences Section */}
+            <section className="relative overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-sm">
+                <div className="p-6 sm:p-8">
+                    <h2 className="text-xl font-semibold text-zinc-900 dark:text-white flex items-center gap-2 mb-6">
+                        <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 p-1.5 rounded-lg">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        </span>
+                        Preferences
+                    </h2>
+
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                            <div>
+                                <p className="font-medium text-zinc-900 dark:text-white">Email Notifications</p>
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400">Receive reminders via email</p>
+                            </div>
+                            <button
+                                onClick={() => togglePreference('email')}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${emailEnabled ? 'bg-blue-600' : 'bg-zinc-200 dark:bg-zinc-700'}`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${emailEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </button>
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                            <div>
+                                <p className="font-medium text-zinc-900 dark:text-white">Push Notifications</p>
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400">Receive reminders on this device</p>
+                            </div>
+                            <button
+                                onClick={() => togglePreference('push')}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${pushEnabled ? 'bg-blue-600' : 'bg-zinc-200 dark:bg-zinc-700'}`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${pushEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             {/* API Token Section - Glass Card */}
             <section className="relative overflow-hidden rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-sm">

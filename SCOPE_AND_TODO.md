@@ -21,9 +21,9 @@
 ### ⏳ Phase 2: Meetings (Commitment Layer)
 **Goal:** granular time-blocking methods.
 - [x] **Meeting Entity**: Title, Start/End Time, Link.
-- [ ] **Prep Reminders**: 
-    - [ ] Defaults: 1d, 1h, 30m, 10m, 5m, 2m before (Auto-created).
-    - [ ] Custom: Ability to add specific time-based reminders.
+- [x] **Prep Reminders**: 
+    - [x] Defaults: 1d, 1h, 30m, 10m, 5m, 2m before (Auto-created).
+    - [x] Custom: Ability to add specific time-based reminders.
 - [x] **Interview Mode**: Track stages (Screening, Tech, Offer).
 
 ### ⏳ Phase 3: Notes (Knowledge Layer)
@@ -51,5 +51,5 @@
     - Dialog to change Title and Due Date.
 
 ### Polish
-- [ ] **Empty States**: "All caught up" screens for empty Inbox/Archives.
+- [x] **Empty States**: "All caught up" screens for empty Inbox/Archives.
 - [ ] **Settings**: Add toggle for "Email vs Push" preference (Granular control).

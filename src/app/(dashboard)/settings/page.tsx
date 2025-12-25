@@ -14,11 +14,16 @@ export default async function SettingsPage() {
     }
 
     let apiToken: string | null = null;
+    let preferences = { emailNotifications: true, pushNotifications: true };
 
     try {
         // Try to find user in our database
         const result = await db
-            .select({ apiToken: users.apiToken })
+            .select({
+                apiToken: users.apiToken,
+                emailNotifications: users.emailNotifications,
+                pushNotifications: users.pushNotifications,
+            })
             .from(users)
             .where(eq(users.id, clerkUser.id))
             .limit(1);
@@ -33,6 +38,10 @@ export default async function SettingsPage() {
             });
         } else {
             apiToken = result[0]?.apiToken || null;
+            preferences = {
+                emailNotifications: result[0].emailNotifications,
+                pushNotifications: result[0].pushNotifications,
+            };
         }
     } catch (error) {
         console.error('Error fetching/creating user:', error);
@@ -51,7 +60,11 @@ export default async function SettingsPage() {
             </div>
 
             {/* Settings Content */}
-            <SettingsClient apiToken={apiToken} userId={clerkUser.id} />
+            <SettingsClient
+                apiToken={apiToken}
+                userId={clerkUser.id}
+                initialPreferences={preferences}
+            />
         </main>
     );
 }

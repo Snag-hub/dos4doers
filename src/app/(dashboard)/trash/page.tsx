@@ -1,6 +1,8 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { fetchItems } from '@/app/actions';
 import { ItemGrid } from '@/components/item-grid';
+import { EmptyState } from '@/components/empty-state';
+import { Trash } from 'lucide-react';
 
 export default async function TrashPage() {
     const user = await currentUser();
@@ -26,8 +28,13 @@ export default async function TrashPage() {
                 initialItems={initialItems}
                 initialHasMore={hasMore}
                 status="trash"
-                emptyTitle="Trash is empty"
-                emptyDescription="Items you delete will end up here."
+                emptyState={
+                    <EmptyState
+                        icon={Trash}
+                        title="Trash is empty"
+                        description="Items you delete will end up here."
+                    />
+                }
             />
         </main>
     );

@@ -1,6 +1,8 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { fetchItems } from '@/app/actions';
 import { ItemGrid } from '@/components/item-grid';
+import { EmptyState } from '@/components/empty-state';
+import { Star } from 'lucide-react';
 
 import { SearchFilterBar } from '@/components/search-filter-bar';
 
@@ -39,8 +41,13 @@ export default async function FavoritesPage({
                 isFavorite={true}
                 search={search}
                 type={type as 'all' | 'article' | 'video'}
-                emptyTitle={search ? `No results for "${search}"` : "No favorites yet"}
-                emptyDescription={search ? "Try checking your spelling or use different keywords." : "Click the star icon on items to add them here."}
+                emptyState={
+                    <EmptyState
+                        icon={Star}
+                        title={search ? `No results for "${search}"` : "No favorites yet"}
+                        description={search ? "Try checking your spelling or use different keywords." : "Click the star icon on items to add them here."}
+                    />
+                }
             />
         </main>
     );

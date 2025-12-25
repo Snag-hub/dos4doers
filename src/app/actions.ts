@@ -2,7 +2,7 @@
 
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
-import { items, reminders, pushSubscriptions } from '@/db/schema';
+import { items, reminders, pushSubscriptions, users } from '@/db/schema';
 
 import { eq, and, desc, sql, ilike, or } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
@@ -360,4 +360,29 @@ export async function sendTestNotification(subscription: string) {
         console.error('Test Notification Failed:', error);
         throw new Error('Failed to send test notification');
     }
+}
+
+export async function getPreferences() {
+    const { userId } = await auth();
+    if (!userId) return null;
+
+    return await db.query.users.findFirst({
+        where: eq(users.id, userId),
+        columns: {
+            emailNotifications: true,
+            pushNotifications: true,
+        },
+    });
+}
+
+export async function updatePreferences(data: { emailNotifications: boolean; pushNotifications: boolean }) {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+
+    await db
+        .update(users)
+        .set(data)
+        .where(eq(users.id, userId));
+
+    revalidatePath('/settings');
 }

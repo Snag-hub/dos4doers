@@ -16,9 +16,7 @@ interface ItemGridProps {
     initialHasMore?: boolean;
     status?: 'inbox' | 'reading' | 'archived' | 'trash';
     isFavorite?: boolean;
-    emptyTitle?: string;
-    emptyDescription?: string;
-    emptyIcon?: LucideIcon;
+    emptyState?: React.ReactNode;
     search?: string;
     type?: 'all' | 'article' | 'video';
 }
@@ -28,9 +26,7 @@ export function ItemGrid({
     initialHasMore = false,
     status,
     isFavorite,
-    emptyTitle = 'No items found',
-    emptyDescription = 'Try adjusting your filters or add some new items.',
-    emptyIcon = Inbox,
+    emptyState,
     search,
     type,
 }: ItemGridProps) {
@@ -87,13 +83,7 @@ export function ItemGrid({
     };
 
     if (items.length === 0) {
-        return (
-            <EmptyState
-                icon={emptyIcon}
-                title={emptyTitle}
-                description={emptyDescription}
-            />
-        );
+        return <>{emptyState}</>;
     }
 
     return (

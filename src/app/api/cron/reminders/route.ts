@@ -31,7 +31,9 @@ export async function GET() {
                 type: sql<string>`'item'`,
                 recurrence: sql<string>`'none'`,
                 favicon: items.favicon,
-                siteName: items.siteName
+                siteName: items.siteName,
+                emailNotifications: users.emailNotifications,
+                pushNotifications: users.pushNotifications
             })
             .from(items)
             .innerJoin(users, eq(items.userId, users.id))
@@ -54,7 +56,9 @@ export async function GET() {
                 recurrence: reminders.recurrence,
                 meetingId: reminders.meetingId,
                 meetingTitle: meetings.title,
-                taskId: reminders.taskId
+                taskId: reminders.taskId,
+                emailNotifications: users.emailNotifications,
+                pushNotifications: users.pushNotifications
             })
             .from(reminders)
             .innerJoin(users, eq(reminders.userId, users.id))
@@ -92,7 +96,13 @@ export async function GET() {
         console.log(`🔔 Found ${allDue.length} due reminders.`);
 
         // 3. Group by User
-        const groupedByUser: Record<string, { name: string | null; email: string; items: typeof allDue }> = {};
+        const groupedByUser: Record<string, {
+            name: string | null;
+            email: string;
+            items: typeof allDue;
+            emailNotifications: boolean;
+            pushNotifications: boolean
+        }> = {};
 
         for (const item of allDue) {
             if (!groupedByUser[item.email]) {
@@ -100,6 +110,8 @@ export async function GET() {
                     name: item.name,
                     email: item.email,
                     items: [],
+                    emailNotifications: item.emailNotifications ?? true,
+                    pushNotifications: item.pushNotifications ?? true,
                 };
             }
             groupedByUser[item.email].items.push(item);
@@ -144,51 +156,59 @@ export async function GET() {
         </div>
       `;
 
-            try {
-                await sendEmail({
-                    to: email,
-                    subject: `DayOS: ${userGroup.items.length} Reminder(s)`,
-                    html,
-                });
-            } catch (emailError) {
-                console.error(`Failed to send email to ${email}:`, emailError);
-                // Continue execution to try Push, or at least not crash the loop for other users
+            if (userGroup.emailNotifications) {
+                try {
+                    await sendEmail({
+                        to: email,
+                        subject: `DayOS: ${userGroup.items.length} Reminder(s)`,
+                        html,
+                    });
+                } catch (emailError) {
+                    console.error(`Failed to send email to ${email}:`, emailError);
+                }
+            } else {
+                console.log(`Skipping email for ${email} (User Preference)`);
             }
 
             // Push Notifications
-            try {
-                const userId = userGroup.items[0].userId;
-                const subs = await db
-                    .select()
-                    .from(pushSubscriptions)
-                    .where(eq(pushSubscriptions.userId, userId));
+            // Push Notifications
+            if (userGroup.pushNotifications) {
+                try {
+                    const userId = userGroup.items[0].userId;
+                    const subs = await db
+                        .select()
+                        .from(pushSubscriptions)
+                        .where(eq(pushSubscriptions.userId, userId));
 
-                console.log(`Checking push for user ${userId}: Found ${subs.length} subscriptions`);
+                    console.log(`Checking push for user ${userId}: Found ${subs.length} subscriptions`);
 
-                if (subs.length > 0) {
-                    const payload = JSON.stringify({
-                        title: `DayOS: ${userGroup.items.length} Reminder(s)`,
-                        body: userGroup.items.map(i => i.title).join(', '),
-                        url: userGroup.items[0].type === 'item' ? '/inbox' : userGroup.items[0].url,
-                    });
+                    if (subs.length > 0) {
+                        const payload = JSON.stringify({
+                            title: `DayOS: ${userGroup.items.length} Reminder(s)`,
+                            body: userGroup.items.map(i => i.title).join(', '),
+                            url: userGroup.items[0].type === 'item' ? '/inbox' : userGroup.items[0].url,
+                        });
 
-                    const pushResults = await Promise.allSettled(subs.map(sub =>
-                        webpush.sendNotification({
-                            endpoint: sub.endpoint,
-                            keys: { p256dh: sub.p256dh, auth: sub.auth }
-                        }, payload)
-                    ));
+                        const pushResults = await Promise.allSettled(subs.map(sub =>
+                            webpush.sendNotification({
+                                endpoint: sub.endpoint,
+                                keys: { p256dh: sub.p256dh, auth: sub.auth }
+                            }, payload)
+                        ));
 
-                    pushResults.forEach((res, idx) => {
-                        if (res.status === 'rejected') {
-                            console.error(`Push sub ${idx} failed:`, res.reason);
-                        } else {
-                            console.log(`Push sub ${idx} success`);
-                        }
-                    });
+                        pushResults.forEach((res, idx) => {
+                            if (res.status === 'rejected') {
+                                console.error(`Push sub ${idx} failed:`, res.reason);
+                            } else {
+                                console.log(`Push sub ${idx} success`);
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Push Logic Error:', error);
                 }
-            } catch (error) {
-                console.error('Push Logic Error:', error);
+            } else {
+                console.log(`Skipping push for ${email} (User Preference)`);
             }
 
             // Cleanup & Reschedule

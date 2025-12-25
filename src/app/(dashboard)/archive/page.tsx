@@ -1,6 +1,7 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { fetchItems } from '@/app/actions';
 import { ItemGrid } from '@/components/item-grid';
+import { EmptyState } from '@/components/empty-state';
 import { Archive } from 'lucide-react';
 
 import { SearchFilterBar } from '@/components/search-filter-bar';
@@ -40,9 +41,13 @@ export default async function ArchivePage({
                 status="archived"
                 search={search}
                 type={type as 'all' | 'article' | 'video'}
-                emptyTitle={search ? `No results for "${search}"` : "Archive is empty"}
-                emptyDescription={search ? "Try checking your spelling or use different keywords." : "Items you archive will appear here."}
-                emptyIcon={Archive}
+                emptyState={
+                    <EmptyState
+                        icon={Archive}
+                        title={search ? `No results for "${search}"` : "Archive is empty"}
+                        description={search ? "Try checking your spelling or use different keywords." : "Items you archive will appear here."}
+                    />
+                }
             />
         </main>
     );
