@@ -2,7 +2,7 @@
 
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
-import { items, reminders, pushSubscriptions, users, notes } from '@/db/schema';
+import { items, reminders, pushSubscriptions, users, notes, tags, itemsToTags } from '@/db/schema';
 
 import { eq, and, desc, sql, ilike, or, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
@@ -74,31 +74,40 @@ export async function fetchItems({
     const slicedItems = hasMore ? userItems.slice(0, limit) : userItems;
 
     const itemIds = slicedItems.map(i => i.id);
-    const itemNotes = itemIds.length > 0
-        ? await db.select().from(notes).where(inArray(notes.itemId, itemIds))
-        : [];
 
-    const { itemsToTags, tags: tagsTable } = await import('@/db/schema');
-    const itemTagsFlat = itemIds.length > 0
-        ? await db.select({
-            itemId: itemsToTags.itemId,
-            tag: tagsTable
-        })
-            .from(itemsToTags)
-            .innerJoin(tagsTable, eq(itemsToTags.tagId, tagsTable.id))
-            .where(inArray(itemsToTags.itemId, itemIds))
-        : [];
+    try {
+        const itemNotes = itemIds.length > 0
+            ? await db.select().from(notes).where(inArray(notes.itemId, itemIds))
+            : [];
 
-    const itemsWithNotes = slicedItems.map(item => ({
-        ...item,
-        notes: itemNotes.filter(n => n.itemId === item.id),
-        tags: itemTagsFlat.filter(it => it.itemId === item.id).map(it => it.tag)
-    }));
+        const itemTagsFlat = itemIds.length > 0
+            ? await db.select({
+                itemId: itemsToTags.itemId,
+                tag: tags
+            })
+                .from(itemsToTags)
+                .innerJoin(tags, eq(itemsToTags.tagId, tags.id))
+                .where(inArray(itemsToTags.itemId, itemIds))
+            : [];
 
-    return {
-        items: itemsWithNotes,
-        hasMore,
-    };
+        const itemsWithNotes = slicedItems.map(item => ({
+            ...item,
+            notes: itemNotes.filter(n => n.itemId === item.id),
+            tags: itemTagsFlat.filter(it => it.itemId === item.id).map(it => it.tag)
+        }));
+
+        return {
+            items: itemsWithNotes,
+            hasMore,
+        };
+    } catch (error) {
+        console.error('Error in fetchItems post-processing:', error);
+        // Return sliced items even if tags/notes fail to prevent total 500
+        return {
+            items: slicedItems.map(item => ({ ...item, notes: [], tags: [] })),
+            hasMore,
+        };
+    }
 }
 
 export async function addReminder(
