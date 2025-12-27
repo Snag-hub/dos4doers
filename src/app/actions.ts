@@ -77,13 +77,21 @@ export async function fetchItems({
 
     try {
         const itemNotes = itemIds.length > 0
-            ? await db.select().from(notes).where(inArray(notes.itemId, itemIds))
+            ? await db.select({
+                id: notes.id,
+                title: notes.title,
+                content: notes.content,
+                itemId: notes.itemId,
+                createdAt: notes.createdAt
+            }).from(notes).where(inArray(notes.itemId, itemIds))
             : [];
 
         const itemTagsFlat = itemIds.length > 0
             ? await db.select({
                 itemId: itemsToTags.itemId,
-                tag: tags
+                tagId: tags.id,
+                tagName: tags.name,
+                tagColor: tags.color
             })
                 .from(itemsToTags)
                 .innerJoin(tags, eq(itemsToTags.tagId, tags.id))
@@ -92,17 +100,23 @@ export async function fetchItems({
 
         const itemsWithNotes = slicedItems.map(item => ({
             ...item,
-            notes: itemNotes.filter(n => n.itemId === item.id),
-            tags: itemTagsFlat.filter(it => it.itemId === item.id).map(it => it.tag)
+            // Ensure date objects are serializable if needed, but Next.js handle Dates. 
+            // However, let's be safe and return clean objects.
+            notes: itemNotes
+                .filter(n => n.itemId === item.id)
+                .map(n => ({ id: n.id, title: n.title, content: n.content, createdAt: n.createdAt })),
+            tags: itemTagsFlat
+                .filter(it => it.itemId === item.id)
+                .map(it => ({ id: it.tagId, name: it.tagName, color: it.tagColor }))
         }));
 
         return {
             items: itemsWithNotes,
             hasMore,
         };
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error in fetchItems post-processing:', error);
-        // Return sliced items even if tags/notes fail to prevent total 500
+        // Fallback: return items without tags/notes to prevent 500
         return {
             items: slicedItems.map(item => ({ ...item, notes: [], tags: [] })),
             hasMore,
