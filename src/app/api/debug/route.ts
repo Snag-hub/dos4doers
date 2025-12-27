@@ -31,7 +31,18 @@ export async function GET() {
             debugInfo.dbCheck = `Error: ${dbError.message || 'Unknown DB error'}`;
         }
 
-        return NextResponse.json(debugInfo);
+        const { fetchItems } = await import('@/app/actions');
+        try {
+            const result = await fetchItems({ page: 1, limit: 5 });
+            return NextResponse.json({ ...debugInfo, fetchItems: 'Success', sampleCount: result.items.length });
+        } catch (fetchError: any) {
+            return NextResponse.json({
+                ...debugInfo,
+                fetchItems: 'Error',
+                errorMessage: fetchError.message,
+                errorStack: fetchError.stack
+            });
+        }
     } catch (error: any) {
         return NextResponse.json({
             error: error.message || 'Unknown error',
