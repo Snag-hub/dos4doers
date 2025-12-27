@@ -4,7 +4,6 @@ import { ItemGrid } from '@/components/item-grid';
 import { EmptyState } from '@/components/empty-state';
 import { Archive } from 'lucide-react';
 
-import { SearchFilterBar } from '@/components/search-filter-bar';
 
 export default async function ArchivePage({
     searchParams,
@@ -33,7 +32,6 @@ export default async function ArchivePage({
                 </p>
             </div>
 
-            <SearchFilterBar />
 
             <ItemGrid
                 initialItems={initialItems}

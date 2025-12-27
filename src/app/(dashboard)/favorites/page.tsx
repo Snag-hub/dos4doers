@@ -4,7 +4,6 @@ import { ItemGrid } from '@/components/item-grid';
 import { EmptyState } from '@/components/empty-state';
 import { Star } from 'lucide-react';
 
-import { SearchFilterBar } from '@/components/search-filter-bar';
 
 export default async function FavoritesPage({
     searchParams,
@@ -33,7 +32,6 @@ export default async function FavoritesPage({
                 </p>
             </div>
 
-            <SearchFilterBar />
 
             <ItemGrid
                 initialItems={initialItems}

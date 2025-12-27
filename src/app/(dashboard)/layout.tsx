@@ -35,8 +35,8 @@ export default function DashboardLayout({
                         />
                         <span className="font-bold text-lg text-zinc-900 dark:text-white">DayOS</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <SearchTrigger className="w-40 sm:w-64" />
+                    <div className="flex items-center gap-1">
+                        <SearchTrigger variant="compact" />
                         <UserButton />
                     </div>
                 </header>

@@ -63,3 +63,11 @@ export async function attachTagToNote(noteId: string, tagId: string) {
     await db.insert(notesToTags).values({ noteId, tagId }).onConflictDoNothing();
     revalidatePath('/notes');
 }
+export async function deleteTag(tagId: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+
+    await db.delete(tags).where(and(eq(tags.id, tagId), eq(tags.userId, userId)));
+    revalidatePath('/inbox');
+    revalidatePath('/tags');
+}

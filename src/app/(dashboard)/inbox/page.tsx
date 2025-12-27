@@ -3,7 +3,6 @@ import { fetchItems } from '@/app/actions';
 import { ItemGrid } from '@/components/item-grid';
 import Link from 'next/link';
 
-import { SearchFilterBar } from '@/components/search-filter-bar';
 import { EmptyState } from '@/components/empty-state';
 import { Inbox } from 'lucide-react';
 
@@ -48,7 +47,6 @@ export default async function InboxPage({
         </div>
       </div>
 
-      <SearchFilterBar />
 
       <ItemGrid
         initialItems={initialItems}

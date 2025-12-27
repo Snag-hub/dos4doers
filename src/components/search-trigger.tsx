@@ -2,10 +2,28 @@
 
 import { Search } from 'lucide-react';
 
-export function SearchTrigger({ className = "" }: { className?: string }) {
+export function SearchTrigger({
+    className = "",
+    variant = "default"
+}: {
+    className?: string;
+    variant?: "default" | "compact";
+}) {
     const handleClick = () => {
         window.dispatchEvent(new CustomEvent('open-omnisearch'));
     };
+
+    if (variant === "compact") {
+        return (
+            <button
+                onClick={handleClick}
+                className={`p-2 rounded-xl text-zinc-500 hover:text-blue-600 hover:bg-blue-50 dark:text-zinc-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-all ${className}`}
+                title="Search (⌘K)"
+            >
+                <Search className="h-5 w-5" />
+            </button>
+        );
+    }
 
     return (
         <button

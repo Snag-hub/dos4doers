@@ -28,6 +28,8 @@ export function Omnisearch() {
         setResults(data);
     }, []);
 
+    const [filter, setFilter] = useState<'all' | 'items' | 'tasks' | 'notes'>('all');
+
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -94,17 +96,32 @@ export function Omnisearch() {
                     </button>
                 </div>
 
+                <div className="flex border-b border-zinc-100 dark:border-zinc-800 px-4 gap-4 overflow-x-auto no-scrollbar bg-zinc-50/50 dark:bg-zinc-950/50">
+                    {(['all', 'items', 'tasks', 'notes'] as const).map((f) => (
+                        <button
+                            key={f}
+                            onClick={() => setFilter(f)}
+                            className={`py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all whitespace-nowrap px-1 ${filter === f
+                                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200'
+                                }`}
+                        >
+                            {f}
+                        </button>
+                    ))}
+                </div>
+
                 <div className="flex-1 overflow-y-auto p-2 sm:max-h-[60vh]">
                     {query === '' ? (
                         <div className="py-12 text-center text-zinc-500">
                             <Search className="h-10 w-10 mx-auto mb-3 opacity-20" />
-                            <p className="text-sm">Type to search for items, tasks, meetings, and notes</p>
+                            <p className="text-sm">Type to search for {filter === 'all' ? 'anything' : filter}</p>
                             <p className="text-xs mt-1 text-zinc-400 italic">Shortcut: Cmd+K</p>
                         </div>
                     ) : (
                         <div className="space-y-4 pb-4 px-2">
                             {/* Items Section */}
-                            {results.items.length > 0 && (
+                            {(filter === 'all' || filter === 'items') && results.items.length > 0 && (
                                 <Section title="Items" icon={<Globe className="h-4 w-4" />}>
                                     {results.items.map(item => (
                                         <ResultItem
@@ -119,7 +136,7 @@ export function Omnisearch() {
                             )}
 
                             {/* Tasks Section */}
-                            {results.tasks.length > 0 && (
+                            {(filter === 'all' || filter === 'tasks') && results.tasks.length > 0 && (
                                 <Section title="Tasks" icon={<CheckCircle className="h-4 w-4" />}>
                                     {results.tasks.map(task => (
                                         <ResultItem
@@ -134,7 +151,7 @@ export function Omnisearch() {
                             )}
 
                             {/* Meetings Section */}
-                            {results.meetings.length > 0 && (
+                            {filter === 'all' && results.meetings.length > 0 && (
                                 <Section title="Meetings" icon={<Calendar className="h-4 w-4" />}>
                                     {results.meetings.map(meeting => (
                                         <ResultItem
@@ -149,7 +166,7 @@ export function Omnisearch() {
                             )}
 
                             {/* Notes Section */}
-                            {results.notes.length > 0 && (
+                            {(filter === 'all' || filter === 'notes') && results.notes.length > 0 && (
                                 <Section title="Notes" icon={<FileText className="h-4 w-4" />}>
                                     {results.notes.map(note => (
                                         <ResultItem
@@ -163,11 +180,16 @@ export function Omnisearch() {
                                 </Section>
                             )}
 
-                            {!isPending && results.items.length === 0 && results.tasks.length === 0 && results.meetings.length === 0 && results.notes.length === 0 && (
-                                <div className="py-12 text-center text-zinc-500">
-                                    <p className="text-sm">No results found for "{query}"</p>
-                                </div>
-                            )}
+                            {!isPending && (
+                                (filter === 'all' && results.items.length === 0 && results.tasks.length === 0 && results.meetings.length === 0 && results.notes.length === 0) ||
+                                (filter === 'items' && results.items.length === 0) ||
+                                (filter === 'tasks' && results.tasks.length === 0) ||
+                                (filter === 'notes' && results.notes.length === 0)
+                            ) && (
+                                    <div className="py-12 text-center text-zinc-500">
+                                        <p className="text-sm">No results found for "{query}" in {filter}</p>
+                                    </div>
+                                )}
                         </div>
                     )}
                 </div>

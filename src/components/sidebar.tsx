@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { SignOutButton } from '@/components/clerk-buttons';
-import { Inbox, Star, Archive, Trash2, Settings, X, CheckSquare, Calendar, Clock, FileText } from 'lucide-react';
+import { Inbox, Star, Archive, Trash2, Settings, X, CheckSquare, Calendar, Clock, FileText, Hash } from 'lucide-react';
 import { SearchTrigger } from '@/components/search-trigger';
 
 const navigation = [
@@ -13,6 +13,7 @@ const navigation = [
     { name: 'Tasks', href: '/tasks', icon: CheckSquare },
     { name: 'Meetings', href: '/meetings', icon: Calendar },
     { name: 'Notes', href: '/notes', icon: FileText },
+    { name: 'Tags', href: '/tags', icon: Hash },
     { name: 'Favorites', href: '/favorites', icon: Star },
     { name: 'Archive', href: '/archive', icon: Archive },
     { name: 'Trash', href: '/trash', icon: Trash2 },
