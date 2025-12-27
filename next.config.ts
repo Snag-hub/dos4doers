@@ -9,6 +9,7 @@ const withPWA = require("next-pwa")({
 
 const nextConfig: NextConfig = {
   /* config options here */
+  serverExternalPackages: ["jsdom", "html-encoding-sniffer"],
 };
 
 export default withPWA(nextConfig);

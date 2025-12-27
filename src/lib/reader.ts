@@ -1,6 +1,5 @@
 import { Readability } from '@mozilla/readability';
 import { JSDOM } from 'jsdom';
-import nodeFetch from 'node-fetch';
 
 export interface ExtractedContent {
     content: string;
@@ -10,7 +9,7 @@ export interface ExtractedContent {
 
 export async function extractContent(url: string): Promise<ExtractedContent | null> {
     try {
-        const response = await nodeFetch(url, {
+        const response = await fetch(url, {
             headers: {
                 'User-Agent': 'DayOS-Bot/1.0 (+https://dayos.app)',
             }
