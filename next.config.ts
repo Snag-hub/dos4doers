@@ -56,7 +56,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.new https://clerk.com https://*.clerk.accounts.dev; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://clerk.new https://clerk.com https://*.clerk.accounts.dev; frame-src 'self' https://clerk.new https://clerk.com https://*.clerk.accounts.dev; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.new https://clerk.com https://*.clerk.accounts.dev https://clerk.dayos.snagdev.in https://vercel.live https://*.vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://clerk.new https://clerk.com https://*.clerk.accounts.dev https://clerk.dayos.snagdev.in https://vercel.live https://*.vercel.live; frame-src 'self' https://clerk.new https://clerk.com https://*.clerk.accounts.dev; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
           },
         ],
       },
