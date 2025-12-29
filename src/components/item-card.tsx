@@ -9,10 +9,18 @@ import Link from 'next/link';
 // Actually the existing code uses custom SVG components (PencilIcon, etc) at bottom. 
 // I will import deleteItem and use existing pattern or imported icons. 
 // Let's use deleteItem from actions.
-import { ConfirmDialog } from '@/components/confirm-dialog';
-import { ReminderScheduler } from '@/components/reminder-scheduler';
-import { EditItemDialog } from '@/components/edit-item-dialog';
+import dynamic from 'next/dynamic';
 import { TagBadge } from '@/components/tag-badge';
+
+const ConfirmDialog = dynamic(() => import('@/components/confirm-dialog').then(mod => mod.ConfirmDialog), {
+    ssr: false,
+});
+const ReminderScheduler = dynamic(() => import('@/components/reminder-scheduler').then(mod => mod.ReminderScheduler), {
+    ssr: false,
+});
+const EditItemDialog = dynamic(() => import('@/components/edit-item-dialog').then(mod => mod.EditItemDialog), {
+    ssr: false,
+});
 
 type Item = InferSelectModel<typeof items> & {
     notes?: any[];
@@ -85,8 +93,8 @@ export function ItemCard({
                                 onToggleSelection?.();
                             }}
                             className={`absolute top-2 left-2 z-10 h-5 w-5 rounded border transition-all cursor-pointer flex items-center justify-center ${isSelected
-                                    ? 'bg-blue-600 border-blue-600'
-                                    : 'bg-white/50 border-zinc-300 opacity-0 group-hover:opacity-100 dark:bg-zinc-900/50 dark:border-zinc-700'
+                                ? 'bg-blue-600 border-blue-600'
+                                : 'bg-white/50 border-zinc-300 opacity-0 group-hover:opacity-100 dark:bg-zinc-900/50 dark:border-zinc-700'
                                 }`}
                         >
                             {isSelected && (

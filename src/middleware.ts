@@ -16,6 +16,13 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  const { userId } = await auth();
+
+  // If user is logged in and trying to access landing page, redirect to inbox
+  if (userId && req.nextUrl.pathname === '/') {
+    return Response.redirect(new URL('/inbox', req.url));
+  }
+
   if (isProtectedRoute(req)) {
     await auth.protect();
   }

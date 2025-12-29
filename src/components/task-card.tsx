@@ -3,9 +3,15 @@
 import { tasks } from '@/db/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import { updateTaskStatus, deleteTask } from '@/app/task-actions';
-import { EditTaskDialog } from '@/components/edit-task-dialog';
+import dynamic from 'next/dynamic';
+
+const EditTaskDialog = dynamic(() => import('@/components/edit-task-dialog').then(mod => mod.EditTaskDialog), {
+    ssr: false,
+});
+const ConfirmDialog = dynamic(() => import('@/components/confirm-dialog').then(mod => mod.ConfirmDialog), {
+    ssr: false,
+});
 import { useState } from 'react';
-import { ConfirmDialog } from '@/components/confirm-dialog';
 import { FileText } from 'lucide-react';
 import Link from 'next/link';
 

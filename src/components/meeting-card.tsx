@@ -4,7 +4,11 @@ import { meetings } from '@/db/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import { deleteMeeting } from '@/app/meeting-actions';
 import { useState } from 'react';
-import { ConfirmDialog } from '@/components/confirm-dialog';
+import dynamic from 'next/dynamic';
+
+const ConfirmDialog = dynamic(() => import('@/components/confirm-dialog').then(mod => mod.ConfirmDialog), {
+    ssr: false,
+});
 import { TrashIcon, VideoIcon, FileText } from 'lucide-react';
 import Link from 'next/link';
 

@@ -4,35 +4,69 @@ import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
 import { tasks, projects, notes } from '@/db/schema';
 import { eq, and, desc, inArray } from 'drizzle-orm';
-import { revalidatePath } from 'next/cache';
+import { unstable_cache, revalidateTag, revalidatePath } from 'next/cache';
 import { v4 as uuidv4 } from 'uuid';
 import { taskSchema } from '@/lib/validations';
+import { rateLimit } from '@/lib/rate-limit';
+
+// --- Cached Functions ---
+
+const getCachedTasks = unstable_cache(
+    async (userId: string) => {
+        const result = await db
+            .select({
+                task: tasks,
+                project: projects
+            })
+            .from(tasks)
+            .leftJoin(projects, eq(tasks.projectId, projects.id))
+            .where(eq(tasks.userId, userId))
+            .orderBy(desc(tasks.createdAt));
+
+        const taskIds = result.map(({ task }) => task.id);
+        const taskNotes = taskIds.length > 0
+            ? await db.select().from(notes).where(inArray(notes.taskId, taskIds))
+            : [];
+
+        return result.map(({ task, project }) => ({
+            ...task,
+            project: project || null,
+            notes: taskNotes.filter(n => n.taskId === task.id)
+        }));
+    },
+    ['user-tasks'],
+    { revalidate: 3600, tags: ['tasks'] }
+);
+
+const getCachedTask = unstable_cache(
+    async (userId: string, taskId: string) => {
+        const result = await db
+            .select({
+                task: tasks,
+                project: projects
+            })
+            .from(tasks)
+            .leftJoin(projects, eq(tasks.projectId, projects.id))
+            .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)))
+            .limit(1);
+
+        if (!result[0]) return null;
+
+        return {
+            ...result[0].task,
+            project: result[0].project || null
+        };
+    },
+    ['single-task'],
+    { revalidate: 3600, tags: ['tasks'] }
+);
+
+// --- Server Actions ---
 
 export async function getTasks() {
     const { userId } = await auth();
     if (!userId) return [];
-
-    const result = await db
-        .select({
-            task: tasks,
-            project: projects
-        })
-        .from(tasks)
-        .leftJoin(projects, eq(tasks.projectId, projects.id))
-        .where(eq(tasks.userId, userId))
-        .orderBy(desc(tasks.createdAt));
-
-    const taskIds = result.map(({ task }) => task.id);
-    const taskNotes = taskIds.length > 0
-        ? await db.select().from(notes).where(inArray(notes.taskId, taskIds))
-        : [];
-
-    // Flatten structure for easier consumption: { ...task, project: { ...project } }
-    return result.map(({ task, project }) => ({
-        ...task,
-        project: project || null,
-        notes: taskNotes.filter(n => n.taskId === task.id)
-    }));
+    return getCachedTasks(userId);
 }
 
 export async function createTask(data: {
@@ -45,6 +79,9 @@ export async function createTask(data: {
 }) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
+
+    const { success } = await rateLimit(`createTask:${userId}`, 10);
+    if (!success) throw new Error('Too many tasks. Please slow down.');
 
     const validated = taskSchema.parse(data);
 
@@ -60,7 +97,10 @@ export async function createTask(data: {
         priority: validated.priority,
     }).returning();
 
+    revalidateTag('tasks');
+    revalidateTag('timeline');
     revalidatePath('/tasks');
+
     return { success: true, task: newTask[0] };
 }
 
@@ -69,6 +109,9 @@ export async function updateTaskStatus(taskId: string, status: 'pending' | 'in_p
     if (!userId) throw new Error('Unauthorized');
 
     await db.update(tasks).set({ status }).where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
+
+    revalidateTag('tasks');
+    revalidateTag('timeline');
     revalidatePath('/tasks');
 }
 
@@ -77,17 +120,13 @@ export async function deleteTask(taskId: string) {
     if (!userId) throw new Error('Unauthorized');
 
     await db.delete(tasks).where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
+
+    revalidateTag('tasks');
+    revalidateTag('timeline');
     revalidatePath('/tasks');
 }
 
-export async function updateTask(taskId: string, data: {
-    title?: string;
-    description?: string;
-    projectId?: string;
-    dueDate?: Date | null;
-    type?: 'personal' | 'work';
-    priority?: 'low' | 'medium' | 'high';
-}) {
+export async function updateTask(taskId: string, data: any) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
@@ -98,6 +137,8 @@ export async function updateTask(taskId: string, data: {
         updatedAt: new Date()
     }).where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
 
+    revalidateTag('tasks');
+    revalidateTag('timeline');
     revalidatePath('/tasks');
 }
 
@@ -138,28 +179,11 @@ export async function deleteProject(projectId: string) {
 export async function getProjects() {
     const { userId } = await auth();
     if (!userId) return [];
-
     return await db.select().from(projects).where(eq(projects.userId, userId));
 }
 
 export async function getTask(taskId: string) {
     const { userId } = await auth();
     if (!userId) return null;
-
-    const result = await db
-        .select({
-            task: tasks,
-            project: projects
-        })
-        .from(tasks)
-        .leftJoin(projects, eq(tasks.projectId, projects.id))
-        .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)))
-        .limit(1);
-
-    if (!result[0]) return null;
-
-    return {
-        ...result[0].task,
-        project: result[0].project || null
-    };
+    return getCachedTask(userId, taskId);
 }

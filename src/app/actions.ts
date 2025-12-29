@@ -3,14 +3,14 @@
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
 import { items, reminders, pushSubscriptions, users, notes, tags, itemsToTags } from '@/db/schema';
-
 import { eq, and, desc, sql, ilike, or, inArray } from 'drizzle-orm';
-import { revalidatePath } from 'next/cache';
+import { unstable_cache, revalidateTag, revalidatePath } from 'next/cache';
 import { v4 as uuidv4 } from 'uuid';
 import { getMetadata } from '@/lib/metadata';
 import webpush from 'web-push';
 import { createItemSchema, updateItemSchema, addReminderSchema } from '@/lib/validations';
 import { extractContent } from '@/lib/reader';
+import { rateLimit } from '@/lib/rate-limit';
 
 // Configure Web Push (Global scope for actions)
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
@@ -21,107 +21,150 @@ if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
     );
 }
 
-export async function fetchItems({
-    page = 1,
-    limit = 12,
-    status = 'inbox',
-    isFavorite,
-    search,
-    type = 'all',
-}: {
-    page?: number;
-    limit?: number;
-    status?: 'inbox' | 'reading' | 'archived' | 'trash';
-    isFavorite?: boolean;
-    search?: string;
-    type?: 'all' | 'article' | 'video';
-}) {
+// --- Cached Functions ---
+
+const getCachedItems = unstable_cache(
+    async (userId: string, page: number, limit: number, status: string, isFavorite?: boolean, search?: string, type?: string) => {
+        const offset = (page - 1) * limit;
+        const conditions = [eq(items.userId, userId)];
+        if (status) conditions.push(eq(items.status, status as any));
+        if (isFavorite) conditions.push(eq(items.isFavorite, true));
+
+        if (search) {
+            const searchPattern = `%${search}%`;
+            conditions.push(or(ilike(items.title, searchPattern), ilike(items.url, searchPattern), ilike(items.description, searchPattern))!);
+        }
+
+        if (type && type !== 'all') {
+            conditions.push(eq(items.type, type as any));
+        }
+
+        const userItems = await db
+            .select()
+            .from(items)
+            .where(and(...conditions))
+            .orderBy(desc(items.createdAt))
+            .limit(limit + 1)
+            .offset(offset);
+
+        const hasMore = userItems.length > limit;
+        const slicedItems = hasMore ? userItems.slice(0, limit) : userItems;
+        const itemIds = slicedItems.map(i => i.id);
+
+        try {
+            const itemNotes = itemIds.length > 0
+                ? await db.select({
+                    id: notes.id,
+                    title: notes.title,
+                    content: notes.content,
+                    itemId: notes.itemId,
+                    createdAt: notes.createdAt
+                }).from(notes).where(inArray(notes.itemId, itemIds))
+                : [];
+
+            const itemTagsFlat = itemIds.length > 0
+                ? await db.select({
+                    itemId: itemsToTags.itemId,
+                    tagId: tags.id,
+                    tagName: tags.name,
+                    tagColor: tags.color
+                })
+                    .from(itemsToTags)
+                    .innerJoin(tags, eq(itemsToTags.tagId, tags.id))
+                    .where(inArray(itemsToTags.itemId, itemIds))
+                : [];
+
+            const itemsWithNotes = slicedItems.map(item => ({
+                ...item,
+                notes: itemNotes
+                    .filter(n => n.itemId === item.id)
+                    .map(n => ({ id: n.id, title: n.title, content: n.content, createdAt: n.createdAt })),
+                tags: itemTagsFlat
+                    .filter(it => it.itemId === item.id)
+                    .map(it => ({ id: it.tagId, name: it.tagName, color: it.tagColor }))
+            }));
+
+            return { items: itemsWithNotes, hasMore };
+        } catch (error) {
+            console.error('Error in fetchItems post-processing:', error);
+            return { items: slicedItems.map(item => ({ ...item, notes: [], tags: [] })), hasMore };
+        }
+    },
+    ['user-items'],
+    { revalidate: 3600, tags: ['items'] }
+);
+
+const getCachedTimelineEvents = unstable_cache(
+    async (userId: string, dateStr: string) => {
+        const date = new Date(dateStr);
+        const dayStart = new Date(date);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(date);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        const { meetings: meetingTable, tasks: taskTable } = await import('@/db/schema');
+
+        const [todayMeetings, todayTasks, todayItems, todayReminders] = await Promise.all([
+            db.select().from(meetingTable).where(and(eq(meetingTable.userId, userId), sql`${meetingTable.startTime} >= ${dayStart}`, sql`${meetingTable.startTime} <= ${dayEnd}`)).orderBy(meetingTable.startTime),
+            db.select().from(taskTable).where(and(eq(taskTable.userId, userId), sql`${taskTable.dueDate} >= ${dayStart}`, sql`${taskTable.dueDate} <= ${dayEnd}`, sql`${taskTable.status} != 'done'`)).orderBy(taskTable.dueDate),
+            db.select().from(items).where(and(eq(items.userId, userId), sql`${items.reminderAt} >= ${dayStart}`, sql`${items.reminderAt} <= ${dayEnd}`)).orderBy(items.reminderAt),
+            db.select().from(reminders).where(and(eq(reminders.userId, userId), sql`${reminders.scheduledAt} >= ${dayStart}`, sql`${reminders.scheduledAt} <= ${dayEnd}`)).orderBy(reminders.scheduledAt)
+        ]);
+
+        const events: any[] = [];
+        for (const meeting of todayMeetings) events.push({ id: meeting.id, type: 'meeting', title: meeting.title, startTime: meeting.startTime, endTime: meeting.endTime, duration: meeting.endTime ? Math.round((meeting.endTime.getTime() - meeting.startTime.getTime()) / (1000 * 60)) : 60, metadata: { meetingLink: meeting.link, meetingType: meeting.type, interviewStage: meeting.stage } });
+        for (const task of todayTasks) events.push({ id: task.id, type: 'task', title: task.title, startTime: task.dueDate, duration: 30, status: task.status, metadata: { projectId: task.projectId, priority: task.priority, taskType: task.type } });
+        for (const item of todayItems) events.push({ id: item.id, type: 'item', title: item.title || 'Untitled', startTime: item.reminderAt!, duration: 15, url: item.url, favicon: item.favicon, metadata: { itemType: item.type, siteName: item.siteName } });
+        for (const reminder of todayReminders) events.push({ id: reminder.id, type: 'reminder', title: reminder.title, startTime: reminder.scheduledAt, duration: 5, metadata: { recurrence: reminder.recurrence, meetingId: reminder.meetingId, taskId: reminder.taskId, itemId: reminder.itemId } });
+
+        return events;
+    },
+    ['user-timeline'],
+    { revalidate: 3600, tags: ['timeline', 'items', 'tasks', 'meetings'] }
+);
+
+const getCachedUserStats = unstable_cache(
+    async (userId: string) => {
+        const stats = await db
+            .select({
+                totalSaved: sql<number>`count(*)::int`,
+                totalRead: sql<number>`count(*) filter (where ${items.viewCount} > 0)::int`,
+            })
+            .from(items)
+            .where(eq(items.userId, userId));
+
+        const mostViewed = await db
+            .select({
+                id: items.id,
+                title: items.title,
+                url: items.url,
+                viewCount: items.viewCount,
+                favicon: items.favicon,
+            })
+            .from(items)
+            .where(and(eq(items.userId, userId), sql`${items.viewCount} > 0`))
+            .orderBy(desc(items.viewCount))
+            .limit(5);
+
+        return {
+            totalSaved: stats[0]?.totalSaved || 0,
+            totalRead: stats[0]?.totalRead || 0,
+            readPercentage: stats[0]?.totalSaved > 0
+                ? Math.round((stats[0].totalRead / stats[0].totalSaved) * 100)
+                : 0,
+            mostViewed,
+        };
+    },
+    ['user-stats'],
+    { revalidate: 3600, tags: ['stats', 'items'] }
+);
+
+// --- Server Actions ---
+
+export async function fetchItems(params: any) {
     const { userId } = await auth();
     if (!userId) return { items: [], hasMore: false };
-
-    const offset = (page - 1) * limit;
-
-    const conditions = [eq(items.userId, userId)];
-    if (status) conditions.push(eq(items.status, status));
-    if (isFavorite) conditions.push(eq(items.isFavorite, true));
-
-    // Search Filter
-    if (search) {
-        const searchPattern = `%${search}%`;
-        conditions.push(
-            or(
-                ilike(items.title, searchPattern),
-                ilike(items.url, searchPattern),
-                ilike(items.description, searchPattern)
-            )! // Using ! because 'or' logic needs at least one arg, but here we supply 3. Drizzle types might be strict.
-        );
-    }
-
-    // Type Filter
-    if (type && type !== 'all') {
-        conditions.push(eq(items.type, type));
-    }
-
-    const userItems = await db
-        .select()
-        .from(items)
-        .where(and(...conditions))
-        .orderBy(desc(items.createdAt))
-        .limit(limit + 1) // Fetch one extra to check if there are more
-        .offset(offset);
-
-    const hasMore = userItems.length > limit;
-    const slicedItems = hasMore ? userItems.slice(0, limit) : userItems;
-
-    const itemIds = slicedItems.map(i => i.id);
-
-    try {
-        const itemNotes = itemIds.length > 0
-            ? await db.select({
-                id: notes.id,
-                title: notes.title,
-                content: notes.content,
-                itemId: notes.itemId,
-                createdAt: notes.createdAt
-            }).from(notes).where(inArray(notes.itemId, itemIds))
-            : [];
-
-        const itemTagsFlat = itemIds.length > 0
-            ? await db.select({
-                itemId: itemsToTags.itemId,
-                tagId: tags.id,
-                tagName: tags.name,
-                tagColor: tags.color
-            })
-                .from(itemsToTags)
-                .innerJoin(tags, eq(itemsToTags.tagId, tags.id))
-                .where(inArray(itemsToTags.itemId, itemIds))
-            : [];
-
-        const itemsWithNotes = slicedItems.map(item => ({
-            ...item,
-            // Ensure date objects are serializable if needed, but Next.js handle Dates. 
-            // However, let's be safe and return clean objects.
-            notes: itemNotes
-                .filter(n => n.itemId === item.id)
-                .map(n => ({ id: n.id, title: n.title, content: n.content, createdAt: n.createdAt })),
-            tags: itemTagsFlat
-                .filter(it => it.itemId === item.id)
-                .map(it => ({ id: it.tagId, name: it.tagName, color: it.tagColor }))
-        }));
-
-        return {
-            items: itemsWithNotes,
-            hasMore,
-        };
-    } catch (error: any) {
-        console.error('Error in fetchItems post-processing:', error);
-        // Fallback: return items without tags/notes to prevent 500
-        return {
-            items: slicedItems.map(item => ({ ...item, notes: [], tags: [] })),
-            hasMore,
-        };
-    }
+    return getCachedItems(userId, params.page || 1, params.limit || 12, params.status || 'inbox', params.isFavorite, params.search, params.type || 'all');
 }
 
 export async function addReminder(
@@ -134,13 +177,7 @@ export async function addReminder(
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    const validated = addReminderSchema.parse({
-        date,
-        recurrence,
-        itemId,
-        title,
-        taskId
-    });
+    const validated = addReminderSchema.parse({ date, recurrence, itemId, title, taskId });
 
     await db.insert(reminders).values({
         id: uuidv4(),
@@ -152,72 +189,49 @@ export async function addReminder(
         recurrence: validated.recurrence,
     });
 
-    // If it's an item reminder, update the legacy column
     if (itemId) {
-        await db
-            .update(items)
-            .set({ reminderAt: date })
-            .where(and(eq(items.id, itemId), eq(items.userId, userId)));
+        await db.update(items).set({ reminderAt: date }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
+        revalidateTag('items');
         revalidatePath('/inbox');
-    } else {
-        revalidatePath('/settings');
     }
+    revalidateTag('timeline');
+    revalidatePath('/settings');
 }
 
-// ... deleteReminder ...
 export async function deleteReminder(reminderId: string) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    await db
-        .delete(reminders)
-        .where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+    await db.delete(reminders).where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
 
+    revalidateTag('timeline');
+    revalidateTag('items');
     revalidatePath('/inbox');
     revalidatePath('/settings');
 }
 
-// ... snoozeReminder ...
 export async function snoozeReminder(reminderId: string, minutes: number) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    // We can't use db.query.reminders.findFirst because we haven't defined relations in schema strictly enough for query builder in this file context maybe? 
-    // Actually the previous code used db.query.reminders.findFirst but I don't see relations defined in the schema file I read.
-    // Let's stick to standard queries to be safe, or trust the previous code if it worked.
-    // Previous code: const reminder = await db.query.reminders.findFirst(...)
-    // I'll assume db.query works.
-
-    // Logic remains: updated time
     const newTime = new Date(Date.now() + minutes * 60000);
 
-    await db
-        .update(reminders)
-        .set({ scheduledAt: newTime })
-        .where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId))); // Added userId check for safety
+    await db.update(reminders).set({ scheduledAt: newTime }).where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
 
+    revalidateTag('timeline');
+    revalidateTag('items');
     revalidatePath('/inbox');
     revalidatePath('/settings');
 }
 
-export async function updateReminder(
-    reminderId: string,
-    date: Date,
-    recurrence: 'none' | 'daily' | 'weekly' | 'monthly' = 'none',
-    title?: string
-) {
+export async function updateReminder(reminderId: string, date: Date, recurrence: 'none' | 'daily' | 'weekly' | 'monthly' = 'none', title?: string) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    await db
-        .update(reminders)
-        .set({
-            scheduledAt: date,
-            recurrence,
-            title: title || null,
-        })
-        .where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+    await db.update(reminders).set({ scheduledAt: date, recurrence, title: title || null }).where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
 
+    revalidateTag('timeline');
+    revalidateTag('items');
     revalidatePath('/inbox');
     revalidatePath('/settings');
 }
@@ -225,107 +239,70 @@ export async function updateReminder(
 export async function getReminders(itemId: string) {
     const { userId } = await auth();
     if (!userId) return [];
-
-    return await db
-        .select()
-        .from(reminders)
-        .where(and(eq(reminders.itemId, itemId), eq(reminders.userId, userId)))
-        .orderBy(desc(reminders.scheduledAt));
+    return await db.select().from(reminders).where(and(eq(reminders.itemId, itemId), eq(reminders.userId, userId))).orderBy(desc(reminders.scheduledAt));
 }
 
 export async function getGeneralReminders() {
     const { userId } = await auth();
     if (!userId) return [];
-
-    // isnull(reminders.itemId) equivalent
-    return await db
-        .select()
-        .from(reminders)
-        .where(and(eq(reminders.userId, userId), sql`${reminders.itemId} IS NULL`))
-        .orderBy(desc(reminders.scheduledAt));
+    return await db.select().from(reminders).where(and(eq(reminders.userId, userId), sql`${reminders.itemId} IS NULL`)).orderBy(desc(reminders.scheduledAt));
 }
 
 export async function toggleFavorite(itemId: string, isFavorite: boolean) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    await db
-        .update(items)
-        .set({ isFavorite })
-        .where(and(eq(items.id, itemId), eq(items.userId, userId)));
+    await db.update(items).set({ isFavorite }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
 
+    revalidateTag('items');
     revalidatePath('/inbox');
     revalidatePath('/favorites');
-    revalidatePath('/archive');
 }
 
 export async function updateStatus(itemId: string, status: 'inbox' | 'reading' | 'archived' | 'trash') {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    await db
-        .update(items)
-        .set({ status })
-        .where(and(eq(items.id, itemId), eq(items.userId, userId)));
+    await db.update(items).set({ status }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
 
+    revalidateTag('items');
     revalidatePath('/inbox');
-    revalidatePath('/favorites');
     revalidatePath('/archive');
-    revalidatePath('/trash');
+    revalidatePath('/favorites');
 }
 
-export async function updateItem(
-    itemId: string,
-    data: { title?: string; reminderAt?: Date | null }
-) {
+export async function updateItem(itemId: string, data: any) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
     const validated = updateItemSchema.parse(data);
 
-    await db
-        .update(items)
-        .set({
-            title: validated.title,
-            reminderAt: validated.reminderAt,
-            status: validated.status,
-            isFavorite: validated.isFavorite,
-        })
-        .where(and(eq(items.id, itemId), eq(items.userId, userId)));
+    await db.update(items).set({ ...validated }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
 
+    revalidateTag('items');
     revalidatePath('/inbox');
-    revalidatePath('/favorites');
-    revalidatePath('/archive');
 }
 
 export async function deleteItem(itemId: string) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    await db
-        .delete(items)
-        .where(and(eq(items.id, itemId), eq(items.userId, userId)));
+    await db.delete(items).where(and(eq(items.id, itemId), eq(items.userId, userId)));
 
+    revalidateTag('items');
+    revalidateTag('stats');
     revalidatePath('/inbox');
-    revalidatePath('/favorites');
-    revalidatePath('/archive');
     revalidatePath('/trash');
 }
-// ... deleteItem ...
 
 export async function emptyTrash() {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    await db
-        .delete(items)
-        .where(
-            and(
-                eq(items.userId, userId),
-                eq(items.status, 'trash')
-            )
-        );
+    await db.delete(items).where(and(eq(items.userId, userId), eq(items.status, 'trash')));
 
+    revalidateTag('items');
+    revalidateTag('stats');
     revalidatePath('/trash');
 }
 
@@ -333,34 +310,24 @@ export async function createItem(url: string, title?: string, description?: stri
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
+    const { success } = await rateLimit(`createItem:${userId}`, 5);
+    if (!success) throw new Error('Too many requests. Please slow down.');
+
     const validated = createItemSchema.parse({ url, title, description });
 
     try {
-        const existingItem = await db
-            .select()
-            .from(items)
-            .where(and(eq(items.url, validated.url), eq(items.userId, userId)))
-            .limit(1);
+        const existingItem = await db.select().from(items).where(and(eq(items.url, validated.url), eq(items.userId, userId))).limit(1);
 
         if (existingItem.length > 0) {
-            // Idempotency: Move to top (Bump) instead of duplicating
-            const updatedItem = await db
-                .update(items)
-                .set({ createdAt: new Date(), status: 'inbox' })
-                .where(eq(items.id, existingItem[0].id))
-                .returning();
-
+            const updatedItem = await db.update(items).set({ createdAt: new Date(), status: 'inbox' }).where(eq(items.id, existingItem[0].id)).returning();
+            revalidateTag('items');
             revalidatePath('/inbox');
             return { success: true, message: 'Item already exists. Moved to top.', item: updatedItem[0] };
         }
 
         const metadata = await getMetadata(validated.url);
-
-        // Extract content if it's an article
         let extracted = null;
-        if (metadata.type === 'article') {
-            extracted = await extractContent(validated.url);
-        }
+        if (metadata.type === 'article') extracted = await extractContent(validated.url);
 
         const newItem = await db.insert(items).values({
             id: uuidv4(),
@@ -378,6 +345,8 @@ export async function createItem(url: string, title?: string, description?: stri
             textContent: extracted?.textContent,
         }).returning();
 
+        revalidateTag('items');
+        revalidateTag('stats');
         revalidatePath('/inbox');
         return { success: true, item: newItem[0] };
     } catch (error) {
@@ -386,43 +355,21 @@ export async function createItem(url: string, title?: string, description?: stri
     }
 }
 
-
 export async function savePushSubscription(subscription: string) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
-
     const sub = JSON.parse(subscription);
-
-    await db.insert(pushSubscriptions).values({
-        id: uuidv4(),
-        userId,
-        endpoint: sub.endpoint,
-        p256dh: sub.keys.p256dh,
-        auth: sub.keys.auth,
-    }).onConflictDoNothing(); // Prevent duplicate subscriptions
+    await db.insert(pushSubscriptions).values({ id: uuidv4(), userId, endpoint: sub.endpoint, p256dh: sub.keys.p256dh, auth: sub.keys.auth }).onConflictDoNothing();
 }
 
 export async function sendTestNotification(subscription: string) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
-
-    if (!process.env.VAPID_PRIVATE_KEY) {
-        throw new Error('Server Error: VAPID_PRIVATE_KEY is missing in Vercel Environment Variables.');
-    }
-
+    if (!process.env.VAPID_PRIVATE_KEY) throw new Error('VAPID_PRIVATE_KEY missing');
     const sub = JSON.parse(subscription);
-    const payload = JSON.stringify({
-        title: '🔔 Test Notification',
-        body: 'It works! Your device is ready to receive DayOS alerts.',
-        icon: '/icon-192.png',
-        url: '/settings'
-    });
-
+    const payload = JSON.stringify({ title: '🔔 Test Notification', body: 'It works!', icon: '/icon-192.png', url: '/settings' });
     try {
-        await webpush.sendNotification({
-            endpoint: sub.endpoint,
-            keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth }
-        }, payload);
+        await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth } }, payload);
         return { success: true };
     } catch (error) {
         console.error('Test Notification Failed:', error);
@@ -433,235 +380,43 @@ export async function sendTestNotification(subscription: string) {
 export async function getPreferences() {
     const { userId } = await auth();
     if (!userId) return null;
-
-    return await db.query.users.findFirst({
-        where: eq(users.id, userId),
-        columns: {
-            emailNotifications: true,
-            pushNotifications: true,
-        },
-    });
+    return await db.query.users.findFirst({ where: eq(users.id, userId), columns: { emailNotifications: true, pushNotifications: true } });
 }
 
-export async function updatePreferences(data: { emailNotifications: boolean; pushNotifications: boolean }) {
+export async function updatePreferences(data: any) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
-
-    await db
-        .update(users)
-        .set(data)
-        .where(eq(users.id, userId));
-
+    await db.update(users).set(data).where(eq(users.id, userId));
     revalidatePath('/settings');
 }
 
-// Analytics: Track when an item is viewed
 export async function trackItemView(itemId: string) {
     const { userId } = await auth();
-    if (!userId) return; // Silent fail for unauthenticated users
-
+    if (!userId) return;
     try {
-        await db
-            .update(items)
-            .set({
-                viewCount: sql`${items.viewCount} + 1`,
-                lastViewedAt: new Date(),
-            })
-            .where(and(eq(items.id, itemId), eq(items.userId, userId)));
+        await db.update(items).set({ viewCount: sql`${items.viewCount} + 1`, lastViewedAt: new Date() }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
+        revalidateTag('stats');
     } catch (error) {
-        // Silent fail - don't block UI for analytics
         console.error('Failed to track item view:', error);
     }
 }
 
-// Analytics: Get user stats
 export async function getUserStats() {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
-
-    const stats = await db
-        .select({
-            totalSaved: sql<number>`count(*)::int`,
-            totalRead: sql<number>`count(*) filter (where ${items.viewCount} > 0)::int`,
-        })
-        .from(items)
-        .where(eq(items.userId, userId));
-
-    const mostViewed = await db
-        .select({
-            id: items.id,
-            title: items.title,
-            url: items.url,
-            viewCount: items.viewCount,
-            favicon: items.favicon,
-        })
-        .from(items)
-        .where(and(eq(items.userId, userId), sql`${items.viewCount} > 0`))
-        .orderBy(desc(items.viewCount))
-        .limit(5);
-
-    return {
-        totalSaved: stats[0]?.totalSaved || 0,
-        totalRead: stats[0]?.totalRead || 0,
-        readPercentage: stats[0]?.totalSaved > 0
-            ? Math.round((stats[0].totalRead / stats[0].totalSaved) * 100)
-            : 0,
-        mostViewed,
-    };
+    return getCachedUserStats(userId);
 }
 
-// Timeline: Get all events for a specific day
 export async function getTimelineEvents(date: Date = new Date()) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
-
-    // Get day bounds
-    const dayStart = new Date(date);
-    dayStart.setHours(0, 0, 0, 0);
-
-    const dayEnd = new Date(date);
-    dayEnd.setHours(23, 59, 59, 999);
-
-    // Fetch meetings for the day
-    const { meetings } = await import('@/db/schema');
-    const todayMeetings = await db
-        .select()
-        .from(meetings)
-        .where(
-            and(
-                eq(meetings.userId, userId),
-                sql`${meetings.startTime} >= ${dayStart}`,
-                sql`${meetings.startTime} <= ${dayEnd}`
-            )
-        )
-        .orderBy(meetings.startTime);
-
-    // Fetch tasks with due dates for the day
-    const { tasks } = await import('@/db/schema');
-    const todayTasks = await db
-        .select()
-        .from(tasks)
-        .where(
-            and(
-                eq(tasks.userId, userId),
-                sql`${tasks.dueDate} >= ${dayStart}`,
-                sql`${tasks.dueDate} <= ${dayEnd}`,
-                sql`${tasks.status} != 'done'`
-            )
-        )
-        .orderBy(tasks.dueDate);
-
-    // Fetch items with reminders for the day
-    const todayItems = await db
-        .select()
-        .from(items)
-        .where(
-            and(
-                eq(items.userId, userId),
-                sql`${items.reminderAt} >= ${dayStart}`,
-                sql`${items.reminderAt} <= ${dayEnd}`
-            )
-        )
-        .orderBy(items.reminderAt);
-
-    // Fetch general reminders for the day
-    const todayReminders = await db
-        .select()
-        .from(reminders)
-        .where(
-            and(
-                eq(reminders.userId, userId),
-                sql`${reminders.scheduledAt} >= ${dayStart}`,
-                sql`${reminders.scheduledAt} <= ${dayEnd}`
-            )
-        )
-        .orderBy(reminders.scheduledAt);
-
-    // Transform to timeline events
-    const events: any[] = [];
-
-    // Add meetings
-    for (const meeting of todayMeetings) {
-        events.push({
-            id: meeting.id,
-            type: 'meeting',
-            title: meeting.title,
-            startTime: meeting.startTime,
-            endTime: meeting.endTime,
-            duration: meeting.endTime
-                ? Math.round((meeting.endTime.getTime() - meeting.startTime.getTime()) / (1000 * 60))
-                : 60, // Default 1 hour
-            metadata: {
-                meetingLink: meeting.link,
-                meetingType: meeting.type,
-                interviewStage: meeting.stage,
-            },
-        });
-    }
-
-    // Add tasks
-    for (const task of todayTasks) {
-        events.push({
-            id: task.id,
-            type: 'task',
-            title: task.title,
-            startTime: task.dueDate,
-            duration: 30, // Default 30 min for tasks
-            status: task.status,
-            metadata: {
-                projectId: task.projectId,
-                priority: task.priority,
-                taskType: task.type,
-            },
-        });
-    }
-
-    // Add items
-    for (const item of todayItems) {
-        events.push({
-            id: item.id,
-            type: 'item',
-            title: item.title || 'Untitled',
-            startTime: item.reminderAt!,
-            duration: 15, // Default 15 min for reading
-            url: item.url,
-            favicon: item.favicon,
-            metadata: {
-                itemType: item.type,
-                siteName: item.siteName,
-            },
-        });
-    }
-
-    // Add reminders
-    for (const reminder of todayReminders) {
-        events.push({
-            id: reminder.id,
-            type: 'reminder',
-            title: reminder.title,
-            startTime: reminder.scheduledAt,
-            duration: 5, // Default 5 min for reminders
-            metadata: {
-                recurrence: reminder.recurrence,
-                meetingId: reminder.meetingId,
-                taskId: reminder.taskId,
-                itemId: reminder.itemId,
-            },
-        });
-    }
-
-    return events;
+    return getCachedTimelineEvents(userId, date.toISOString());
 }
 
 export async function getItem(itemId: string) {
     const { userId } = await auth();
     if (!userId) return null;
-
-    const result = await db.select()
-        .from(items)
-        .where(and(eq(items.id, itemId), eq(items.userId, userId)))
-        .limit(1);
-
+    const result = await db.select().from(items).where(and(eq(items.id, itemId), eq(items.userId, userId))).limit(1);
     return result[0] || null;
 }
 
@@ -669,94 +424,35 @@ export async function globalSearch(query: string) {
     const { userId } = await auth();
     if (!userId || !query) return { items: [], tasks: [], meetings: [], notes: [] };
 
+    const { success } = await rateLimit(`search:${userId}`, 20);
+    if (!success) throw new Error('Too many searches. Please slow down.');
+
     const searchPattern = `%${query}%`;
+    const searchedItems = await db.select().from(items).where(and(eq(items.userId, userId), or(ilike(items.title, searchPattern), ilike(items.url, searchPattern), ilike(items.description, searchPattern), ilike(items.textContent, searchPattern)))).limit(5);
 
-    const searchedItems = await db
-        .select()
-        .from(items)
-        .where(
-            and(
-                eq(items.userId, userId),
-                or(
-                    ilike(items.title, searchPattern),
-                    ilike(items.url, searchPattern),
-                    ilike(items.description, searchPattern),
-                    ilike(items.textContent, searchPattern)
-                )
-            )
-        )
-        .limit(5);
+    const { tasks: taskTable, meetings: meetingTable } = await import('@/db/schema');
+    const [searchedTasks, searchedMeetings, searchedNotes] = await Promise.all([
+        db.select().from(taskTable).where(and(eq(taskTable.userId, userId), or(ilike(taskTable.title, searchPattern), ilike(taskTable.description, searchPattern)))).limit(5),
+        db.select().from(meetingTable).where(and(eq(meetingTable.userId, userId), or(ilike(meetingTable.title, searchPattern), ilike(meetingTable.description, searchPattern)))).limit(5),
+        db.select().from(notes).where(and(eq(notes.userId, userId), or(ilike(notes.title, searchPattern), ilike(notes.content, searchPattern)))).limit(5)
+    ]);
 
-    const { tasks, meetings } = await import('@/db/schema');
-    const searchedTasks = await db
-        .select()
-        .from(tasks)
-        .where(
-            and(
-                eq(tasks.userId, userId),
-                or(
-                    ilike(tasks.title, searchPattern),
-                    ilike(tasks.description, searchPattern)
-                )
-            )
-        )
-        .limit(5);
-
-    const searchedMeetings = await db
-        .select()
-        .from(meetings)
-        .where(
-            and(
-                eq(meetings.userId, userId),
-                or(
-                    ilike(meetings.title, searchPattern),
-                    ilike(meetings.description, searchPattern)
-                )
-            )
-        )
-        .limit(5);
-
-    const searchedNotes = await db
-        .select()
-        .from(notes)
-        .where(
-            and(
-                eq(notes.userId, userId),
-                or(
-                    ilike(notes.title, searchPattern),
-                    ilike(notes.content, searchPattern)
-                )
-            )
-        )
-        .limit(5);
-
-    return {
-        items: searchedItems,
-        tasks: searchedTasks,
-        meetings: searchedMeetings,
-        notes: searchedNotes,
-    };
+    return { items: searchedItems, tasks: searchedTasks, meetings: searchedMeetings, notes: searchedNotes };
 }
 
 export async function batchUpdateStatus(itemIds: string[], status: 'inbox' | 'reading' | 'archived' | 'trash') {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
-
-    await db.update(items)
-        .set({ status })
-        .where(and(inArray(items.id, itemIds), eq(items.userId, userId)));
-
+    await db.update(items).set({ status }).where(and(inArray(items.id, itemIds), eq(items.userId, userId)));
+    revalidateTag('items');
     revalidatePath('/inbox');
-    revalidatePath('/archive');
-    revalidatePath('/trash');
 }
 
 export async function batchDeleteItems(itemIds: string[]) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
-
-    await db.delete(items)
-        .where(and(inArray(items.id, itemIds), eq(items.userId, userId)));
-
+    await db.delete(items).where(and(inArray(items.id, itemIds), eq(items.userId, userId)));
+    revalidateTag('items');
+    revalidateTag('stats');
     revalidatePath('/trash');
 }

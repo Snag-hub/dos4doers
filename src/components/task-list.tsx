@@ -3,9 +3,17 @@
 import { tasks } from '@/db/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import { TaskCard } from './task-card';
-import { CreateTaskDialog } from './create-task-dialog';
-import { CreateProjectDialog } from './create-project-dialog';
-import { ManageProjectsDialog } from './manage-projects-dialog';
+import dynamic from 'next/dynamic';
+
+const CreateTaskDialog = dynamic(() => import('./create-task-dialog').then(mod => mod.CreateTaskDialog), {
+    ssr: false,
+});
+const CreateProjectDialog = dynamic(() => import('./create-project-dialog').then(mod => mod.CreateProjectDialog), {
+    ssr: false,
+});
+const ManageProjectsDialog = dynamic(() => import('./manage-projects-dialog').then(mod => mod.ManageProjectsDialog), {
+    ssr: false,
+});
 import { useState } from 'react';
 import { PlusIcon, FolderPlus, Settings2, CheckSquare } from 'lucide-react';
 import { EmptyState } from './empty-state';

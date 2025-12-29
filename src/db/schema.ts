@@ -236,3 +236,9 @@ export const notes = pgTable('notes', {
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
+
+export const rateLimits = pgTable('rate_limits', {
+  key: text('key').notNull().primaryKey(),
+  count: integer('count').notNull().default(0),
+  reset: timestamp('reset').notNull(),
+});

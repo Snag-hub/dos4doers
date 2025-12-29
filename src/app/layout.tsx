@@ -36,7 +36,9 @@ export const viewport = {
   userScalable: false, // Optional: prevents zooming on mobile inputs
 };
 
-import { Omnisearch } from "@/components/omnisearch";
+import dynamic from "next/dynamic";
+
+const Omnisearch = dynamic(() => import("@/components/omnisearch").then(mod => mod.Omnisearch));
 
 export default function RootLayout({
   children,

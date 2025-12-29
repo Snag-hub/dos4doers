@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 import { Calendar } from 'lucide-react';
-import { CreateMeetingDialog } from './create-meeting-dialog';
+import dynamic from 'next/dynamic';
+
+const CreateMeetingDialog = dynamic(() => import('./create-meeting-dialog').then(mod => mod.CreateMeetingDialog), {
+    ssr: false,
+});
 
 export function NewMeetingButton() {
     const [showDialog, setShowDialog] = useState(false);

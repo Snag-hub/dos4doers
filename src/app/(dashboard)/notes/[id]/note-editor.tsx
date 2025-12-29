@@ -2,7 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { MarkdownEditor } from '@/components/markdown-editor';
+import dynamic from 'next/dynamic';
+
+const MarkdownEditor = dynamic(() => import('@/components/markdown-editor').then(mod => mod.MarkdownEditor), {
+    ssr: false,
+    loading: () => (
+        <div className="flex-1 flex items-center justify-center bg-zinc-50 dark:bg-zinc-900/50">
+            <div className="flex flex-col items-center gap-3">
+                <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-xs font-medium text-zinc-500">Loading editor...</p>
+            </div>
+        </div>
+    )
+});
 import { createNote, updateNote, deleteNote, getAttachmentTargets } from '@/app/note-actions';
 import { ArrowLeft, Save, Trash2, Link2, X, CheckSquare, Calendar, BookOpen, ChevronRight, Plus } from 'lucide-react';
 import Link from 'next/link';

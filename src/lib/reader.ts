@@ -1,5 +1,6 @@
 import { Readability } from '@mozilla/readability';
 import { DOMParser } from 'linkedom';
+import DOMPurify from 'isomorphic-dompurify';
 
 export interface ExtractedContent {
     content: string;
@@ -29,7 +30,7 @@ export async function extractContent(url: string): Promise<ExtractedContent | nu
         }
 
         return {
-            content: article.content || '', // Sanitized HTML
+            content: DOMPurify.sanitize(article.content || ''),
             textContent: article.textContent || '',
             excerpt: article.excerpt || '',
         };
