@@ -26,7 +26,7 @@ export async function extractContent(url: string): Promise<ExtractedContent | nu
         document.write(html);
 
         // Initialize DOMPurify with the happy-dom window
-        const DOMPurify = createDOMPurify(window as unknown as Window);
+        const DOMPurify = createDOMPurify(window as unknown as any);
 
         const reader = new Readability(document as unknown as Document);
         const article = reader.parse();
