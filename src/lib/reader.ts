@@ -1,5 +1,5 @@
 import { Readability } from '@mozilla/readability';
-import { DOMParser } from 'linkedom';
+import { JSDOM } from 'jsdom';
 import DOMPurify from 'isomorphic-dompurify';
 
 export interface ExtractedContent {
@@ -21,8 +21,8 @@ export async function extractContent(url: string): Promise<ExtractedContent | nu
         }
 
         const html = await response.text();
-        const dom = new DOMParser().parseFromString(html, 'text/html');
-        const reader = new Readability(dom as unknown as Document);
+        const dom = new JSDOM(html, { url });
+        const reader = new Readability(dom.window.document);
         const article = reader.parse();
 
         if (!article) {
