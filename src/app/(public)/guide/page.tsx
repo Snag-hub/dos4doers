@@ -44,6 +44,41 @@ export default function GuidePage() {
                 </div>
 
                 <div className="space-y-40">
+                    {/* section: Chronology */}
+                    <section id="timeline" className="scroll-mt-32">
+                        <div className="flex flex-col md:flex-row gap-16 items-center">
+                            <div className="flex-1 order-2 md:order-1">
+                                <div className="p-8 rounded-[40px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 p-4 opacity-5">
+                                        <Clock className="w-32 h-32" />
+                                    </div>
+                                    <h3 className="text-3xl font-black mb-6 tracking-tight">Mastering the Timeline</h3>
+                                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6 font-medium">
+                                        The Timeline is your single source of truth. It stitches together every action into a seamless historical stream.
+                                    </p>
+                                    <ul className="space-y-4">
+                                        <li className="flex items-start gap-3">
+                                            <div className="mt-1 h-5 w-5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 text-blue-600 dark:text-blue-400 font-bold text-[10px]">1</div>
+                                            <p className="text-sm text-zinc-500 dark:text-zinc-400"><span className="font-bold text-zinc-900 dark:text-white">Chronological Flow:</span> Jump back to any date to see what you were working on.</p>
+                                        </li>
+                                        <li className="flex items-start gap-3">
+                                            <div className="mt-1 h-5 w-5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 text-blue-600 dark:text-blue-400 font-bold text-[10px]">2</div>
+                                            <p className="text-sm text-zinc-500 dark:text-zinc-400"><span className="font-bold text-zinc-900 dark:text-white">Unified Context:</span> Articles, tasks, and meetings are displayed together as they happened.</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="flex-1 order-1 md:order-2">
+                                <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest mb-6">
+                                    Historical Recall
+                                </span>
+                                <h2 className="text-5xl font-black mb-6 tracking-tight">Your digital history, <br />re-visualized.</h2>
+                                <p className="text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
+                                    Ever wondered when exactly you saved that one article or when you finished that major project? The Timeline makes recall effortless.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
                     {/* section: Quick Start */}
                     <section id="quick-start" className="scroll-mt-32">
                         <div className="flex flex-col md:flex-row gap-16">
@@ -121,7 +156,80 @@ export default function GuidePage() {
                         </div>
                     </section>
 
-                    {/* section: Power User */}
+                    {/* section: The Trinity */}
+                    <section id="trinity" className="scroll-mt-32">
+                        <div className="text-center mb-16">
+                            <h2 className="text-5xl font-black mb-6 tracking-tight">The Trinity</h2>
+                            <p className="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
+                                DayOS is your Personal Operating System. It's built on three core pillars that keep your life in sync.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                            <div className="space-y-6">
+                                <div className="h-14 w-14 rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 flex items-center justify-center">
+                                    <ListFilter className="w-8 h-8" />
+                                </div>
+                                <h3 className="text-2xl font-black tracking-tight">Actionable Tasks</h3>
+                                <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                                    Don't just save links, act on them. Create tasks, group them into projects, and track your progress without leaving your research.
+                                </p>
+                            </div>
+                            <div className="space-y-6">
+                                <div className="h-14 w-14 rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center">
+                                    <BookOpen className="w-8 h-8" />
+                                </div>
+                                <h3 className="text-2xl font-black tracking-tight">Digital Notes</h3>
+                                <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                                    Capture thoughts instantly. Notes in DayOS are context-aware—attach them to articles, tasks, or meetings for effortless recall.
+                                </p>
+                            </div>
+                            <div className="space-y-6">
+                                <div className="h-14 w-14 rounded-2xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 flex items-center justify-center">
+                                    <Clock className="w-8 h-8" />
+                                </div>
+                                <h3 className="text-2xl font-black tracking-tight">Smart Meetings</h3>
+                                <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                                    Your schedule, centralized. Manage interviews, calls, and syncs. Attach notes directly to meetings to prepare and follow up.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="timeline" className="scroll-mt-32">
+                        <div className="text-center mb-16">
+                            <h2 className="text-5xl font-black mb-6 tracking-tight">Mastering the Timeline</h2>
+                            <p className="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
+                                The central heartbeat of your digital life. Recall every activity in a unified chronological stream.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                            <div className="space-y-8">
+                                <div className="p-8 rounded-[40px] bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/20">
+                                    <h4 className="text-xl font-black mb-4 flex items-center gap-3">
+                                        <Clock className="w-6 h-6 text-emerald-600" />
+                                        Single Source of Truth
+                                    </h4>
+                                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
+                                        The Timeline unifies articles, tasks, and meetings into one seamless stream. Never ask &quot;When did I do that?&quot; again. Just scroll and recall.
+                                    </p>
+                                </div>
+                                <div className="p-8 rounded-[40px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
+                                    <h4 className="text-xl font-black mb-4">Historical Recall</h4>
+                                    <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
+                                        Jump to any specific date using the calendar picker. Perfect for reviewing meeting notes from last month or finding that one article you read on a random Tuesday.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="relative group p-10 rounded-[60px] border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden aspect-video flex items-center justify-center">
+                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent pointer-events-none" />
+                                <div className="text-center space-y-4">
+                                    <div className="h-12 w-1 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full animate-pulse" />
+                                    <div className="h-12 w-1 w-[90%] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl mx-auto shadow-sm" />
+                                    <div className="h-12 w-1 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full animate-pulse" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <section id="power-user" className="scroll-mt-32 p-12 md:p-20 rounded-[80px] bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 overflow-hidden relative">
                         <div className="absolute top-0 right-0 p-10 opacity-10">
                             <Keyboard className="w-64 h-64" />

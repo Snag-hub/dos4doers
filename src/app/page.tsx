@@ -2,7 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { SignedOut, SignInButton as ClerkSignInButton, SignUpButton } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, BookOpen, CheckCircle, Bell, Zap, Globe, Github, Twitter, Mail, ArrowRight, Shield, Command, Linkedin } from "lucide-react";
+import { Search, BookOpen, CheckCircle, Bell, Zap, Globe, Github, Twitter, Mail, ArrowRight, Shield, Command, Linkedin, Clock } from "lucide-react";
 
 export default async function Home() {
   const user = await currentUser();
@@ -163,78 +163,166 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* The Personal OS Trinity */}
+        <section className="py-24 relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 opacity-20 pointer-events-none">
+            <div className="absolute top-0 left-0 w-96 h-96 bg-blue-400/30 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-400/30 rounded-full blur-[120px]" />
+          </div>
+
+          <div className="mx-auto max-w-7xl px-6">
+            <div className="text-center mb-20">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-widest mb-6">
+                The Personal Operating System
+              </span>
+              <h2 className="text-4xl md:text-6xl font-black text-zinc-900 dark:text-white mb-6 tracking-tight">
+                One unified <span className="text-blue-600">Digital Brain.</span>
+              </h2>
+              <p className="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
+                DayOS is more than just a reader. It&apos;s where your knowledge lives, your tasks grow, and your schedule stays in sync.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Note Pillar */}
+              <div className="relative group p-8 rounded-[40px] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500">
+                <div className="mb-8 h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                  <BookOpen className="h-8 w-8" />
+                </div>
+                <h3 className="text-2xl font-black mb-4 tracking-tight">Digital Notes</h3>
+                <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
+                  Context-aware capture. Attach notes to articles, tasks, or meetings for effortless recall and project deep-dives.
+                </p>
+                <div className="mt-8 flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-10px] group-hover:translate-x-0 transition-all">
+                  Learn more <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Task Pillar */}
+              <div className="relative group p-8 rounded-[40px] border border-zinc-200 bg-zinc-900 text-white dark:border-zinc-800 dark:bg-white dark:text-zinc-900 hover:shadow-2xl transition-all duration-500 scale-105 shadow-xl sm:z-10">
+                <div className="mb-8 h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 text-white dark:bg-zinc-900 dark:text-white flex shadow-lg group-hover:scale-110 group-hover:-rotate-3 transition-transform">
+                  <CheckCircle className="h-8 w-8" />
+                </div>
+                <h3 className="text-2xl font-black mb-4 tracking-tight">Actionable Tasks</h3>
+                <p className="text-zinc-400 dark:text-zinc-500 leading-relaxed font-medium">
+                  Don&apos;t just save links, act on them. Create tasks, group them into projects, and track progress without leaving your research flow.
+                </p>
+                <div className="mt-8 flex items-center gap-2 text-blue-400 dark:text-blue-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-10px] group-hover:translate-x-0 transition-all">
+                  Organize now <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Meeting Pillar */}
+              <div className="relative group p-8 rounded-[40px] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500">
+                <div className="mb-8 h-16 w-16 items-center justify-center rounded-2xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 flex shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                  <Clock className="h-8 w-8" />
+                </div>
+                <h3 className="text-2xl font-black mb-4 tracking-tight">Smart Meetings</h3>
+                <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
+                  Centralized scheduling. Manage interviews, calls, and syncs. Prepare instantly by linking notes directly to your calendar.
+                </p>
+                <div className="mt-8 flex items-center gap-2 text-purple-600 dark:text-purple-400 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-10px] group-hover:translate-x-0 transition-all">
+                  View Calendar <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Features Bento Grid */}
         <section id="features" className="py-24 bg-zinc-50 dark:bg-zinc-950">
           <div className="mx-auto max-w-7xl px-6">
-            <div className="mb-16 text-center">
-              <h2 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-5xl">Everything you need to <br className="hidden sm:block" /> focus and scale.</h2>
-              <p className="mt-4 text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto italic font-medium">Built for knowledge workers who suffer from digital overload.</p>
+            <div className="mb-16">
+              <h2 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-5xl">Engineered for Focus.</h2>
+              <p className="mt-4 text-zinc-600 dark:text-zinc-400 max-w-xl italic font-medium">The small details that make a massive difference in your daily flow.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Feature 1: Reader Mode */}
-              <div className="md:col-span-2 relative group overflow-hidden rounded-3xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {/* Reader Mode (Large) */}
+              <div className="md:col-span-2 md:row-span-2 relative group overflow-hidden rounded-[48px] border border-zinc-200 bg-white p-10 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
                 <div className="flex flex-col h-full justify-between">
                   <div>
-                    <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 shadow-inner group-hover:scale-110 transition-transform">
-                      <BookOpen className="h-6 w-6" />
+                    <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 shadow-inner group-hover:scale-110 transition-transform">
+                      <BookOpen className="h-8 w-8" />
                     </div>
-                    <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Kindle-Style Reader Mode</h3>
-                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-md">
-                      Strip away ads, tracking, and distractions. DayOS extracts the "meat" of any article using Mozilla's Readability engine.
+                    <h3 className="text-3xl font-black text-zinc-900 dark:text-white mb-4">Master Reader Mode</h3>
+                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-lg font-medium">
+                      DayOS extracts the pure content of any article using Mozilla&apos;s Readability engine. No ads. No popups. Just pure signal.
                     </p>
                   </div>
-                  <div className="mt-8 relative h-48 rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-4 drop-shadow-lg scale-90 sm:scale-100 transition-transform group-hover:scale-[1.02]">
-                    <div className="space-y-3">
-                      <div className="h-4 w-3/4 bg-blue-500/20 rounded-full" />
-                      <div className="h-3 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full" />
-                      <div className="h-3 w-[90%] bg-zinc-200 dark:bg-zinc-800 rounded-full" />
-                      <div className="h-3 w-[95%] bg-zinc-200 dark:bg-zinc-800 rounded-full" />
-                      <div className="h-3 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full" />
-                      <div className="h-3 w-2/3 bg-zinc-200 dark:bg-zinc-800 rounded-full" />
+                  <div className="mt-12 relative h-64 rounded-3xl overflow-hidden border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 shadow-2xl scale-100 transition-transform group-hover:scale-[1.05] duration-700">
+                    <div className="space-y-4">
+                      <div className="h-5 w-3/4 bg-blue-500/20 rounded-full" />
+                      <div className="h-3 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full" />
+                      <div className="h-3 w-[95%] bg-zinc-100 dark:bg-zinc-800 rounded-full" />
+                      <div className="h-3 w-[90%] bg-zinc-100 dark:bg-zinc-800 rounded-full" />
+                      <div className="h-3 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full" />
+                      <div className="h-3 w-[85%] bg-zinc-100 dark:bg-zinc-800 rounded-full" />
+                      <div className="h-3 w-[92%] bg-zinc-100 dark:bg-zinc-800 rounded-full" />
+                      <div className="h-3 w-3/4 bg-zinc-100 dark:bg-zinc-800 rounded-full" />
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Feature 2: Smart Notifications */}
-              <div className="relative group overflow-hidden rounded-3xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 shadow-inner group-hover:rotate-12 transition-transform">
-                  <Bell className="h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Nudge, Don't Spam</h3>
-                <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                  Intelligent follow-up loops. Get a clean email digest or web-push nudges when it’s time to read.
-                </p>
-              </div>
-
-              {/* Feature 3: Omnisearch */}
-              <div className="relative group overflow-hidden rounded-3xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 shadow-inner group-hover:scale-90 transition-transform">
-                  <Command className="h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Universal Omnisearch</h3>
-                <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                  Search across articles, tasks, meetings, and notes instantly with `Cmd+K`. Zero latency.
-                </p>
-              </div>
-
-              {/* Feature 4: User Isolation */}
-              <div className="md:col-span-2 relative group overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-white to-zinc-50 p-8 dark:from-zinc-900 dark:to-black dark:border-zinc-800 shadow-sm">
-                <div className="flex flex-col sm:flex-row gap-8 items-center">
+              {/* Power Scheduler */}
+              <div className="md:col-span-2 relative group overflow-hidden rounded-[48px] border border-zinc-200 bg-white p-10 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                <div className="flex items-center gap-8">
                   <div className="flex-1">
-                    <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 shadow-inner">
-                      <Shield className="h-6 w-6" />
+                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 shadow-inner group-hover:rotate-12 transition-transform">
+                      <Bell className="h-8 w-8" />
                     </div>
-                    <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Tested for Teams</h3>
-                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                      Invite your colleagues and friends! DayOS now supports full multi-user isolation. Your data is yours alone, encrypted at rest and protected by Clerk.
+                    <h3 className="text-2xl font-black text-zinc-900 dark:text-white mb-2">Power Scheduler</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 font-medium">
+                      Single-tap presets for &quot;Tonight&quot; or &quot;Tomorrow.&quot; Zero friction scheduling.
                     </p>
                   </div>
-                  <div className="flex-shrink-0 grid grid-cols-2 gap-2">
-                    {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="h-12 w-12 rounded-full border-2 border-white dark:border-zinc-800 bg-zinc-200 dark:bg-zinc-800 overflow-hidden shadow-md">
-                        <Image src={`https://i.pravatar.cc/150?u=${i}`} alt="Avatar" width={48} height={48} />
+                  <div className="hidden sm:flex flex-col gap-2 scale-90">
+                    <div className="px-4 py-2 rounded-xl bg-orange-500 text-white font-bold text-xs uppercase tracking-tighter shadow-lg shadow-orange-500/20">In 3 Hours</div>
+                    <div className="px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-bold text-xs uppercase tracking-tighter">Tonight</div>
+                    <div className="px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-bold text-xs uppercase tracking-tighter">Tomorrow</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Timeline (Medium) */}
+              <div className="md:col-span-2 relative group overflow-hidden rounded-[48px] border border-zinc-200 bg-white p-10 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 shadow-inner group-hover:scale-90 transition-transform">
+                  <Clock className="h-8 w-8" />
+                </div>
+                <h3 className="text-2xl font-black text-zinc-900 dark:text-white mb-2">Infinite Timeline</h3>
+                <p className="text-zinc-500 dark:text-zinc-400 font-medium">
+                  A unified chronological stream of your activity. See exactly when you saved, read, or acted.
+                </p>
+              </div>
+
+              {/* Omnisearch (Medium) */}
+              <div className="md:col-span-2 relative group overflow-hidden rounded-[48px] border border-zinc-200 bg-white p-10 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 shadow-inner group-hover:scale-110 transition-transform">
+                  <Command className="h-8 w-8" />
+                </div>
+                <h3 className="text-2xl font-black text-zinc-900 dark:text-white mb-2">Omnisearch</h3>
+                <p className="text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">
+                  Find anything across articles, tasks, and meetings instantly with `Cmd+K`. Zero latency recall.
+                </p>
+              </div>
+
+              {/* User Isolation (Large) */}
+              <div className="md:col-span-4 relative group overflow-hidden rounded-[48px] border border-zinc-200 bg-gradient-to-br from-zinc-900 to-black p-12 dark:from-white dark:to-zinc-50 dark:border-zinc-200 shadow-2xl">
+                <div className="flex flex-col md:flex-row gap-12 items-center">
+                  <div className="flex-1">
+                    <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-500 dark:bg-emerald-100 dark:text-emerald-600 shadow-inner">
+                      <Shield className="h-8 w-8" />
+                    </div>
+                    <h3 className="text-3xl font-black text-white dark:text-zinc-900 mb-4 tracking-tight">Isolated. Encrypted. Yours.</h3>
+                    <p className="text-zinc-400 dark:text-zinc-500 text-lg leading-relaxed font-medium">
+                      Privacy is a right, not a feature. DayOS uses full multi-user isolation. Your knowledge base is encrypted at rest and accessible only by you. Built for individuals and tested for high-compliance teams.
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 grid grid-cols-4 gap-4 md:rotate-6">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                      <div key={i} className="h-16 w-16 rounded-2xl border-4 border-white/5 dark:border-zinc-200 bg-zinc-800 dark:bg-zinc-200 overflow-hidden shadow-2xl hover:scale-110 transition-transform duration-500">
+                        <Image src={`https://i.pravatar.cc/150?u=${i}`} alt="Avatar" width={64} height={64} className="grayscale hover:grayscale-0 transition-all" />
                       </div>
                     ))}
                   </div>
