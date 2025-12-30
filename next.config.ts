@@ -66,7 +66,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.new https://clerk.com https://*.clerk.accounts.dev https://clerk.dayos.snagdev.in https://vercel.live https://*.vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://clerk.new https://clerk.com https://*.clerk.accounts.dev https://clerk.dayos.snagdev.in https://vercel.live https://*.vercel.live; frame-src 'self' https://clerk.new https://clerk.com https://*.clerk.accounts.dev https://vercel.live https://*.vercel.live; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.new https://clerk.com https://*.clerk.accounts.dev https://clerk.dayos.snagdev.in https://vercel.live https://*.vercel.live https://stats.pusher.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://clerk.new https://clerk.com https://*.clerk.accounts.dev https://clerk.dayos.snagdev.in https://vercel.live https://*.vercel.live wss://ws-us3.pusher.com https://sockjs-us3.pusher.com https://stats.pusher.com; frame-src 'self' https://clerk.new https://clerk.com https://*.clerk.accounts.dev https://vercel.live https://*.vercel.live; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
           },
         ],
       },
