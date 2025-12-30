@@ -71,6 +71,13 @@
       "when": 1766818865716,
       "tag": "0009_add_tags_and_reader_content",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1767106523145,
+      "tag": "0010_brown_luke_cage",
+      "breakpoints": true
     }
   ]
 }

@@ -6,6 +6,7 @@ import {
   pgEnum,
   integer,
   primaryKey,
+  index,
 } from 'drizzle-orm/pg-core';
 import type { AdapterAccount } from 'next-auth/adapters';
 
@@ -117,7 +118,11 @@ export const items = pgTable('items', {
   createdAt: timestamp('createdAt')
     .notNull()
     .defaultNow(),
-});
+}, (t) => [
+  index('items_user_status_created_idx').on(t.userId, t.status, t.createdAt),
+  index('items_user_url_idx').on(t.userId, t.url),
+  index('items_user_view_count_idx').on(t.userId, t.viewCount),
+]);
 
 export const recurrenceEnum = pgEnum('recurrence', ['none', 'daily', 'weekly', 'monthly']);
 
@@ -138,7 +143,9 @@ export const reminders = pgTable('reminders', {
   scheduledAt: timestamp('scheduledAt').notNull(),
   recurrence: recurrenceEnum('recurrence').default('none').notNull(),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
-});
+}, (t) => [
+  index('reminders_user_scheduled_idx').on(t.userId, t.scheduledAt),
+]);
 
 export const projects = pgTable('projects', {
   id: text('id').notNull().primaryKey(),
@@ -160,7 +167,9 @@ export const tasks = pgTable('tasks', {
   priority: taskPriorityEnum('priority').default('medium').notNull(),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-});
+}, (t) => [
+  index('tasks_user_status_due_date_idx').on(t.userId, t.status, t.dueDate),
+]);
 
 export const tags = pgTable('tags', {
   id: text('id').primaryKey(),
@@ -168,7 +177,9 @@ export const tags = pgTable('tags', {
   name: text('name').notNull(),
   color: text('color').default('#3B82F6'), // Default blue
   createdAt: timestamp('createdAt').notNull().defaultNow(),
-});
+}, (t) => [
+  index('tags_user_name_idx').on(t.userId, t.name),
+]);
 
 export const itemsToTags = pgTable('items_to_tags', {
   itemId: text('itemId').notNull().references(() => items.id, { onDelete: 'cascade' }),
