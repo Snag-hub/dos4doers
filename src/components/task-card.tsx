@@ -125,7 +125,7 @@ export function TaskCard({ task }: { task: Task }) {
                             </span>
 
                             {task.dueDate && (
-                                <span className={`flex items-center gap-1 ${new Date(task.dueDate) < new Date() && optimisticStatus !== 'done' ? 'text-red-500' : 'text-zinc-500'}`}>
+                                <span suppressHydrationWarning className={`flex items-center gap-1 ${new Date(task.dueDate).getTime() < new Date().getTime() && optimisticStatus !== 'done' ? 'text-red-500' : 'text-zinc-500'}`}>
                                     <CalendarIcon className="h-3 w-3" />
                                     {new Date(task.dueDate).toLocaleDateString()}
                                 </span>
