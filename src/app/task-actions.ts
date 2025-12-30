@@ -108,7 +108,7 @@ export async function updateTaskStatus(taskId: string, status: 'pending' | 'in_p
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    await db.update(tasks).set({ status }).where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
+    await db.update(tasks).set({ status, updatedAt: new Date() }).where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
 
     revalidateTag('tasks', 'default' as any);
     revalidateTag('timeline', 'default' as any);

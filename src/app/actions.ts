@@ -258,7 +258,7 @@ export async function toggleFavorite(itemId: string, isFavorite: boolean) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    await db.update(items).set({ isFavorite }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
+    await db.update(items).set({ isFavorite, updatedAt: new Date() }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
 
     revalidateTag(`items-${userId}`, 'default' as any);
     revalidatePath('/inbox');
@@ -269,7 +269,7 @@ export async function updateStatus(itemId: string, status: 'inbox' | 'reading' |
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    await db.update(items).set({ status }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
+    await db.update(items).set({ status, updatedAt: new Date() }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
 
     revalidateTag(`items-${userId}`, 'default' as any);
     revalidatePath('/inbox');
@@ -283,7 +283,7 @@ export async function updateItem(itemId: string, data: any) {
 
     const validated = updateItemSchema.parse(data);
 
-    await db.update(items).set({ ...validated }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
+    await db.update(items).set({ ...validated, updatedAt: new Date() }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
 
     revalidateTag(`items-${userId}`, 'default' as any);
     revalidatePath('/inbox');
@@ -449,7 +449,7 @@ export async function globalSearch(query: string) {
 export async function batchUpdateStatus(itemIds: string[], status: 'inbox' | 'reading' | 'archived' | 'trash') {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
-    await db.update(items).set({ status }).where(and(inArray(items.id, itemIds), eq(items.userId, userId)));
+    await db.update(items).set({ status, updatedAt: new Date() }).where(and(inArray(items.id, itemIds), eq(items.userId, userId)));
     revalidateTag(`items-${userId}`, 'default' as any);
     revalidatePath('/inbox');
 }

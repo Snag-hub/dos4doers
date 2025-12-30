@@ -118,6 +118,9 @@ export const items = pgTable('items', {
   createdAt: timestamp('createdAt')
     .notNull()
     .defaultNow(),
+  updatedAt: timestamp('updatedAt')
+    .notNull()
+    .defaultNow(),
 }, (t) => [
   index('items_user_status_created_idx').on(t.userId, t.status, t.createdAt),
   index('items_user_url_idx').on(t.userId, t.url),
@@ -213,6 +216,7 @@ export const meetings = pgTable('meetings', {
   type: meetingTypeEnum('type').default('general').notNull(),
   stage: interviewStageEnum('stage'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
 
 export const pushSubscriptions = pgTable('push_subscriptions', {

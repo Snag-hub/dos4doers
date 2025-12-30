@@ -15,18 +15,12 @@ export async function GET(req: Request) {
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
         // 1. Delete items that have been in 'trash' for more than 30 days
-        // FIXME: 'items' table does not have 'updatedAt' column. 
-        // We cannot safely determine when an item was moved to trash without it.
-        // Disabling this Cleanup logic for items for now to prevent build errors.
-        /*
         const deletedItems = await db.delete(items)
             .where(and(
                 eq(items.status, 'trash'),
                 lt(items.updatedAt, thirtyDaysAgo)
             ))
             .returning({ id: items.id });
-        */
-        const deletedItems: { id: string }[] = [];
 
         // 2. Archive tasks that have been 'done' for more than 30 days
         const archivedTasks = await db.update(tasks)
