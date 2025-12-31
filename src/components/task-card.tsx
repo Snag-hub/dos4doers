@@ -122,7 +122,7 @@ export function TaskCard({ task }: { task: Task }) {
                     drag="x"
                     dragConstraints={{ left: -100, right: 0 }}
                     dragElastic={0.1}
-                    dragDirectionLock
+
                     onDragEnd={onDragEnd}
                     className={`group relative flex flex-col p-4 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md transition-all dark:bg-zinc-900 dark:border-zinc-800 ${isPending ? 'opacity-50 pointer-events-none' : ''} z-10`}
                     style={{ touchAction: 'pan-y' }}

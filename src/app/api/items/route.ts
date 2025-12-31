@@ -7,6 +7,7 @@ import { eq, and, or, ilike, desc } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 import { createItemSchema } from '@/lib/validations';
 import { extractContent } from '@/lib/reader';
+import { rateLimit } from '@/lib/rate-limit';
 
 // CORS headers for browser extension
 const corsHeaders = {
@@ -25,10 +26,12 @@ export async function POST(req: Request) {
   let userId = clerkUserId;
 
   // If no Clerk session, check for API token
+  // Authentication & Token Verification
   if (!userId) {
     const authHeader = req.headers.get('Authorization');
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
+      // Verify token exists and matches a user
       const user = await db.query.users.findFirst({
         where: eq(users.apiToken, token),
       });
@@ -39,7 +42,13 @@ export async function POST(req: Request) {
   }
 
   if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
+    return NextResponse.json({ error: 'Unauthorized: Invalid or missing token' }, { status: 401, headers: corsHeaders });
+  }
+
+  // Rate Limiting (3 requests per minute per user)
+  const { success: rateSuccess } = await rateLimit(`api:createItem:${userId}`, 3);
+  if (!rateSuccess) {
+    return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429, headers: corsHeaders });
   }
 
   const body = await req.json();

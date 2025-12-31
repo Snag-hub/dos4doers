@@ -37,3 +37,7 @@ next-env.d.ts
 
 build.log
 build_check.log
+
+# Playwright
+/playwright-report/
+/test-results/

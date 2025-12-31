@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tokenSection = document.getElementById('tokenSection');
   const mainSection = document.getElementById('mainSection');
   const apiTokenInput = document.getElementById('apiToken');
-  const apiBaseInput = document.getElementById('apiBase');
+  // const apiBaseInput = document.getElementById('apiBase'); // Removed per request
   const saveTokenButton = document.getElementById('saveToken');
   const changeTokenButton = document.getElementById('changeToken');
   const statusParagraph = document.getElementById('status');
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
   // Default Base URL
-  let API_BASE = 'http://localhost:3000/api';
+  let API_BASE = 'https://dayos.snagdev.in/api';
 
   // --- Helpers ---
 
@@ -65,18 +65,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // --- Initialization ---
 
-  const { apiToken, apiBase } = await getStorage(['apiToken', 'apiBase']);
+  // const { apiToken, apiBase } = await getStorage(['apiToken', 'apiBase']);
+  const { apiToken } = await getStorage(['apiToken']);
 
-  if (apiBase) {
-    API_BASE = apiBase.endsWith('/api') ? apiBase : `${apiBase}/api`;
-  }
+  // Force Prod URL (Ignore stored base if any)
+  // if (apiBase) {
+  //   API_BASE = apiBase.endsWith('/api') ? apiBase : `${apiBase}/api`;
+  // }
 
-  if (apiToken && apiBase) {
+  if (apiToken) {
     showMain();
     loadCurrentPageInfo();
   } else {
     showToken();
-    if (apiBase) apiBaseInput.value = apiBase.replace('/api', '');
   }
 
   // --- UI Logic ---
@@ -117,27 +118,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 1. Save Token
   saveTokenButton.addEventListener('click', async () => {
     const token = apiTokenInput.value.trim();
-    let base = apiBaseInput.value.trim();
+    // Use default or pre-configured base URL
+    // For now using the default let API_BASE defined above or stored one if exists (though we are removing the UI to set it)
+    // Actually, we should probably just save the token.
 
-    if (base && !base.startsWith('http')) {
-      base = 'https://' + base;
-    }
-
-    // Strip trailing slash
-    if (base && base.endsWith('/')) {
-      base = base.slice(0, -1);
-    }
-
-    if (token && base) {
-      await setStorage({ apiToken: token, apiBase: base });
-
-      API_BASE = base.endsWith('/api') ? base : `${base}/api`;
+    if (token) {
+      // We don't update apiBase from UI anymore. We use the default.
+      await setStorage({ apiToken: token });
 
       showMain();
       loadCurrentPageInfo();
       setStatus('Connected!', 'success');
     } else {
-      setStatus('Fill both fields', 'error');
+      setStatus('Token is required', 'error');
     }
   });
 
@@ -164,6 +157,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (res.ok) {
         setStatus('Link saved!', 'success');
+      } else if (res.status === 429) {
+        setStatus('Rate limit exceeded (3/min). Please wait.', 'error');
       } else {
         const data = await res.json().catch(() => ({}));
         setStatus(data.error || 'Failed to save', 'error');
@@ -223,6 +218,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (res.ok) {
         setStatus('Reminder set!', 'success');
         remTitleInput.value = ''; // Reset
+      } else if (res.status === 429) {
+        setStatus('Rate limit exceeded (3/min). Please wait.', 'error');
       } else {
         const data = await res.json().catch(() => ({}));
         setStatus(data.error || 'Failed to set reminder', 'error');

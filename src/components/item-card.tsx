@@ -100,7 +100,7 @@ export function ItemCard({
                     drag="x"
                     dragConstraints={{ left: -100, right: 0 }}
                     dragElastic={0.1}
-                    dragDirectionLock
+
                     onDragEnd={onDragEnd}
                     className={`group relative flex flex-row sm:flex-col overflow-hidden rounded-xl bg-white border border-zinc-200 shadow-sm transition-all hover:shadow-md dark:bg-zinc-900 dark:border-zinc-800 ${isPending ? 'opacity-50 pointer-events-none' : ''} min-h-[8rem] sm:h-auto z-10`}
                     style={{ touchAction: 'pan-y' }}

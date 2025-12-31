@@ -3,6 +3,7 @@ import { reminders, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
+import { rateLimit } from '@/lib/rate-limit';
 
 // CORS headers for browser extension
 const corsHeaders = {
@@ -31,6 +32,12 @@ export async function POST(request: Request) {
 
         if (!user) {
             return NextResponse.json({ error: 'Invalid token' }, { status: 401, headers: corsHeaders });
+        }
+
+        // Rate Limiting (3 requests per minute per user)
+        const { success: rateSuccess } = await rateLimit(`api:createReminder:${user.id}`, 3);
+        if (!rateSuccess) {
+            return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429, headers: corsHeaders });
         }
 
         const body = await request.json();

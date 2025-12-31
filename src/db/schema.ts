@@ -219,6 +219,8 @@ export const meetings = pgTable('meetings', {
   stage: interviewStageEnum('stage'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+  provider: text('provider').default('dayos').notNull(),
+  externalId: text('externalId'), // Google Calendar Event ID
 });
 
 export const pushSubscriptions = pgTable('push_subscriptions', {

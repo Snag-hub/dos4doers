@@ -41,9 +41,9 @@
 
 ### � Phase 5: Robustness & Hardening (In Progress)
 **Goal:** Industrial-grade stability.
-- [ ] **Automated Testing**: Unit (Vitest) + E2E (Playwright).
-- [ ] **Type-Safe API**: Zod validation for all inputs.
-- [ ] **Rate Limiting**: Protection for extension endpoints.
+- [/] **Automated Testing**: Unit (Vitest) + E2E (Playwright).
+- [x] **Type-Safe API**: Zod validation for all inputs.
+- [/] **Rate Limiting**: Protection for extension endpoints (Lib ready, pending integration).
 
 ### 🚀 Phase 6: Power User Features (Backlog)
 **Goal:** Superior experience.
@@ -51,6 +51,11 @@
 - [ ] **Omnisearch**: Search everything via Cmd+K.
 - [ ] **Tagging**: Global organization system.
 - [ ] **Batch Actions**: Multi-select and bulk archive.
+
+### 📱 Phase 7: Ubiquity & Integration (In Progress)
+**Goal:** Be everywhere.
+- [x] **Mobile Share Target**: Save from Android/iOS shares (PWA).
+- [ ] **Calendar Sync**: Bi-directional sync with Google Calendar.
 
 ---
 
