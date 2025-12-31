@@ -192,6 +192,7 @@ export default function NotesView({ initialNotes, initialSearch, filterLabel }: 
                                             drag="x"
                                             dragConstraints={{ left: -100, right: 0 }} // Restraint dragging
                                             dragElastic={0.1}
+                                            dragDirectionLock
                                             onDragEnd={(e, info) => onDragEnd(e, info, note.id)}
                                             className="relative z-10 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm mb-3 overflow-hidden"
                                             style={{ touchAction: 'pan-y' }} // Important for vertical scrolling
