@@ -92,10 +92,10 @@ export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): {
         return { success: true, data: validated };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const firstError = error.errors[0];
+            const firstError = error.issues[0];
             return {
                 success: false,
-                error: firstError.message,
+                error: firstError?.message || 'Invalid input',
             };
         }
         return {
