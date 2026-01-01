@@ -1,16 +1,13 @@
 'use client';
 
-import { AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { ItemCard } from '@/components/item-card';
 import { fetchItems } from '@/app/actions';
 import { items } from '@/db/schema';
 import { InferSelectModel } from 'drizzle-orm';
-import { Loader2, Inbox, LucideIcon } from 'lucide-react';
-import { EmptyState } from '@/components/empty-state';
+import { Loader2 } from 'lucide-react';
 import { SelectionBar } from '@/components/selection-bar';
-import { PullToRefresh } from '@/components/pull-to-refresh';
 
 type Item = InferSelectModel<typeof items>;
 
@@ -94,24 +91,21 @@ export function ItemGrid({
         }
     };
 
-
+    if (items.length === 0 && !isLoading) {
+        return emptyState || null;
+    }
 
     return (
-        <PullToRefresh onRefresh={async () => {
-            // Revalidating items via server action would be better, but refresh is ok
-            await new Promise(r => setTimeout(r, 1000));
-        }}>
+        <>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                <AnimatePresence mode="popLayout">
-                    {items.map((item) => (
-                        <ItemCard
-                            key={item.id}
-                            item={item}
-                            isSelected={selectedIds.includes(item.id)}
-                            onToggleSelection={() => toggleSelection(item.id)}
-                        />
-                    ))}
-                </AnimatePresence>
+                {items.map((item) => (
+                    <ItemCard
+                        key={item.id}
+                        item={item}
+                        isSelected={selectedIds.includes(item.id)}
+                        onToggleSelection={() => toggleSelection(item.id)}
+                    />
+                ))}
             </div>
 
             {hasMore && (
@@ -130,6 +124,6 @@ export function ItemGrid({
                     currentStatus={status}
                 />
             )}
-        </PullToRefresh>
+        </>
     );
 }
