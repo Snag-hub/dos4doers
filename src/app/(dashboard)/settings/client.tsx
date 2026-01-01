@@ -356,8 +356,8 @@ export default function SettingsClient({
                                             {item.favicon && (
                                                 <img src={item.favicon} alt="" className="w-4 h-4 rounded" />
                                             )}
-                                            <span className="flex-1 text-sm text-zinc-900 dark:text-zinc-100 truncate">{item.title || item.url}</span>
-                                            <span className="text-xs font-medium text-purple-600 dark:text-purple-400">{item.viewCount} views</span>
+                                            <span className="flex-1 text-sm text-zinc-900 dark:text-zinc-100 truncate min-w-0">{item.title || item.url}</span>
+                                            <span className="text-xs font-medium text-purple-600 dark:text-purple-400 whitespace-nowrap">{item.viewCount} views</span>
                                         </a>
                                     ))}
                                 </div>
@@ -544,13 +544,13 @@ export default function SettingsClient({
                         ) : (
                             generalReminders.map((reminder) => (
                                 <div key={reminder.id} className={`group flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border ${editingId === reminder.id ? 'border-purple-500 ring-1 ring-purple-500 bg-purple-50/10' : 'border-zinc-100 dark:border-zinc-800'} rounded-xl hover:border-purple-200 dark:hover:border-purple-900/50 transition-all shadow-sm`}>
-                                    <div className="flex items-center gap-4 cursor-pointer flex-1" onClick={() => handleEdit(reminder)}>
-                                        <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                                    <div className="flex items-center gap-4 cursor-pointer flex-1 min-w-0" onClick={() => handleEdit(reminder)}>
+                                        <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
                                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         </div>
-                                        <div>
-                                            <p className="font-medium text-zinc-900 dark:text-zinc-100">{reminder.title}</p>
-                                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 flex items-center gap-2">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-medium text-zinc-900 dark:text-zinc-100 truncate">{reminder.title}</p>
+                                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 flex flex-wrap items-center gap-2">
                                                 <span>Due: <span className="text-zinc-700 dark:text-zinc-300">{new Date(reminder.scheduledAt).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span></span>
                                                 <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide ${reminder.recurrence !== 'none' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'}`}>
                                                     {reminder.recurrence === 'none' ? 'One-time' : reminder.recurrence}

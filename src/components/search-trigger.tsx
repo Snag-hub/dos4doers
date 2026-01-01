@@ -17,7 +17,7 @@ export function SearchTrigger({
         return (
             <button
                 onClick={handleClick}
-                className={`p-2 rounded-xl text-zinc-500 hover:text-blue-600 hover:bg-blue-50 dark:text-zinc-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-all ${className}`}
+                className={`p-2 rounded-xl text-zinc-500 hover:text-blue-600 hover:bg-blue-50 dark:text-zinc-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-all relative z-30 ${className}`}
                 title="Search (⌘K)"
             >
                 <Search className="h-5 w-5" />

@@ -88,11 +88,11 @@ export function ItemCard({
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
-                    className={`group relative flex flex-row sm:flex-col overflow-hidden rounded-xl bg-white border border-zinc-200 shadow-sm transition-all hover:shadow-md dark:bg-zinc-900 dark:border-zinc-800 ${isPending ? 'opacity-50 pointer-events-none' : ''} min-h-[8rem] sm:h-auto z-10 touch-pan-y`}
+                    className={`group relative flex flex-row sm:flex-col overflow-hidden rounded-xl bg-white border border-zinc-200 shadow-sm transition-all hover:shadow-md dark:bg-zinc-900 dark:border-zinc-800 ${isPending ? 'opacity-50 pointer-events-none' : ''} min-h-[6rem] w-full max-w-full sm:h-auto z-10 touch-pan-y`}
                 >
                     {/* Image Section */}
                     {item.image && (
-                        <div className="relative w-32 shrink-0 sm:w-full sm:h-auto sm:aspect-video bg-zinc-100 dark:bg-zinc-800">
+                        <div className="relative w-24 shrink-0 sm:w-full sm:h-auto sm:aspect-video bg-zinc-100 dark:bg-zinc-800">
                             <img
                                 src={item.image}
                                 alt={item.title || 'Item image'}
@@ -163,7 +163,7 @@ export function ItemCard({
                                 onClick={() => trackItemView(item.id)}
                                 className="block text-sm sm:text-base font-semibold leading-tight text-zinc-900 hover:text-blue-600 dark:text-zinc-100 dark:hover:text-blue-400 line-clamp-2"
                             >
-                                {item.title || item.url}
+                                {item.title || "Untitled Link"}
                             </a>
 
                             {item.description && (
