@@ -41,6 +41,7 @@ import dynamic from "next/dynamic";
 const Omnisearch = dynamic(() => import("@/components/omnisearch").then(mod => mod.Omnisearch));
 import { Toaster } from 'sonner';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { OfflineBanner } from '@/components/offline-banner';
 
 export default function RootLayout({
   children,
@@ -55,6 +56,7 @@ export default function RootLayout({
           suppressHydrationWarning
         >
           <ErrorBoundary>
+            <OfflineBanner />
             <Omnisearch />
             {children}
             <Toaster position="bottom-right" theme="system" />
