@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { items, reminders, users } from '@/db/schema';
-import { sendEmail } from '@/lib/mail';
+import { sendEmail } from '@/lib/email';
 import { and, eq, lte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 

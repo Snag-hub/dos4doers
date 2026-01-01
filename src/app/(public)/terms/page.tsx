@@ -145,8 +145,8 @@ export default function TermsPage() {
                             For questions about these Terms of Service, please contact:
                         </p>
                         <ul className="list-none mt-2 space-y-1">
-                            <li>Legal inquiries: <a href="mailto:legal@dayos.snagdev.in" className="text-blue-600 underline">legal@dayos.snagdev.in</a></li>
-                            <li>General support: <a href="mailto:support@dayos.snagdev.in" className="text-blue-600 underline">support@dayos.snagdev.in</a></li>
+                            <li>Legal inquiries: <a href="mailto:legal@support.dayos.snagdev.in" className="text-blue-600 underline">legal@support.dayos.snagdev.in</a></li>
+                            <li>General support: <a href="mailto:support@support.dayos.snagdev.in" className="text-blue-600 underline">support@support.dayos.snagdev.in</a></li>
                         </ul>
                     </section>
                 </div>

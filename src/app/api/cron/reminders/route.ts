@@ -17,6 +17,9 @@ if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
+    const cronStartTime = Date.now();
+    console.log(`🔔 [CRON] Reminder job started at ${new Date().toISOString()}`);
+
     const authHeader = req.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
         return new NextResponse('Unauthorized', { status: 401 });
@@ -24,8 +27,10 @@ export async function GET(req: Request) {
 
     try {
         const now = new Date();
+        console.log(`⏰ [CRON] Current time: ${now.toISOString()}`);
 
         // 1. Find Due ITEMS (Legacy/Attached)
+        const itemQueryStart = Date.now();
         const dueItems = await db
             .select({
                 itemId: items.id,
@@ -49,8 +54,10 @@ export async function GET(req: Request) {
                     lt(items.reminderAt, now)
                 )
             );
+        console.log(`📊 [CRON] Item query took ${Date.now() - itemQueryStart}ms - Found ${dueItems.length} items`);
 
         // 2. Find Due REMINDERS (General/Quick/Meetings)
+        const reminderQueryStart = Date.now();
         const dueRemindersRaw = await db
             .select({
                 itemId: reminders.id,
@@ -72,6 +79,7 @@ export async function GET(req: Request) {
             .where(
                 lt(reminders.scheduledAt, now)
             );
+        console.log(`📊 [CRON] Reminder query took ${Date.now() - reminderQueryStart}ms - Found ${dueRemindersRaw.length} reminders`);
 
         // Process reminders to format them correctly (Meeting vs General)
         const processedReminders = dueRemindersRaw.map(r => {
@@ -96,10 +104,12 @@ export async function GET(req: Request) {
         const allDue = [...dueItems, ...processedReminders];
 
         if (allDue.length === 0) {
-            return NextResponse.json({ message: 'No due reminders found.' });
+            const totalDuration = Date.now() - cronStartTime;
+            console.log(`✅ [CRON] Completed in ${totalDuration}ms - No due reminders`);
+            return NextResponse.json({ message: 'No due reminders found.', duration: totalDuration });
         }
 
-        console.log(`🔔 Found ${allDue.length} due reminders.`);
+        console.log(`🔔 [CRON] Found ${allDue.length} due reminders - Starting processing...`);
 
         // 3. Group by User
         const groupedByUser: Record<string, {
@@ -163,20 +173,63 @@ export async function GET(req: Request) {
       `;
 
             if (userGroup.emailNotifications) {
-                const userId = userGroup.items[0].userId;
-                await withNotificationLogging(
-                    userId,
-                    'email',
-                    email,
-                    async () => {
-                        await sendEmail({
-                            to: email,
-                            subject: `DayOS: ${userGroup.items.length} Reminder(s)`,
-                            html,
-                        });
-                    },
-                    { reminderCount: userGroup.items.length }
-                );
+                // Only send emails for general reminders (not item-specific)
+                // This conserves Resend free tier quota (3000 emails/month)
+                const generalReminders = userGroup.items.filter(item => item.type === 'reminder');
+
+                if (generalReminders.length > 0) {
+                    const userId = userGroup.items[0].userId;
+
+                    // Rebuild HTML with only general reminders
+                    const generalItemsHtml = generalReminders
+                        .map(
+                            (item) => `
+                        <div style="margin-bottom: 16px; padding: 12px; border: 1px solid #e4e4e7; border-radius: 8px;">
+                          <h3 style="margin: 0 0 8px 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                            <a href="${appUrl + item.url}" style="color: #2563eb; text-decoration: none;">${item.title || 'Untitled Reminder'}</a>
+                          </h3>
+                          <p style="margin: 0; font-size: 14px; color: #52525b;">
+                            ${item.siteName ? `<span style="font-weight: 500; color: #18181b;">${item.siteName}</span> • ` : ''}
+                            Reminder Due
+                            ${item.recurrence && item.recurrence !== 'none' ? ` • 🔁 ${item.recurrence}` : ''}
+                          </p>
+                        </div>
+                      `
+                        )
+                        .join('');
+
+                    const generalHtml = `
+                    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                      <div style="text-align: center; margin-bottom: 24px;">
+                        <img src="${appUrl}/icon-192.png" width="48" height="48" style="border-radius: 12px; margin-bottom: 16px;" alt="DayOS Logo" />
+                        <h1 style="color: #18181b; margin: 0; font-size: 24px;">Reminder Due</h1>
+                      </div>
+                      <p>Hi ${userGroup.name || 'there'}, here are your reminders:</p>
+                      ${generalItemsHtml}
+                      <p style="margin-top: 24px; font-size: 12px; color: #a1a1aa; text-align: center;">
+                        <a href="${appUrl}/settings" style="color: #52525b;">Manage Reminders</a>
+                      </p>
+                    </div>
+                  `;
+
+                    await withNotificationLogging(
+                        userId,
+                        'email',
+                        email,
+                        async () => {
+                            await sendEmail({
+                                to: email,
+                                subject: `DayOS: ${generalReminders.length} Reminder(s)`,
+                                html: generalHtml,
+                            });
+                        },
+                        { reminderCount: generalReminders.length, type: 'general-only' }
+                    );
+
+                    console.log(`📧 [CRON] Sent email for ${generalReminders.length} general reminders (skipped ${userGroup.items.length - generalReminders.length} item reminders)`);
+                } else {
+                    console.log(`⏭️  [CRON] Skipping email for ${email} - Only item-specific reminders (push notification sent instead)`);
+                }
             } else {
                 console.log(`Skipping email for ${email} (User Preference)`);
             }
@@ -245,9 +298,14 @@ export async function GET(req: Request) {
             results.push({ email, count: userGroup.items.length });
         }
 
+        const totalDuration = Date.now() - cronStartTime;
+        console.log(`✅ [CRON] Completed successfully in ${totalDuration}ms - Processed ${results.length} users`);
+
         return NextResponse.json({
             success: true,
             processed: results,
+            duration: totalDuration,
+            timestamp: new Date().toISOString(),
         });
     } catch (error) {
         console.error('Cron job failed:', error);

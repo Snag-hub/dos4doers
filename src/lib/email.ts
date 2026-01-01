@@ -1,27 +1,22 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const emailServer = process.env.EMAIL_SERVER;
 const emailFrom = process.env.EMAIL_FROM || 'DayOS <noreply@dayos.app>';
 
-// Create a transporter using environment variables or fallback for dev
-const transportConfig = process.env.EMAIL_SERVER
-    ? process.env.EMAIL_SERVER
-    : (process.env.EMAIL_SERVER_HOST && process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_KEY)
-        ? {
-            host: process.env.EMAIL_SERVER_HOST,
-            port: parseInt(process.env.EMAIL_SERVER_PORT || '587'),
-            auth: {
-                user: process.env.MAILJET_API_KEY,
-                pass: process.env.MAILJET_SECRET_KEY
-            }
-        }
-        : {
-            streamTransport: true, // Fallback: logs to console if no server configured
-            newline: 'windows',
-        };
+// Lazy initialization - only create client when needed
+function getResendClient() {
+    if (!process.env.RESEND_API_KEY) {
+        return null;
+    }
+    return new Resend(process.env.RESEND_API_KEY);
+}
 
-const transporter = nodemailer.createTransport(transportConfig as any);
-
+/**
+ * Send an email using Resend
+ * @param to - Recipient email address
+ * @param subject - Email subject
+ * @param html - HTML content
+ * @returns Promise with email result
+ */
 export async function sendEmail({
     to,
     subject,
@@ -31,28 +26,81 @@ export async function sendEmail({
     subject: string;
     html: string;
 }) {
-    // Check if we are incorrectly falling back to mock when we have a real config
-    const isMock = (transportConfig as any).streamTransport === true;
+    // Validate inputs
+    if (!to || !subject || !html) {
+        console.error('❌ Email validation failed: Missing required fields');
+        throw new Error('Missing required email fields');
+    }
 
-    if (isMock && process.env.NODE_ENV !== 'production') {
-        console.log('📧 [Mock Email] Server not configured. Logging details:');
-        console.log(`To: ${to}`);
-        console.log(`Subject: ${subject}`);
-        // console.log(`HTML: ${html}`); // verbose
-        return;
+    // Check if Resend is configured
+    const resend = getResendClient();
+    if (!resend) {
+        console.warn('⚠️  RESEND_API_KEY not configured. Email not sent.');
+        if (process.env.NODE_ENV !== 'production') {
+            console.log('📧 [Mock Email] Would have sent:');
+            console.log(`   To: ${to}`);
+            console.log(`   Subject: ${subject}`);
+        }
+        return null;
     }
 
     try {
-        const info = await transporter.sendMail({
+        const startTime = Date.now();
+
+        const { data, error } = await resend.emails.send({
             from: emailFrom,
-            to,
+            to: [to],
             subject,
             html,
         });
-        console.log(`✅ Email sent to ${to}: ${info.messageId}`);
-        return info;
+
+        const duration = Date.now() - startTime;
+
+        if (error) {
+            console.error('❌ Resend API error:', error);
+            throw new Error(`Failed to send email: ${error.message}`);
+        }
+
+        console.log(`✅ Email sent successfully to ${to} (${duration}ms) - ID: ${data?.id}`);
+        return data;
     } catch (error) {
         console.error('❌ Failed to send email:', error);
-        throw error; // Re-throw to allow caller to handle/report
+        throw error;
+    }
+}
+
+/**
+ * Send a batch of emails using Resend
+ * @param emails - Array of email objects
+ * @returns Promise with batch result
+ */
+export async function sendBatchEmails(emails: Array<{
+    to: string;
+    subject: string;
+    html: string;
+}>) {
+    if (!process.env.RESEND_API_KEY) {
+        console.warn('⚠️  RESEND_API_KEY not configured. Batch emails not sent.');
+        return null;
+    }
+
+    try {
+        const results = await Promise.allSettled(
+            emails.map(email => sendEmail(email))
+        );
+
+        const successful = results.filter(r => r.status === 'fulfilled').length;
+        const failed = results.filter(r => r.status === 'rejected').length;
+
+        console.log(`📧 Batch email results: ${successful} sent, ${failed} failed`);
+
+        return {
+            successful,
+            failed,
+            results,
+        };
+    } catch (error) {
+        console.error('❌ Batch email error:', error);
+        throw error;
     }
 }
