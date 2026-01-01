@@ -154,6 +154,19 @@ export function TimelineEventCard({ event }: TimelineEventCardProps) {
                                         </span>
                                     </>
                                 )}
+                                {/* Calendar badge for meetings */}
+                                {event.type === 'meeting' && event.metadata?.calendarName && (
+                                    <>
+                                        <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                                        <span
+                                            className="px-1.5 py-0.5 rounded text-white text-[10px] font-medium whitespace-nowrap"
+                                            style={{ backgroundColor: event.metadata.calendarColor || '#3B82F6' }}
+                                            title={event.metadata.accountEmail || 'Google Calendar'}
+                                        >
+                                            {event.metadata.calendarName}
+                                        </span>
+                                    </>
+                                )}
                             </div>
 
                             {/* Metadata */}

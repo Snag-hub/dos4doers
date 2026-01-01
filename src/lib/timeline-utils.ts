@@ -17,6 +17,11 @@ export type TimelineEvent = {
         projectId?: string;
         itemType?: string;
         recurrence?: string;
+        // Calendar metadata for multi-calendar support
+        calendarId?: string;
+        calendarName?: string;
+        calendarColor?: string;
+        accountEmail?: string;
         [key: string]: any;
     };
 };

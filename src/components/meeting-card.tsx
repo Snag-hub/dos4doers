@@ -42,7 +42,7 @@ export function MeetingCard({ meeting }: { meeting: Meeting }) {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                             <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
                                 {meeting.title}
                             </h3>
@@ -54,6 +54,15 @@ export function MeetingCard({ meeting }: { meeting: Meeting }) {
                             {meeting.stage && (
                                 <span className="px-1.5 py-0.5 rounded bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400 text-[10px] font-bold uppercase">
                                     {meeting.stage}
+                                </span>
+                            )}
+                            {meeting.calendarName && (
+                                <span
+                                    className="px-1.5 py-0.5 rounded text-white text-[10px] font-medium"
+                                    style={{ backgroundColor: meeting.calendarColor || '#3B82F6' }}
+                                    title={meeting.accountEmail || 'Google Calendar'}
+                                >
+                                    {meeting.calendarName}
                                 </span>
                             )}
                         </div>

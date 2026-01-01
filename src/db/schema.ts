@@ -221,6 +221,12 @@ export const meetings = pgTable('meetings', {
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
   provider: text('provider').default('dayos').notNull(),
   externalId: text('externalId'), // Google Calendar Event ID
+
+  // Calendar metadata for multi-calendar support
+  calendarId: text('calendarId'), // Google Calendar ID (e.g., "primary", "user@gmail.com")
+  calendarName: text('calendarName'), // Human-readable calendar name
+  calendarColor: text('calendarColor'), // Calendar color from Google (hex format)
+  accountEmail: text('accountEmail'), // Email of the Google account
 });
 
 export const pushSubscriptions = pgTable('push_subscriptions', {
