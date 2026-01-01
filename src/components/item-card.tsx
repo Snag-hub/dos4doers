@@ -86,7 +86,7 @@ export function ItemCard({
                 {/* Red Background Layer Removed */}
 
                 <div
-                    className={`group relative flex flex-row sm:flex-col overflow-hidden rounded-xl bg-white border border-zinc-200 shadow-sm transition-all hover:shadow-md dark:bg-zinc-900 dark:border-zinc-800 ${isPending ? 'opacity-50 pointer-events-none' : ''} min-h-[6rem] w-full max-w-full sm:h-auto z-10 touch-pan-y`}
+                    className={`group relative flex flex-row sm:flex-col overflow-hidden rounded-xl bg-white border border-zinc-200 shadow-sm transition-all hover:shadow-md dark:bg-zinc-900 dark:border-zinc-800 ${isPending ? 'opacity-50 pointer-events-none' : ''} min-h-[6rem] w-full max-w-full sm:h-auto z-10`}
                 >
                     {/* Image Section */}
                     {item.image && (
