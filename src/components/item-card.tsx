@@ -274,51 +274,51 @@ export function ItemCard({
                     <div className="flex items-center gap-1 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                         <button
                             onClick={() => setShowEditDialog(true)}
-                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            title="Edit"
+                            className="flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                         >
                             <Pencil className="w-4 h-4" />
-                            <span className="hidden sm:inline">Edit</span>
                         </button>
 
                         <button
                             onClick={() => setShowReminderDialog(true)}
-                            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${item.reminderAt
+                            title="Remind"
+                            className={`flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${item.reminderAt
                                 ? 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
                                 : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                                 }`}
                         >
                             <Bell className="w-4 h-4" />
-                            <span className="hidden sm:inline">Remind</span>
                         </button>
 
                         {item.content && (
                             <Link
                                 href={`/reader/${item.id}`}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                                title="Read"
+                                className="flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
                             >
                                 <BookOpen className="w-4 h-4" />
-                                <span className="hidden sm:inline">Read</span>
                             </Link>
                         )}
 
                         {item.status === 'trash' ? (
                             <button
                                 onClick={handleRestore}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
+                                title="Restore"
+                                className="flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
                             >
                                 <RotateCcw className="w-4 h-4" />
-                                <span className="hidden sm:inline">Restore</span>
                             </button>
                         ) : (
                             <button
                                 onClick={handleArchive}
-                                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${item.status === 'archived'
+                                title={item.status === 'archived' ? 'Unarchive' : 'Archive'}
+                                className={`flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${item.status === 'archived'
                                     ? 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20'
                                     : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                                     }`}
                             >
                                 <Archive className="w-4 h-4" />
-                                <span className="hidden sm:inline">{item.status === 'archived' ? 'Unarchive' : 'Archive'}</span>
                             </button>
                         )}
 
@@ -328,10 +328,10 @@ export function ItemCard({
                                 e.stopPropagation();
                                 setShowDeleteConfirm(true);
                             }}
-                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                            title="Delete"
+                            className="flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
                             <Trash2 className="w-4 h-4" />
-                            <span className="hidden sm:inline">Delete</span>
                         </button>
                     </div>
                 </div>

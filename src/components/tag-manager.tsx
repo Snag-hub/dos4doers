@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, X, Tag as TagIcon, Hash } from 'lucide-react';
+import { Plus, X, Tag as TagIcon, Hash, Loader2 } from 'lucide-react';
 import { createTag, getTags } from '@/app/tag-actions';
+import { toast } from 'sonner';
 
 interface Tag {
     id: string;
@@ -21,6 +22,7 @@ export function TagManager({
     const [showNewTagInput, setShowNewTagInput] = useState(false);
     const [newTagName, setNewTagName] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [isCreating, setIsCreating] = useState(false);
 
     useEffect(() => {
         loadTags();
@@ -34,13 +36,23 @@ export function TagManager({
 
     const handleCreateTag = async () => {
         if (!newTagName.trim()) return;
+        setIsCreating(true);
         try {
-            const newTag = await createTag({ name: newTagName });
+            const newTag = await createTag({ name: newTagName.trim() });
             setTags(prev => [...prev, newTag]);
             setNewTagName('');
             setShowNewTagInput(false);
+
+            // Automatically select the newly created tag
+            if (onToggleTag) {
+                onToggleTag(newTag.id);
+            }
+            toast.success(`Tag "${newTag.name}" created`);
         } catch (error) {
             console.error('Failed to create tag:', error);
+            toast.error('Failed to create tag');
+        } finally {
+            setIsCreating(false);
         }
     };
 
@@ -54,8 +66,8 @@ export function TagManager({
                         key={tag.id}
                         onClick={() => onToggleTag(tag.id)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${selectedTags.includes(tag.id)
-                                ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
-                                : 'bg-white border-zinc-200 text-zinc-600 hover:border-zinc-300 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700'
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                            : 'bg-white border-zinc-200 text-zinc-600 hover:border-zinc-300 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700'
                             }`}
                         style={selectedTags.includes(tag.id) ? {} : { borderColor: tag.color || undefined }}
                     >
@@ -88,9 +100,10 @@ export function TagManager({
                     />
                     <button
                         onClick={handleCreateTag}
-                        className="p-1 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                        disabled={isCreating}
+                        className="p-1 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
                     >
-                        <Plus className="h-3 w-3" />
+                        {isCreating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
                     </button>
                     <button
                         onClick={() => setShowNewTagInput(false)}

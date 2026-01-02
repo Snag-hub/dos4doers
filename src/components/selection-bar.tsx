@@ -39,7 +39,8 @@ export function SelectionBar({
 
     return (
         // Use safe-area-inset-bottom to avoid overlap with mobile gesture bars
-        <div className="fixed bottom-[calc(2rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 duration-300">
+        // Raised z-index and bottom offset to float above mobile navigation
+        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-[60] animate-in slide-in-from-bottom-8 duration-300">
             <div className="flex items-center gap-4 px-6 py-4 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-white">
                 <div className="flex items-center gap-3 pr-4 border-r border-zinc-800">
                     <button onClick={onClear} className="p-1 hover:bg-zinc-800 rounded-md transition-colors">
