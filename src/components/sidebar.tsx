@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { SignOutButton } from '@/components/clerk-buttons';
-import { UserButton } from '@clerk/nextjs';
+import { UserButton, useUser } from '@clerk/nextjs';
 import { Inbox, Star, Archive, Trash2, Settings, X, CheckSquare, Calendar, Clock, FileText, Hash } from 'lucide-react';
 import { SearchTrigger } from '@/components/search-trigger';
 
@@ -32,6 +32,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
     const pathname = usePathname();
+    const { user } = useUser();
 
     const sidebarContent = (
         <div className="flex h-full flex-col glass-sidebar">
@@ -97,8 +98,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="flex items-center gap-3">
                     <UserButton afterSignOutUrl="/" />
                     <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100 flex-1 truncate">
-                        {/* UserButton handles the UI, we can keep this clean or add name if we fetch it separately */}
-                        Profile
+                        {user?.fullName || user?.primaryEmailAddress?.emailAddress || 'User'}
                     </div>
                 </div>
             </div>

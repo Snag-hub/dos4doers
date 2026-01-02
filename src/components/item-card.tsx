@@ -111,6 +111,28 @@ export function ItemCard({
                     : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xl'
                 } bg-white dark:bg-zinc-900`}>
 
+                {/* Selection Checkbox - Always visible */}
+                {onToggleSelection && (
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            haptic('selection');
+                            onToggleSelection();
+                        }}
+                        className={`absolute top-3 left-3 z-20 w-6 h-6 rounded-lg border-2 transition-all duration-200 flex items-center justify-center ${isSelected
+                            ? 'bg-blue-600 border-blue-600 scale-110'
+                            : 'bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 hover:scale-110'
+                            }`}
+                    >
+                        {isSelected && (
+                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        )}
+                    </button>
+                )}
+
                 {/* Image Section */}
                 {item.image && !imageError && (
                     <div className="relative w-full aspect-video bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
@@ -124,28 +146,6 @@ export function ItemCard({
 
                         {/* Gradient Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                        {/* Selection Checkbox */}
-                        {onToggleSelection && (
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    haptic('selection');
-                                    onToggleSelection();
-                                }}
-                                className={`absolute top-3 left-3 z-10 w-6 h-6 rounded-lg border-2 transition-all duration-200 flex items-center justify-center ${isSelected
-                                    ? 'bg-blue-600 border-blue-600 scale-110'
-                                    : 'bg-white/90 border-white/50 backdrop-blur-sm hover:bg-white hover:border-white hover:scale-110'
-                                    }`}
-                            >
-                                {isSelected && (
-                                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                )}
-                            </button>
-                        )}
 
                         {/* Status Badges */}
                         <div className="absolute top-3 right-3 flex gap-2">
