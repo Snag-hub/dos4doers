@@ -2,7 +2,7 @@ console.log('[push-sw] Custom Worker Loaded');
 
 self.addEventListener('push', function (event) {
     console.log('[push-sw] Push Received');
-    let data = { title: 'DayOS Notification', body: 'New alert!', url: '/' };
+    let data = { title: 'DOs 4 DOERs Notification', body: 'New alert!', url: '/' };
 
     try {
         if (event.data) {
@@ -25,7 +25,7 @@ self.addEventListener('push', function (event) {
     };
 
     event.waitUntil(
-        self.registration.showNotification(data.title || 'DayOS', options)
+        self.registration.showNotification(data.title || 'DOs 4 DOERs', options)
             .catch(err => console.error('[push-sw] Show Notification Error:', err))
     );
 });
