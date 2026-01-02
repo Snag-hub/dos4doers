@@ -6,7 +6,7 @@ test.describe('Core Application Flow', () => {
         await page.goto('/');
 
         // Check title (Update based on your actual metadata)
-        await expect(page).toHaveTitle(/DayOS|Sign In/);
+        await expect(page).toHaveTitle(/DOs 4 DOERs|Sign In/);
     });
 
     test('protected route redirects to sign-in', async ({ page }) => {

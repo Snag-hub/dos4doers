@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
@@ -94,7 +94,7 @@ function ShareContent() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-zinc-50 dark:bg-zinc-950 text-center">
             <div className="mb-6">
-                <Image src="/icon-192.png" alt="DayOS" width={64} height={64} className="rounded-xl shadow-md" />
+                <Image src="/icon-192.png" alt="DOs 4 DOERs" width={64} height={64} className="rounded-xl shadow-md" />
             </div>
 
             {status === 'saving' && (

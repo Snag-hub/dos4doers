@@ -1,4 +1,4 @@
-Commons Clause License Condition v1.0
+﻿Commons Clause License Condition v1.0
 
 The Software is provided to you by the Licensor under the Apache License 2.0,
 with the following additional condition:
@@ -23,9 +23,9 @@ this Commons Clause License Condition notice.
 
 ---
 
-Software: DayOS
+Software: DOs 4 DOERs
 License: Apache 2.0 with Commons Clause
-Licensor: DayOS
+Licensor: DOs 4 DOERs
 
 ---
 
@@ -43,7 +43,7 @@ PROHIBITED USES:
 ✗ Selling modified versions
 ✗ Using to provide commercial services
 
-For commercial licensing inquiries, contact: legal@dayos.snagdev.in
+For commercial licensing inquiries, contact: legal@DOs 4 DOERs.snagdev.in
 
 ---
 

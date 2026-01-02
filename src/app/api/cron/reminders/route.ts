@@ -1,4 +1,4 @@
-import { db } from '@/db';
+﻿import { db } from '@/db';
 import { items, users, pushSubscriptions, reminders, meetings } from '@/db/schema';
 import { eq, and, lt, isNotNull, sql } from 'drizzle-orm';
 import { sendEmail } from '@/lib/email';
@@ -88,7 +88,7 @@ export async function GET(req: Request) {
                     ...r,
                     title: `Meeting: ${r.meetingTitle}`,
                     url: '/meetings',
-                    siteName: 'DayOS Meeting',
+                    siteName: 'DOs 4 DOERs Meeting',
                     favicon: null,
                 };
             }
@@ -96,7 +96,7 @@ export async function GET(req: Request) {
             return {
                 ...r,
                 url: '/settings',
-                siteName: 'DayOS Reminder',
+                siteName: 'DOs 4 DOERs Reminder',
                 favicon: null,
             };
         });
@@ -135,7 +135,7 @@ export async function GET(req: Request) {
 
         const results = [];
         // Use process.env.NEXTAUTH_URL or fallback. Ensure no trailing slash for consistent handling
-        const appUrl = (process.env.NEXTAUTH_URL || 'https://dayos.app').replace(/\/$/, "");
+        const appUrl = (process.env.NEXTAUTH_URL || 'https://DOs 4 DOERs.app').replace(/\/$/, "");
 
         for (const email of Object.keys(groupedByUser)) {
             const userGroup = groupedByUser[email];
@@ -161,13 +161,13 @@ export async function GET(req: Request) {
             const html = `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="text-align: center; margin-bottom: 24px;">
-            <img src="${appUrl}/icon-192.png" width="48" height="48" style="border-radius: 12px; margin-bottom: 16px;" alt="DayOS Logo" />
+            <img src="${appUrl}/icon-192.png" width="48" height="48" style="border-radius: 12px; margin-bottom: 16px;" alt="DOs 4 DOERs Logo" />
             <h1 style="color: #18181b; margin: 0; font-size: 24px;">Reminder Due</h1>
           </div>
           <p>Hi ${userGroup.name || 'there'}, here are your reminders:</p>
           ${itemsHtml}
           <p style="margin-top: 24px; font-size: 12px; color: #a1a1aa; text-align: center;">
-            <a href="${appUrl}/inbox" style="color: #52525b;">Open DayOS Inbox</a>
+            <a href="${appUrl}/inbox" style="color: #52525b;">Open DOs 4 DOERs Inbox</a>
           </p>
         </div>
       `;
@@ -201,7 +201,7 @@ export async function GET(req: Request) {
                     const generalHtml = `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                       <div style="text-align: center; margin-bottom: 24px;">
-                        <img src="${appUrl}/icon-192.png" width="48" height="48" style="border-radius: 12px; margin-bottom: 16px;" alt="DayOS Logo" />
+                        <img src="${appUrl}/icon-192.png" width="48" height="48" style="border-radius: 12px; margin-bottom: 16px;" alt="DOs 4 DOERs Logo" />
                         <h1 style="color: #18181b; margin: 0; font-size: 24px;">Reminder Due</h1>
                       </div>
                       <p>Hi ${userGroup.name || 'there'}, here are your reminders:</p>
@@ -219,7 +219,7 @@ export async function GET(req: Request) {
                         async () => {
                             await sendEmail({
                                 to: email,
-                                subject: `DayOS: ${generalReminders.length} Reminder(s)`,
+                                subject: `DOs 4 DOERs: ${generalReminders.length} Reminder(s)`,
                                 html: generalHtml,
                             });
                         },
@@ -246,7 +246,7 @@ export async function GET(req: Request) {
 
                 if (subs.length > 0) {
                     const payload = JSON.stringify({
-                        title: `DayOS: ${userGroup.items.length} Reminder(s)`,
+                        title: `DOs 4 DOERs: ${userGroup.items.length} Reminder(s)`,
                         body: userGroup.items.map(i => i.title).join(', '),
                         url: userGroup.items[0].type === 'item' ? '/inbox' : userGroup.items[0].url,
                     });

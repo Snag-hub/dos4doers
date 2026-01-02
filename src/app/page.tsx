@@ -1,4 +1,4 @@
-import { currentUser } from "@clerk/nextjs/server";
+﻿import { currentUser } from "@clerk/nextjs/server";
 import { SignedOut, SignInButton as ClerkSignInButton, SignUpButton } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,7 +14,7 @@ export default async function Home() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <Image src="/icon-192.png" alt="Logo" width={32} height={32} className="rounded-lg shadow-sm" />
-            <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">DayOS</span>
+            <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">DOs 4 DOERs</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-500 dark:text-zinc-400">
             <a href="#features" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Features</a>
@@ -68,7 +68,7 @@ export default async function Home() {
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Digital Intelligence</span>
             </h1>
             <p className="mx-auto mt-8 max-w-2xl text-lg text-zinc-600 dark:text-zinc-400 sm:text-xl animate-in fade-in slide-in-from-bottom-12 duration-700 delay-200">
-              DayOS bridges the gap between capture and action. Save everything, focus instantly with Reader Mode, and never miss a follow-up with intelligent reminders.
+              DOs 4 DOERs bridges the gap between capture and action. Save everything, focus instantly with Reader Mode, and never miss a follow-up with intelligent reminders.
             </p>
             <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-16 duration-700 delay-300">
               {user ? (
@@ -105,7 +105,7 @@ export default async function Home() {
                   <div className="flex-1 flex justify-center">
                     <div className="w-full max-w-md h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center px-3 gap-2">
                       <Globe className="w-3 h-3 text-zinc-400" />
-                      <span className="text-[10px] text-zinc-500 font-medium whitespace-nowrap">dayos.snagdev.in/inbox</span>
+                      <span className="text-[10px] text-zinc-500 font-medium whitespace-nowrap">DOs 4 DOERs.snagdev.in/inbox</span>
                     </div>
                   </div>
                 </div>
@@ -179,7 +179,7 @@ export default async function Home() {
                 One unified <span className="text-blue-600">Digital Brain.</span>
               </h2>
               <p className="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
-                DayOS is more than just a reader. It&apos;s where your knowledge lives, your tasks grow, and your schedule stays in sync.
+                DOs 4 DOERs is more than just a reader. It&apos;s where your knowledge lives, your tasks grow, and your schedule stays in sync.
               </p>
             </div>
 
@@ -247,7 +247,7 @@ export default async function Home() {
                     </div>
                     <h3 className="text-3xl font-black text-zinc-900 dark:text-white mb-4">Master Reader Mode</h3>
                     <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-lg font-medium">
-                      DayOS extracts the pure content of any article using Mozilla&apos;s Readability engine. No ads. No popups. Just pure signal.
+                      DOs 4 DOERs extracts the pure content of any article using Mozilla&apos;s Readability engine. No ads. No popups. Just pure signal.
                     </p>
                   </div>
                   <div className="mt-12 relative h-64 rounded-3xl overflow-hidden border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 shadow-2xl scale-100 transition-transform group-hover:scale-[1.05] duration-700">
@@ -316,7 +316,7 @@ export default async function Home() {
                     </div>
                     <h3 className="text-3xl font-black text-white dark:text-zinc-900 mb-4 tracking-tight">Isolated. Encrypted. Yours.</h3>
                     <p className="text-zinc-400 dark:text-zinc-500 text-lg leading-relaxed font-medium">
-                      Privacy is a right, not a feature. DayOS uses full multi-user isolation. Your knowledge base is encrypted at rest and accessible only by you. Built for individuals and tested for high-compliance teams.
+                      Privacy is a right, not a feature. DOs 4 DOERs uses full multi-user isolation. Your knowledge base is encrypted at rest and accessible only by you. Built for individuals and tested for high-compliance teams.
                     </p>
                   </div>
                   <div className="flex-shrink-0 grid grid-cols-4 gap-4 md:rotate-6">
@@ -341,7 +341,7 @@ export default async function Home() {
                 <div>
                   <h2 className="text-4xl font-black text-white dark:text-black mb-6">Designed for the <br /> 1% of Doers.</h2>
                   <p className="text-zinc-400 dark:text-zinc-600 text-lg mb-8 leading-relaxed italic">
-                    "Most productivity apps are just databases of regret. DayOS is the first time I actually feel in control of my reading queue."
+                    "Most productivity apps are just databases of regret. DOs 4 DOERs is the first time I actually feel in control of my reading queue."
                   </p>
                   <div className="flex items-center gap-4">
                     <div className="h-10 w-10 rounded-full border border-white/20 overflow-hidden bg-zinc-800">
@@ -349,7 +349,7 @@ export default async function Home() {
                     </div>
                     <div>
                       <p className="font-bold text-white dark:text-black leading-none">Snag-hub</p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 uppercase tracking-widest font-bold">Creator of DayOS</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 uppercase tracking-widest font-bold">Creator of DOs 4 DOERs</p>
                     </div>
                   </div>
                 </div>
@@ -384,7 +384,7 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
             <Image src="/icon-192.png" alt="Logo" width={24} height={24} className="rounded-md" />
-            <span className="text-lg font-black text-zinc-900 dark:text-white">DayOS</span>
+            <span className="text-lg font-black text-zinc-900 dark:text-white">DOs 4 DOERs</span>
             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-2 px-1 border border-zinc-200 dark:border-zinc-800 rounded">Beta</span>
           </div>
           <div className="flex gap-8 text-sm text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-center sm:text-left">
@@ -410,7 +410,7 @@ export default async function Home() {
           </div>
         </div>
         <div className="mt-12 text-center text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400/50">
-          &copy; {new Date().getFullYear()} DayOS. Designed by Snag-hub.
+          &copy; {new Date().getFullYear()} DOs 4 DOERs. Designed by Snag-hub.
         </div>
       </footer>
     </div>

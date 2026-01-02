@@ -1,7 +1,7 @@
 {
-  "name": "DayOS",
-  "short_name": "DayOS",
-  "description": "Your daily driver for productivity and reading.",
+  "name": "DOs 4 DOERs",
+  "short_name": "DOs 4 DOERs",
+  "description": "Less planning. More doing.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",

@@ -1,6 +1,6 @@
-# Getting Started with DayOS
+﻿# Getting Started with DOs 4 DOERs
 
-Welcome to DayOS! This guide will help you get up and running in just a few minutes.
+Welcome to DOs 4 DOERs! This guide will help you get up and running in just a few minutes.
 
 ---
 
@@ -18,7 +18,7 @@ Welcome to DayOS! This guide will help you get up and running in just a few minu
 
 ## 1. Create Your Account
 
-1. Visit [dayos.snagdev.in](https://dayos.snagdev.in)
+1. Visit [DOs 4 DOERs.snagdev.in](https://DOs 4 DOERs.snagdev.in)
 2. Click **"Sign Up"** in the top right
 3. Choose your sign-up method:
    - Email and password
@@ -64,16 +64,16 @@ There are several ways to save content:
 1. Click the **"+"** button in the top navigation
 2. Paste any URL
 3. Click **"Save"**
-4. DayOS will automatically extract:
+4. DOs 4 DOERs will automatically extract:
    - Title
    - Description
    - Featured image
    - Full article content (if available)
 
-### Method 2: Share to DayOS (Mobile)
+### Method 2: Share to DOs 4 DOERs (Mobile)
 1. Open any app with a share button
 2. Tap **Share**
-3. Select **"DayOS"** from the share menu
+3. Select **"DOs 4 DOERs"** from the share menu
 4. The item is saved instantly!
 
 ### Method 3: Browser Extension (Recommended)
@@ -117,7 +117,7 @@ The browser extension is the fastest way to save content while browsing.
 
 5. **Start Saving!**
    - Click the extension icon on any page
-   - Or right-click → **"Save to DayOS"**
+   - Or right-click → **"Save to DOs 4 DOERs"**
    - Or use keyboard shortcut: `Ctrl+Shift+S` (Windows/Linux) or `Cmd+Shift+S` (Mac)
 
 📖 **Need help?** See the [Complete Extension Guide](../EXTENSION_GUIDE.md)
@@ -195,8 +195,8 @@ Go to **Settings** → **Preferences** to configure:
 
 - **Documentation**: Check our [full documentation](./README.md)
 - **FAQ**: See [Frequently Asked Questions](./FAQ.md)
-- **Support**: Email us at support@dayos.com
-- **Bug Reports**: [Open an issue](https://github.com/yourusername/dayos/issues)
+- **Support**: Email us at support@DOs 4 DOERs.com
+- **Bug Reports**: [Open an issue](https://github.com/yourusername/DOs 4 DOERs/issues)
 
 ---
 

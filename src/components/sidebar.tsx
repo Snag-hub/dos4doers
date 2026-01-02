@@ -41,12 +41,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <Link href="/" className="flex items-center gap-2 font-bold text-xl text-zinc-900 dark:text-white">
                     <Image
                         src="/icon-192.png"
-                        alt="DayOS Logo"
+                        alt="DOs 4 DOERs Logo"
                         width={32}
                         height={32}
                         className="rounded-lg"
                     />
-                    <span>DayOS</span>
+                    <span>DOs 4 DOERs</span>
                 </Link>
                 {/* Mobile Close Button */}
                 <button

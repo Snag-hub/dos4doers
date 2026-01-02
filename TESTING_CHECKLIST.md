@@ -1,7 +1,7 @@
-# Manual Testing Checklist - Pre-Launch
+﻿# Manual Testing Checklist - Pre-Launch
 
 ## Overview
-Complete this checklist before releasing DayOS to early users. Test on multiple devices and browsers to ensure a smooth user experience.
+Complete this checklist before releasing DOs 4 DOERs to early users. Test on multiple devices and browsers to ensure a smooth user experience.
 
 ---
 
@@ -44,13 +44,13 @@ Complete this checklist before releasing DayOS to early users. Test on multiple 
 ### Browser Extension
 - [ ] Extension icon visible in toolbar
 - [ ] Click extension icon saves current page
-- [ ] Right-click menu "Save to DayOS" works
+- [ ] Right-click menu "Save to DOs 4 DOERs" works
 - [ ] Keyboard shortcut (Ctrl+Shift+S) works
 - [ ] Extension shows success notification
 - [ ] Extension shows error for invalid pages
 
-### Share to DayOS (Mobile)
-- [ ] Share sheet shows DayOS option
+### Share to DOs 4 DOERs (Mobile)
+- [ ] Share sheet shows DOs 4 DOERs option
 - [ ] Sharing from browser works
 - [ ] Sharing from other apps works
 - [ ] Item saved correctly

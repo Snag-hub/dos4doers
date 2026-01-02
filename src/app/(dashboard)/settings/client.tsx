@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { generateApiToken } from './actions';
 import { getGeneralReminders, addReminder, deleteReminder, updateReminder, updatePreferences } from '@/app/actions';
@@ -263,7 +263,7 @@ export default function SettingsClient({
                         <SectionHeader
                             icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>}
                             title="Preferences"
-                            description="Customize how DayOS interacts with you."
+                            description="Customize how DOs 4 DOERs interacts with you."
                         />
                         <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
                             <ToggleRow
@@ -371,7 +371,7 @@ export default function SettingsClient({
                         />
                         <div className="flex flex-col gap-3">
                             <a
-                                href="/dayos-extension.zip"
+                                href="/DOs 4 DOERs-extension.zip"
                                 download
                                 className="flex items-center justify-between p-3 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/30 hover:bg-sky-100 dark:hover:bg-sky-900/40 transition-colors group"
                             >
@@ -387,7 +387,7 @@ export default function SettingsClient({
                                 <svg className="w-4 h-4 text-sky-400 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                             </a>
                             <a
-                                href="/dayos-extension-firefox.zip"
+                                href="/DOs 4 DOERs-extension-firefox.zip"
                                 download
                                 className="flex items-center justify-between p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/30 hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors group"
                             >
@@ -561,7 +561,7 @@ export default function SettingsClient({
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <div>
-                                        <p className="font-medium text-zinc-900 dark:text-zinc-100 text-sm">DayOS v1.0</p>
+                                        <p className="font-medium text-zinc-900 dark:text-zinc-100 text-sm">DOs 4 DOERs v1.0</p>
                                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Your personal knowledge hub</p>
                                     </div>
                                 </div>

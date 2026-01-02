@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { Sidebar } from '@/components/sidebar';
@@ -28,12 +28,12 @@ export default function DashboardLayout({
                     <div className="flex items-center gap-2">
                         <Image
                             src="/icon-192.png"
-                            alt="DayOS"
+                            alt="DOs 4 DOERs"
                             width={28}
                             height={28}
                             className="rounded-lg"
                         />
-                        <span className="font-bold text-lg text-zinc-900 dark:text-white">DayOS</span>
+                        <span className="font-bold text-lg text-zinc-900 dark:text-white">DOs 4 DOERs</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <SearchTrigger variant="compact" />

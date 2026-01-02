@@ -1,8 +1,8 @@
-# DayOS - Your Personal Knowledge Hub
+# DOs 4 DOERs
 
 <div align="center">
 
-**Save, organize, and revisit everything that matters.**
+**Less planning. More doing.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
@@ -61,7 +61,7 @@
 
 1. **Visit the App**
    ```
-   https://dayos.snagdev.in
+   https://dos4doers.snagdev.in
    ```
 
 2. **Create an Account**
@@ -79,7 +79,7 @@
 
 5. **Start Saving!**
    - Click the extension icon on any page
-   - Or use right-click → "Save to DayOS"
+   - Or use right-click → "Save to DOs 4 DOERs"
 
 📖 **[Complete User Guide](./docs/USER_GUIDE.md)**
 
@@ -96,8 +96,8 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/dayos.git
-   cd dayos
+   git clone https://github.com/yourusername/dos4doers.git
+   cd dos4doers
    ```
 
 2. **Install dependencies**
@@ -155,13 +155,13 @@ npm run build
 
 ## 🧩 Browser Extension
 
-The DayOS browser extension lets you save any webpage with a single click.
+The DOs 4 DOERs browser extension lets you save any webpage with a single click.
 
 ### Quick Setup
 
 1. **Download the Extension**
-   - Chrome/Edge: Download `dayos-extension.zip` from Settings
-   - Firefox: Download `dayos-extension-firefox.zip` from Settings
+   - Chrome/Edge: Download `dos4doers-extension.zip` from Settings
+   - Firefox: Download `dos4doers-extension-firefox.zip` from Settings
 
 2. **Install**
    - **Chrome/Edge**: 
@@ -177,12 +177,12 @@ The DayOS browser extension lets you save any webpage with a single click.
 
 3. **Configure**
    - Click the extension icon
-   - Enter your API token from DayOS Settings
+   - Enter your API token from DOs 4 DOERs Settings
    - Click "Save"
 
 4. **Use**
    - Click the extension icon on any page to save
-   - Or right-click → "Save to DayOS"
+   - Or right-click → "Save to DOs 4 DOERs"
    - Or use keyboard shortcut: `Ctrl+Shift+S` (Windows/Linux) or `Cmd+Shift+S` (Mac)
 
 📖 **[Complete Extension Guide](./EXTENSION_GUIDE.md)**
@@ -192,7 +192,7 @@ The DayOS browser extension lets you save any webpage with a single click.
 ## 📚 Documentation
 
 ### User Guides
-- **[Getting Started](./docs/GETTING_STARTED.md)** - First steps with DayOS
+- **[Getting Started](./docs/GETTING_STARTED.md)** - First steps with DOs 4 DOERs
 - **[Extension Setup](./EXTENSION_GUIDE.md)** - Install and configure the browser extension
 - **[Features Overview](./docs/FEATURES.md)** - Detailed feature documentation
 - **[FAQ](./docs/FAQ.md)** - Frequently asked questions
@@ -253,8 +253,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Made with ❤️ by the DayOS Team**
+**Made with ❤️ by the DOs 4 DOERs Team**
 
-[Website](#) • [Documentation](./docs) • [Report Bug](https://github.com/yourusername/dayos/issues) • [Request Feature](https://github.com/yourusername/dayos/issues)
+[Website](#) • [Documentation](./docs) • [Report Bug](https://github.com/yourusername/dos4doers/issues) • [Request Feature](https://github.com/yourusername/dos4doers/issues)
 
 </div>

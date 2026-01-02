@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export default function TermsPage() {
@@ -17,21 +17,21 @@ export default function TermsPage() {
                     <section>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">1. Acceptance of Terms</h2>
                         <p>
-                            By accessing or using DayOS, you agree to be bound by these Terms of Service. If you do not agree, please do not use the application.
+                            By accessing or using DOs 4 DOERs, you agree to be bound by these Terms of Service. If you do not agree, please do not use the application.
                         </p>
                     </section>
 
                     <section>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">2. Eligibility</h2>
                         <p>
-                            You must be at least 13 years old to use DayOS. By using the service, you represent that you meet this age requirement. If you are under 18, you must have permission from a parent or guardian.
+                            You must be at least 13 years old to use DOs 4 DOERs. By using the service, you represent that you meet this age requirement. If you are under 18, you must have permission from a parent or guardian.
                         </p>
                     </section>
 
                     <section>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">3. Account Terms</h2>
                         <p>
-                            When you create an account with DayOS:
+                            When you create an account with DOs 4 DOERs:
                         </p>
                         <ul className="list-disc pl-6 mt-2 space-y-1">
                             <li>You must provide accurate and complete information</li>
@@ -45,7 +45,7 @@ export default function TermsPage() {
                     <section>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">4. Use of Service</h2>
                         <p>
-                            DayOS is a personal productivity tool. You agree to use the service for lawful purposes and in accordance with these Terms. You are responsible for maintaining the confidentiality of your account.
+                            DOs 4 DOERs is a personal productivity tool. You agree to use the service for lawful purposes and in accordance with these Terms. You are responsible for maintaining the confidentiality of your account.
                         </p>
                     </section>
 
@@ -55,7 +55,7 @@ export default function TermsPage() {
                             You may not:
                         </p>
                         <ul className="list-disc pl-6 mt-2 space-y-1">
-                            <li>Use DayOS to store or distribute illegal content</li>
+                            <li>Use DOs 4 DOERs to store or distribute illegal content</li>
                             <li>Attempt to breach security or access other users' data</li>
                             <li>Use the service for any malicious purposes</li>
                             <li>Abuse, harass, or harm other users</li>
@@ -68,10 +68,10 @@ export default function TermsPage() {
                     <section>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">6. Intellectual Property</h2>
                         <p>
-                            <strong>Your Content:</strong> You retain all rights to the content you save and create in DayOS. By using the service, you grant us a limited license to store, display, and process your content solely to provide the service.
+                            <strong>Your Content:</strong> You retain all rights to the content you save and create in DOs 4 DOERs. By using the service, you grant us a limited license to store, display, and process your content solely to provide the service.
                         </p>
                         <p className="mt-4">
-                            <strong>Our Property:</strong> The DayOS name, logo, and all service features are our intellectual property. You may not use them without permission.
+                            <strong>Our Property:</strong> The DOs 4 DOERs name, logo, and all service features are our intellectual property. You may not use them without permission.
                         </p>
                     </section>
 
@@ -107,28 +107,28 @@ export default function TermsPage() {
                     <section>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">9. Disclaimer of Warranty</h2>
                         <p>
-                            DayOS is provided "as is" without warranties of any kind, either express or implied. We do not guarantee that the service will be uninterrupted, error-free, or secure. You use the service at your own risk.
+                            DOs 4 DOERs is provided "as is" without warranties of any kind, either express or implied. We do not guarantee that the service will be uninterrupted, error-free, or secure. You use the service at your own risk.
                         </p>
                     </section>
 
                     <section>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">10. Limitation of Liability</h2>
                         <p>
-                            In no event shall DayOS or its creator be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or in connection with your use of the service, including but not limited to loss of data, loss of profits, or business interruption.
+                            In no event shall DOs 4 DOERs or its creator be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or in connection with your use of the service, including but not limited to loss of data, loss of profits, or business interruption.
                         </p>
                     </section>
 
                     <section>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">11. Indemnification</h2>
                         <p>
-                            You agree to indemnify and hold harmless DayOS and its creator from any claims, damages, losses, or expenses (including legal fees) arising from your use of the service or violation of these Terms.
+                            You agree to indemnify and hold harmless DOs 4 DOERs and its creator from any claims, damages, losses, or expenses (including legal fees) arising from your use of the service or violation of these Terms.
                         </p>
                     </section>
 
                     <section>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">12. Governing Law</h2>
                         <p>
-                            These Terms of Service are governed by and construed in accordance with the laws of India. Any disputes arising from these Terms or your use of DayOS shall be subject to the exclusive jurisdiction of the courts in India.
+                            These Terms of Service are governed by and construed in accordance with the laws of India. Any disputes arising from these Terms or your use of DOs 4 DOERs shall be subject to the exclusive jurisdiction of the courts in India.
                         </p>
                     </section>
 
@@ -145,8 +145,8 @@ export default function TermsPage() {
                             For questions about these Terms of Service, please contact:
                         </p>
                         <ul className="list-none mt-2 space-y-1">
-                            <li>Legal inquiries: <a href="mailto:legal@support.dayos.snagdev.in" className="text-blue-600 underline">legal@support.dayos.snagdev.in</a></li>
-                            <li>General support: <a href="mailto:support@support.dayos.snagdev.in" className="text-blue-600 underline">support@support.dayos.snagdev.in</a></li>
+                            <li>Legal inquiries: <a href="mailto:legal@support.DOs 4 DOERs.snagdev.in" className="text-blue-600 underline">legal@support.DOs 4 DOERs.snagdev.in</a></li>
+                            <li>General support: <a href="mailto:support@support.DOs 4 DOERs.snagdev.in" className="text-blue-600 underline">support@support.DOs 4 DOERs.snagdev.in</a></li>
                         </ul>
                     </section>
                 </div>

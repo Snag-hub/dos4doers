@@ -1,4 +1,4 @@
-# DayOS: Scope & Master Plan
+﻿# DOs 4 DOERs: Scope & Master Plan
 
 ## 🗺 Roadmap
 

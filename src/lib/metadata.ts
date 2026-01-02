@@ -1,4 +1,4 @@
-import ogs from 'open-graph-scraper';
+﻿import ogs from 'open-graph-scraper';
 import nodeFetch from 'node-fetch';
 
 export interface Metadata {
@@ -56,7 +56,7 @@ export async function getMetadata(url: string): Promise<Metadata> {
         return nodeFetch(input, {
           signal: controller.signal as any,
           headers: {
-            'User-Agent': 'DayOS-Bot/1.0 (+https://dayos.app)',
+            'User-Agent': 'DOs 4 DOERs-Bot/1.0 (+https://DOs 4 DOERs.app)',
           }
         });
       };

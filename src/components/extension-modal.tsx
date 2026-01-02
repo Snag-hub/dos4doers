@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef } from 'react';
 import { X, Download, AlertCircle } from 'lucide-react';
@@ -64,7 +64,7 @@ export function ExtensionModal({ isOpen, onClose }: ExtensionModalProps) {
 
                     <div className="mt-10 flex flex-col sm:flex-row gap-4">
                         <a
-                            href="/dayos-extension-chromium.zip"
+                            href="/DOs 4 DOERs-extension-chromium.zip"
                             download
                             className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 py-4 text-sm font-bold text-white transition-all hover:bg-blue-500 shadow-lg shadow-blue-500/20 active:scale-95"
                             onClick={onClose}

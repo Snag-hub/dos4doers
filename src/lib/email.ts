@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-const emailFrom = process.env.EMAIL_FROM || 'DayOS <noreply@dayos.app>';
+const emailFrom = process.env.EMAIL_FROM || 'DOs 4 DOERs <noreply@dos4doers.app>';
 
 // Lazy initialization - only create client when needed
 function getResendClient() {

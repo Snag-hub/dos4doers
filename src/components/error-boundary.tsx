@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
@@ -143,7 +143,7 @@ export class ErrorBoundary extends Component<Props, State> {
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center mt-6">
                                 If this problem persists, please{' '}
                                 <a
-                                    href="mailto:support@dayos.snagdev.in"
+                                    href="mailto:support@DOs 4 DOERs.snagdev.in"
                                     className="text-blue-600 dark:text-blue-400 hover:underline"
                                 >
                                     contact support

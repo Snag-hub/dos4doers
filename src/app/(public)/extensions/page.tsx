@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowLeft, Chrome, Monitor, Zap, Shield, Download, Pin } from "lucide-react";
 import { ChromeExtensionLink } from "@/components/chrome-extension-link";
 
@@ -14,7 +14,7 @@ export default function ExtensionsPage() {
                 <div className="mb-16">
                     <h1 className="text-5xl font-black mb-6 tracking-tight">Get the Extension</h1>
                     <p className="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed">
-                        DayOS works best when it's just a click away. Save articles, set reminders, and capture inspiration directly from your browser.
+                        DOs 4 DOERs works best when it's just a click away. Save articles, set reminders, and capture inspiration directly from your browser.
                         Need help starting? Check our <Link href="/guide" className="text-blue-600 hover:underline">User Guide</Link>.
                     </p>
                 </div>
@@ -45,7 +45,7 @@ export default function ExtensionsPage() {
                         <h3 className="text-2xl font-bold mb-2">Edge</h3>
                         <p className="text-zinc-500 text-sm mb-8">Optimized V3 build for Microsoft Edge.</p>
                         <a
-                            href="/dayos-extension-chromium.zip"
+                            href="/DOs 4 DOERs-extension-chromium.zip"
                             download
                             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-blue-500"
                         >
@@ -111,7 +111,7 @@ export default function ExtensionsPage() {
                                     Pin for Easy Access
                                 </h3>
                                 <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed pl-8">
-                                    Click the puzzle icon in your toolbar and pin DayOS so you can save pages instantly.
+                                    Click the puzzle icon in your toolbar and pin DOs 4 DOERs so you can save pages instantly.
                                 </p>
                             </div>
                         </div>

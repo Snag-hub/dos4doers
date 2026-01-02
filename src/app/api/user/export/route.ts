@@ -1,4 +1,4 @@
-
+﻿
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
@@ -38,7 +38,7 @@ export async function GET() {
         return new NextResponse(JSON.stringify(exportData, null, 2), {
             headers: {
                 'Content-Type': 'application/json',
-                'Content-Disposition': `attachment; filename="dayos-export-${new Date().toISOString().split('T')[0]}.json"`,
+                'Content-Disposition': `attachment; filename="DOs 4 DOERs-export-${new Date().toISOString().split('T')[0]}.json"`,
             },
         });
     } catch (error) {

@@ -1,4 +1,4 @@
-import {
+﻿import {
   timestamp,
   pgTable,
   text,
@@ -219,7 +219,7 @@ export const meetings = pgTable('meetings', {
   stage: interviewStageEnum('stage'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-  provider: text('provider').default('dayos').notNull(),
+  provider: text('provider').default('DOs 4 DOERs').notNull(),
   externalId: text('externalId'), // Google Calendar Event ID
 
   // Calendar metadata for multi-calendar support

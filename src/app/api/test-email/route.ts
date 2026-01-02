@@ -1,4 +1,4 @@
-import { sendEmail } from '@/lib/email';
+﻿import { sendEmail } from '@/lib/email';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -25,7 +25,7 @@ export async function GET(req: Request) {
                     <h1 style="color: #18181b; margin: 0; font-size: 24px;">✅ Email Test Successful!</h1>
                 </div>
                 <p>Hi there,</p>
-                <p>This is a test email from your DayOS application using <strong>Resend</strong>.</p>
+                <p>This is a test email from your DOs 4 DOERs application using <strong>Resend</strong>.</p>
                 <p>If you're seeing this, your email system is working correctly! 🎉</p>
                 <hr style="border: none; border-top: 1px solid #e4e4e7; margin: 24px 0;" />
                 <p style="font-size: 12px; color: #a1a1aa; text-align: center;">
@@ -36,7 +36,7 @@ export async function GET(req: Request) {
 
         const result = await sendEmail({
             to,
-            subject: 'DayOS Email Test - Resend Integration',
+            subject: 'DOs 4 DOERs Email Test - Resend Integration',
             html: testHtml,
         });
 

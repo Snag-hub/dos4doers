@@ -1,4 +1,4 @@
-import { Readability } from '@mozilla/readability';
+﻿import { Readability } from '@mozilla/readability';
 import { Window } from 'happy-dom';
 import createDOMPurify from 'dompurify';
 
@@ -12,7 +12,7 @@ export async function extractContent(url: string): Promise<ExtractedContent | nu
     try {
         const response = await fetch(url, {
             headers: {
-                'User-Agent': 'DayOS-Bot/1.0 (+https://dayos.app)',
+                'User-Agent': 'DOs 4 DOERs-Bot/1.0 (+https://DOs 4 DOERs.app)',
             }
         });
 

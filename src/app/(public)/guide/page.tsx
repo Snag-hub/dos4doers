@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import {
     ArrowLeft, BookOpen, Bell, Globe, Zap, CheckCircle, Shield,
     ArrowRight, Search, Keyboard, MousePointer2, ListFilter,
@@ -15,7 +15,7 @@ export default function GuidePage() {
                         <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
                             <Zap className="w-5 h-5 fill-current" />
                         </div>
-                        DayOS
+                        DOs 4 DOERs
                     </Link>
                     <nav className="hidden md:flex items-center gap-6 text-sm font-bold text-zinc-500">
                         <a href="#quick-start" className="hover:text-blue-600 transition-colors">Quick Start</a>
@@ -39,7 +39,7 @@ export default function GuidePage() {
                         Master your <br /><span className="text-blue-600">Intelligence.</span>
                     </h1>
                     <p className="text-xl md:text-2xl text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed font-medium">
-                        Welcome to DayOS. This guide will transform how you capture, organize, and recall everything you find on the web.
+                        Welcome to DOs 4 DOERs. This guide will transform how you capture, organize, and recall everything you find on the web.
                     </p>
                 </div>
 
@@ -85,23 +85,23 @@ export default function GuidePage() {
                             <div className="flex-1">
                                 <h2 className="text-4xl font-black mb-6 tracking-tight">Your First 5 Minutes</h2>
                                 <p className="text-zinc-600 dark:text-zinc-400 mb-10 leading-relaxed text-lg">
-                                    Setting up DayOS is instant. Follow these four steps to start building your knowledge base.
+                                    Setting up DOs 4 DOERs is instant. Follow these four steps to start building your knowledge base.
                                 </p>
                                 <div className="space-y-8">
                                     <Step number="01" title="Sign In & Connect">
                                         Create an account using Clerk. Your data is isolated and encrypted from day one.
                                     </Step>
                                     <Step number="02" title="Desktop: Browser Extension">
-                                        The fastest way to save. Click the DayOS icon in your browser to instantly capture the current page.
+                                        The fastest way to save. Click the DOs 4 DOERs icon in your browser to instantly capture the current page.
                                         <Link href="/extensions" className="text-blue-600 hover:underline inline-flex items-center gap-1 ml-1">
                                             Get Extension <ArrowRight className="w-3 h-3" />
                                         </Link>
                                     </Step>
                                     <Step number="03" title="Mobile: Android Sharing">
-                                        On your phone? Use the system <span className="text-blue-600 font-bold">Share</span> menu in any app (like Chrome or YouTube) and select <span className="text-blue-600 font-bold">DayOS</span> to save it to your inbox.
+                                        On your phone? Use the system <span className="text-blue-600 font-bold">Share</span> menu in any app (like Chrome or YouTube) and select <span className="text-blue-600 font-bold">DOs 4 DOERs</span> to save it to your inbox.
                                     </Step>
                                     <Step number="04" title="The Magic: Auto-Extraction">
-                                        Once saved, DayOS works in the background. It automatically extracts the clean article text, metadata, and thumbnails so it's ready for you in the <span className="text-blue-600 font-bold">Inbox</span>.
+                                        Once saved, DOs 4 DOERs works in the background. It automatically extracts the clean article text, metadata, and thumbnails so it's ready for you in the <span className="text-blue-600 font-bold">Inbox</span>.
                                     </Step>
                                 </div>
                             </div>
@@ -151,7 +151,7 @@ export default function GuidePage() {
                                 title="Intelligent Snooze"
                                 color="bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
                             >
-                                Not ready to read? Snooze items for 10m, 1hr, or until tomorrow. DayOS manages the queue so you don't have to.
+                                Not ready to read? Snooze items for 10m, 1hr, or until tomorrow. DOs 4 DOERs manages the queue so you don't have to.
                             </FeatureCard>
                         </div>
                     </section>
@@ -161,7 +161,7 @@ export default function GuidePage() {
                         <div className="text-center mb-16">
                             <h2 className="text-5xl font-black mb-6 tracking-tight">The Trinity</h2>
                             <p className="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
-                                DayOS is your Personal Operating System. It's built on three core pillars that keep your life in sync.
+                                DOs 4 DOERs is your Personal Operating System. It's built on three core pillars that keep your life in sync.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -180,7 +180,7 @@ export default function GuidePage() {
                                 </div>
                                 <h3 className="text-2xl font-black tracking-tight">Digital Notes</h3>
                                 <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                    Capture thoughts instantly. Notes in DayOS are context-aware—attach them to articles, tasks, or meetings for effortless recall.
+                                    Capture thoughts instantly. Notes in DOs 4 DOERs are context-aware—attach them to articles, tasks, or meetings for effortless recall.
                                 </p>
                             </div>
                             <div className="space-y-6">
@@ -237,7 +237,7 @@ export default function GuidePage() {
                         <div className="relative z-10 max-w-3xl">
                             <h2 className="text-4xl md:text-5xl font-black text-white dark:text-zinc-900 mb-8 tracking-tight">Become a Power User.</h2>
                             <p className="text-zinc-400 dark:text-zinc-500 mb-12 text-lg leading-relaxed">
-                                DayOS is built for speed. Once you master the keyboard, you'll never go back to clicking around.
+                                DOs 4 DOERs is built for speed. Once you master the keyboard, you'll never go back to clicking around.
                             </p>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
@@ -266,15 +266,15 @@ export default function GuidePage() {
                             <div className="space-y-6">
                                 <FAQ
                                     q="The extension isn't saving my token."
-                                    a="Make sure you've copied the correct API Token from your DayOS Settings page. Paste it exactly, and ensure no extra spaces were added at the start or end."
+                                    a="Make sure you've copied the correct API Token from your DOs 4 DOERs Settings page. Paste it exactly, and ensure no extra spaces were added at the start or end."
                                 />
                                 <FAQ
                                     q="Does Reader Mode work on every site?"
                                     a="Most major news sites, blogs, and documentation pages are supported. If a site is heavily protected or uses a non-standard layout, we'll still save the URL and metadata for you."
                                 />
                                 <FAQ
-                                    q="Can I use DayOS on mobile?"
-                                    a="Yes! DayOS is a PWA (Progressive Web App). Simply visit the site on Safari (iOS) or Chrome (Android) and choose 'Add to Home Screen' for a native-like experience."
+                                    q="Can I use DOs 4 DOERs on mobile?"
+                                    a="Yes! DOs 4 DOERs is a PWA (Progressive Web App). Simply visit the site on Safari (iOS) or Chrome (Android) and choose 'Add to Home Screen' for a native-like experience."
                                 />
                                 <FAQ
                                     q="How do I permanently delete something?"
@@ -294,7 +294,7 @@ export default function GuidePage() {
                             href="/inbox"
                             className="px-10 py-5 rounded-3xl bg-white text-blue-600 text-lg font-black transition-all hover:scale-105 active:scale-95 shadow-xl"
                         >
-                            Open DayOS
+                            Open DOs 4 DOERs
                         </Link>
                         <Link
                             href="/extensions"

@@ -1,7 +1,7 @@
-# DayOS: Project Overview
+﻿# DOs 4 DOERs: Project Overview
 
 ## 🌟 Vision
-DayOS is a **productivity system** designed to bridge the gap between "Capture" and "Action". Unlike traditional read-later apps that become graveyards for links, or to-do apps that lack context, DayOS treats every captured item (Article, Video, Task, Meeting) as a time-based commitment.
+DOs 4 DOERs is a **productivity system** designed to bridge the gap between "Capture" and "Action". Unlike traditional read-later apps that become graveyards for links, or to-do apps that lack context, DOs 4 DOERs treats every captured item (Article, Video, Task, Meeting) as a time-based commitment.
 
 **Core Philosophy:**
 1.  **Capture Everything**: Frictionless saving from browser/mobile.
@@ -52,7 +52,7 @@ DayOS is a **productivity system** designed to bridge the gap between "Capture" 
 
 ### 3. Branding & UX
 -   **Premium Design**: Glassmorphism, Dark Mode (OLED friendly), Smooth Animations.
--   **Rich Emails**: Notifications include the DayOS logo and source website favicons.
+-   **Rich Emails**: Notifications include the DOs 4 DOERs logo and source website favicons.
 -   **Responsive**: "WhatsApp-style" mobile navigation (Bottom Tabs).
 
 ### 4. Reliability
