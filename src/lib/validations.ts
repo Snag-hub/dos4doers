@@ -60,5 +60,9 @@ export const meetingSchema = z.object({
 // Tag Validations
 export const tagSchema = z.object({
   name: z.string().min(1).max(50),
-  color: z.string().regex(/^#[0-9A-F]{6}$/i).or(z.literal('')).optional().transform(val => val === '' ? undefined : val),
+  color: z.union([
+    z.string().regex(/^#[0-9A-F]{6}$/i),
+    z.literal(''),
+    z.undefined()
+  ]).optional().transform(val => !val || val === '' ? undefined : val),
 });
