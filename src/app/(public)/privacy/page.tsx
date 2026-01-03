@@ -83,7 +83,7 @@ export default function PrivacyPage() {
                             <li><strong>Opt-out:</strong> Unsubscribe from email notifications</li>
                         </ul>
                         <p className="mt-4">
-                            To exercise these rights, contact us at <a href="mailto:privacy@support.DOs 4 DOERs.snagdev.in" className="text-blue-600 underline">privacy@support.DOs 4 DOERs.snagdev.in</a> or use the data export feature in Settings.
+                            To exercise these rights, contact us at <a href="mailto:privacy@support.dos4doers.snagdev.in" className="text-blue-600 underline">privacy@support.dos4doers.snagdev.in</a> or use the data export feature in Settings.
                         </p>
                     </section>
 
@@ -139,8 +139,8 @@ export default function PrivacyPage() {
                             If you have any questions about this Privacy Policy, please contact us:
                         </p>
                         <ul className="list-none mt-2 space-y-1">
-                            <li>Privacy inquiries: <a href="mailto:privacy@support.DOs 4 DOERs.snagdev.in" className="text-blue-600 underline">privacy@support.DOs 4 DOERs.snagdev.in</a></li>
-                            <li>General support: <a href="mailto:support@support.DOs 4 DOERs.snagdev.in" className="text-blue-600 underline">support@support.DOs 4 DOERs.snagdev.in</a></li>
+                            <li>Privacy inquiries: <a href="mailto:privacy@support.dos4doers.snagdev.in" className="text-blue-600 underline">privacy@support.dos4doers.snagdev.in</a></li>
+                            <li>General support: <a href="mailto:support@support.dos4doers.snagdev.in" className="text-blue-600 underline">support@support.dos4doers.snagdev.in</a></li>
                         </ul>
                     </section>
                 </div>

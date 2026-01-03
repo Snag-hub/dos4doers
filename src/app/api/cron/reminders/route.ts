@@ -135,7 +135,7 @@ export async function GET(req: Request) {
 
         const results = [];
         // Use process.env.NEXTAUTH_URL or fallback. Ensure no trailing slash for consistent handling
-        const appUrl = (process.env.NEXTAUTH_URL || 'https://DOs 4 DOERs.app').replace(/\/$/, "");
+        const appUrl = (process.env.NEXTAUTH_URL || 'https://dos4doers.app').replace(/\/$/, "");
 
         for (const email of Object.keys(groupedByUser)) {
             const userGroup = groupedByUser[email];

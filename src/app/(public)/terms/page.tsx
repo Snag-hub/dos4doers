@@ -145,8 +145,8 @@ export default function TermsPage() {
                             For questions about these Terms of Service, please contact:
                         </p>
                         <ul className="list-none mt-2 space-y-1">
-                            <li>Legal inquiries: <a href="mailto:legal@support.DOs 4 DOERs.snagdev.in" className="text-blue-600 underline">legal@support.DOs 4 DOERs.snagdev.in</a></li>
-                            <li>General support: <a href="mailto:support@support.DOs 4 DOERs.snagdev.in" className="text-blue-600 underline">support@support.DOs 4 DOERs.snagdev.in</a></li>
+                            <li>Legal inquiries: <a href="mailto:legal@support.dos4doers.snagdev.in" className="text-blue-600 underline">legal@support.dos4doers.snagdev.in</a></li>
+                            <li>General support: <a href="mailto:support@support.dos4doers.snagdev.in" className="text-blue-600 underline">support@support.dos4doers.snagdev.in</a></li>
                         </ul>
                     </section>
                 </div>
