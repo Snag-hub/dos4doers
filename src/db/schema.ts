@@ -21,6 +21,8 @@ export const taskPriorityEnum = pgEnum('task_priority', ['low', 'medium', 'high'
 export const meetingTypeEnum = pgEnum('meeting_type', ['general', 'interview']);
 export const interviewStageEnum = pgEnum('interview_stage', ['screening', 'technical', 'culture', 'offer', 'rejected']);
 
+export const userStatusEnum = pgEnum('user_status', ['active', 'waitlist']);
+
 // Simplified users table for Clerk
 export const users = pgTable('user', {
   id: text('id')
@@ -37,6 +39,7 @@ export const users = pgTable('user', {
     .defaultNow(),
   emailNotifications: boolean('emailNotifications').default(true).notNull(),
   pushNotifications: boolean('pushNotifications').default(true).notNull(),
+  status: userStatusEnum('status').default('active').notNull(),
 });
 
 export const accounts = pgTable(
