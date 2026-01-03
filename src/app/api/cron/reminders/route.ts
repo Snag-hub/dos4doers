@@ -263,7 +263,7 @@ export async function GET(req: Request) {
                       <div style="max-width: 600px; margin: 0 auto; background: #ffffff;">
                         <!-- Header with Gradient -->
                         <div style="background: linear-gradient(135deg, #0A1628 0%, #1e293b 100%); padding: 40px 24px; text-align: center; border-radius: 0 0 24px 24px;">
-                          <img src="${appUrl}/icon-192.png" width="56" height="56" style="border-radius: 14px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);" alt="DOs 4 DOERs Logo" />
+                          <img src="https://dos4doers.snagdev.in/icon-192.png" width="56" height="56" style="border-radius: 14px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);" alt="DOs 4 DOERs Logo" />
                           <h1 style="color: #ffffff; margin: 0 0 8px 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Your Daily Digest</h1>
                           <p style="color: #94a3b8; margin: 0; font-size: 15px; font-weight: 500;">Hi ${userGroup.name || 'there'}, here's what needs your attention</p>
                         </div>
