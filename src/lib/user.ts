@@ -1,7 +1,7 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { db } from '@/db';
 import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, count } from 'drizzle-orm';
 
 /**
  * Ensures the current authenticated Clerk user exists in the local database.
@@ -24,13 +24,18 @@ export async function ensureUser() {
 
     if (!existingUser) {
         // Create user if they don't exist
+        // Enforce Beta Limit (50 users)
+        const [userCount] = await db.select({ count: count() }).from(users);
+        const status = userCount.count >= 50 ? 'waitlist' : 'active';
+
         await db.insert(users).values({
             id: clerkUser.id,
             email: clerkUser.emailAddresses[0]?.emailAddress || '',
             name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || null,
             image: clerkUser.imageUrl || null,
+            status: status, // active or waitlist
         });
-        console.log(`[USER] Created new local record for Clerk user: ${clerkUser.id}`);
+        console.log(`[USER] Created new local record for Clerk user: ${clerkUser.id} with status: ${status}`);
     }
 
     return clerkUser.id;

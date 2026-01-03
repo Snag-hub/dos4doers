@@ -99,6 +99,13 @@
       "when": 1767287620216,
       "tag": "0013_sharp_mandarin",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1767441881735,
+      "tag": "0014_giant_vermin",
+      "breakpoints": true
     }
   ]
 }
