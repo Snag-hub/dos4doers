@@ -18,19 +18,22 @@ export async function submitFeedback(message: string, path: string) {
     // For now, let's send it to the developer email if known, or just log it.
     // But requirement was "Email to admin".
     // I'll assume `process.env.ADMIN_EMAIL` or send to self.
-    const adminEmail = 'imsnag21@gmail.com'; // Hardcoded for your context or use ENV
+    // Send email to admins
+    const adminEmails = ['imsnag.1@gmail.com', 'contact.dos4doers@gmail.com'];
 
-    await sendEmail({
-        to: adminEmail,
-        subject: `[Beta Feedback] from ${name}`,
-        html: `
-            <div style="font-family: sans-serif;">
-                <h2>New Feedback Received</h2>
-                <p><strong>User:</strong> ${name} (${email})</p>
-                <p><strong>Path:</strong> ${path}</p>
-                <hr />
-                <p style="white-space: pre-wrap;">${message}</p>
-            </div>
-        `
-    });
+    await Promise.all(adminEmails.map(to =>
+        sendEmail({
+            to,
+            subject: `[Beta Feedback] from ${name}`,
+            html: `
+                <div style="font-family: sans-serif;">
+                    <h2>New Feedback Received</h2>
+                    <p><strong>User:</strong> ${name} (${email})</p>
+                    <p><strong>Path:</strong> ${path}</p>
+                    <hr />
+                    <p style="white-space: pre-wrap;">${message}</p>
+                </div>
+            `
+        })
+    ));
 }

@@ -33,16 +33,16 @@ export function FeedbackWidget() {
         <>
             {/* Trigger Button */}
             <button
-                onClick={() => setIsOpen(true)}
-                className={`fixed bottom-4 right-4 md:bottom-8 md:right-8 z-50 flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 ${isOpen ? 'bg-zinc-800 text-white dark:bg-zinc-700' : 'bg-blue-600 text-white'}`}
-                aria-label="Send Feedback"
+                onClick={() => setIsOpen(!isOpen)}
+                className={`fixed bottom-24 right-4 md:bottom-8 md:right-8 z-50 flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 ${isOpen ? 'bg-zinc-800 text-white dark:bg-zinc-700' : 'bg-blue-600 text-white'}`}
+                aria-label={isOpen ? "Close Feedback" : "Send Feedback"}
             >
                 {isOpen ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
             </button>
 
             {/* Modal */}
             {isOpen && (
-                <div className="fixed bottom-20 right-4 md:bottom-24 md:right-8 z-50 w-[calc(100vw-32px)] md:w-80 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl animate-in slide-in-from-bottom-5 duration-200">
+                <div className="fixed bottom-40 right-4 md:bottom-24 md:right-8 z-50 w-[calc(100vw-32px)] md:w-80 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl animate-in slide-in-from-bottom-5 duration-200">
                     <form onSubmit={handleSubmit} className="p-4">
                         <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-2">
                             Send Feedback
