@@ -5,13 +5,16 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     try {
-        const { action, itemId, type } = await request.json();
+        const { action, itemId, reminderId, type } = await request.json();
 
-        if (!action || !itemId) {
+        // Support both field names for compatibility
+        const id = itemId || reminderId;
+
+        if (!action || !id) {
             return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
         }
 
-        console.log(`🔔 [PUSH ACTION] ${action} on ${type} ${itemId}`);
+        console.log(`🔔 [PUSH ACTION] ${action} on ${type} ${id}`);
 
         if (action === 'snooze') {
             // Snooze for 1 hour
@@ -20,11 +23,11 @@ export async function POST(request: Request) {
             if (type === 'reminder') {
                 await db.update(reminders)
                     .set({ scheduledAt: newTime })
-                    .where(eq(reminders.id, itemId));
+                    .where(eq(reminders.id, id));
             } else if (type === 'item') {
                 await db.update(items)
                     .set({ reminderAt: newTime })
-                    .where(eq(items.id, itemId));
+                    .where(eq(items.id, id));
             }
 
         } else if (action === 'mark-read') {
@@ -34,20 +37,20 @@ export async function POST(request: Request) {
             // For items it means "Read" -> read=true
 
             if (type === 'reminder') {
-                await db.delete(reminders).where(eq(reminders.id, itemId));
+                await db.delete(reminders).where(eq(reminders.id, id));
             } else if (type === 'item') {
                 await db.update(items)
                     .set({ read: true, reminderAt: null }) // clear reminder too
-                    .where(eq(items.id, itemId));
+                    .where(eq(items.id, id));
             }
 
         } else if (action === 'delete') {
             if (type === 'reminder') {
-                await db.delete(reminders).where(eq(reminders.id, itemId));
+                await db.delete(reminders).where(eq(reminders.id, id));
             } else if (type === 'item') {
                 // Should we delete the item or just the reminder?
                 // "Delete" usually implies full deletion.
-                await db.delete(items).where(eq(items.id, itemId));
+                await db.delete(items).where(eq(items.id, id));
             }
         }
 
