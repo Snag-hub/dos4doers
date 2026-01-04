@@ -36,15 +36,16 @@ export async function GET(request: Request) {
     const appUrl = (process.env.NEXTAUTH_URL || 'https://dos4doers.app').replace(/\/$/, "");
 
     for (const user of subscribers) {
-      // Check for duplicate execution (Idempotency)
+      // Check for duplicate execution (Idempotency) - Improved
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Start of today
+
       if (user.lastDailyDigestAt) {
         const lastSent = new Date(user.lastDailyDigestAt);
-        if (
-          lastSent.getDate() === now.getDate() &&
-          lastSent.getMonth() === now.getMonth() &&
-          lastSent.getFullYear() === now.getFullYear()
-        ) {
-          console.log(`⏭️  [DIGEST] Skipping ${user.email} - Already sent today`);
+        lastSent.setHours(0, 0, 0, 0); // Start of last sent day
+
+        if (lastSent.getTime() >= today.getTime()) {
+          console.log(`⏭️  [DIGEST] Skipping ${user.email} - Already sent today (${user.lastDailyDigestAt})`);
           continue;
         }
       }
@@ -126,6 +127,11 @@ export async function GET(request: Request) {
                 .footer { background: #fafafa; padding: 24px; text-align: center; font-size: 12px; color: #a1a1aa; border-top: 1px solid #e4e4e7; }
                 .btn { display: inline-block; background: #2563eb; color: white; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: 500; font-size: 14px; margin-top: 8px; }
                 .link { color: #2563eb; text-decoration: none; }
+                @media only screen and (max-width: 600px) {
+                  .container { margin: 0 !important; border-radius: 0 !important; }
+                  .content { padding: 20px !important; }
+                  .header { padding: 24px 20px !important; }
+                }
               </style>
             </head>
             <body>
@@ -136,7 +142,8 @@ export async function GET(request: Request) {
                   <div class="header">
                     <img src="${appUrl}/icon-192.png" width="48" height="48" style="border-radius: 10px; margin-bottom: 12px;" alt="Logo" />
                     <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700;">Daily Briefing</h1>
-                    <p style="color: #a1a1aa; margin: 8px 0 0 0; font-size: 14px;">Productivity Update for ${user.name || 'Friend'}</p>
+                    <p style="color: #a1a1aa; margin: 4px 0 0 0; font-size: 14px;">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                    <p style="color: #71717a; margin: 4px 0 0 0; font-size: 13px;">for ${user.name || 'Friend'}</p>
                   </div>
 
                   <div class="content">
@@ -214,18 +221,20 @@ export async function GET(request: Request) {
             </html>
             `;
 
-      // Send
+      // Update Timestamp FIRST (prevents race condition)
+      const digestTimestamp = new Date();
+      await db.update(users)
+        .set({ lastDailyDigestAt: digestTimestamp })
+        .where(eq(users.id, user.id));
+
+      // Then send email
       await sendEmail({
         to: user.email,
         subject: `Daily Briefing: ${upcomingMeetings.length} Meetings, ${dueReminders.length} Reminders`,
         html
       });
 
-      // Update Timestamp
-      await db.update(users)
-        .set({ lastDailyDigestAt: new Date() })
-        .where(eq(users.id, user.id));
-
+      console.log(`✅ [DIGEST] Sent to ${user.email} at ${digestTimestamp.toISOString()}`);
       results.push({ email: user.email });
     }
 

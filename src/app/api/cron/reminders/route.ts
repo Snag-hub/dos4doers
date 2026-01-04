@@ -225,23 +225,28 @@ export async function GET(req: Request) {
       // Cleanup & Reschedule
       for (const item of userGroup.items) {
         if (item.type === 'item') {
-          // Items are currently always one-time reminders logic
-          await db.update(items).set({ reminderAt: null }).where(eq(items.id, item.itemId));
+          // Items: Keep reminderAt set so user can snooze/dismiss via actions
+          // Only clear if user clicks "Done" or "Delete" action
+          console.log(`ℹ️ [CRON] Item ${item.itemId} reminder sent - awaiting user action`);
         } else {
           // General Reminders: Check Recurrence
           if (item.recurrence === 'daily') {
             const nextDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
             await db.update(reminders).set({ scheduledAt: nextDate }).where(eq(reminders.id, item.itemId));
+            console.log(`🔁 [CRON] Daily reminder ${item.itemId} rescheduled to ${nextDate.toISOString()}`);
           } else if (item.recurrence === 'weekly') {
             const nextDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
             await db.update(reminders).set({ scheduledAt: nextDate }).where(eq(reminders.id, item.itemId));
+            console.log(`🔁 [CRON] Weekly reminder ${item.itemId} rescheduled to ${nextDate.toISOString()}`);
           } else if (item.recurrence === 'monthly') {
             const nextDate = new Date();
             nextDate.setMonth(nextDate.getMonth() + 1);
             await db.update(reminders).set({ scheduledAt: nextDate }).where(eq(reminders.id, item.itemId));
+            console.log(`🔁 [CRON] Monthly reminder ${item.itemId} rescheduled to ${nextDate.toISOString()}`);
           } else {
-            // One-time: Delete
-            await db.delete(reminders).where(eq(reminders.id, item.itemId));
+            // One-time: DON'T delete - let user actions handle it
+            // User can click "Done" or "Delete" to remove, or "Snooze" to reschedule
+            console.log(`ℹ️ [CRON] One-time reminder ${item.itemId} sent - awaiting user action`);
           }
         }
       }
