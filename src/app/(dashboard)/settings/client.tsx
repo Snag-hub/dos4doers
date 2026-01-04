@@ -321,28 +321,42 @@ export default function SettingsClient({
                                     <div className="flex justify-end pb-3">
                                         <button
                                             onClick={async () => {
-                                                const toastId = toast.loading('Diagnosing...');
+                                                const toastId = toast.loading('Step 1: Checking Env...');
+
+                                                const timeout = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
+                                                const withTimeout = (promise: Promise<any>, ms: number) => Promise.race([promise, timeout(ms)]);
                                                 try {
                                                     // 1. Check Env
                                                     if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) throw new Error('Missing VAPID Key');
 
                                                     // 2. Check Browser Support
+                                                    toast.loading('Step 2: Browser Support...', { id: toastId });
                                                     if (!('serviceWorker' in navigator)) throw new Error('No SW Support');
                                                     if (!('Notification' in window)) throw new Error('No Notification Support');
 
                                                     // 3. Check Permission
+                                                    toast.loading(`Step 3: Permission (${Notification.permission})...`, { id: toastId });
                                                     if (Notification.permission !== 'granted') throw new Error(`Permission: ${Notification.permission}`);
 
-                                                    // 4. Check Registration
-                                                    const reg = await navigator.serviceWorker.ready;
-                                                    if (!reg) throw new Error('SW Not Ready');
+                                                    // 4. Check Registration (Timeout enforced)
+                                                    toast.loading('Step 4: Waiting for SW Ready...', { id: toastId });
+                                                    let reg;
+                                                    try {
+                                                        reg = await withTimeout(navigator.serviceWorker.ready, 2000);
+                                                    } catch (e) {
+                                                        const regs = await navigator.serviceWorker.getRegistrations();
+                                                        throw new Error(`SW Ready Timeout. Found ${regs.length} regs. Controller: ${navigator.serviceWorker.controller ? 'Yes' : 'No'}`);
+                                                    }
+                                                    if (!reg) throw new Error('SW Not Ready (Reg is null)');
 
                                                     // 5. Check Subscription
-                                                    const sub = await reg.pushManager.getSubscription();
+                                                    toast.loading('Step 5: Checking Subscription...', { id: toastId });
+                                                    const sub = await withTimeout(reg.pushManager.getSubscription(), 2000);
                                                     if (!sub) throw new Error('No active subscription on client');
 
                                                     // 6. Test Send
-                                                    const res = await sendTestNotification();
+                                                    toast.loading('Step 6: Sending Test...', { id: toastId });
+                                                    const res = await withTimeout(sendTestNotification(), 8000);
 
                                                     toast.dismiss(toastId);
                                                     if (res.success) toast.success(`Sent! (Count: ${res.count})`);
@@ -351,7 +365,8 @@ export default function SettingsClient({
                                                 } catch (e: any) {
                                                     toast.dismiss(toastId);
                                                     console.error(e);
-                                                    alert(`Diagnostic Error: ${e.message}`); // Use alert for mobile visibility
+                                                    // Use alert for immediate visibility on mobile if toast is missed
+                                                    alert(`Error: ${e.message}`);
                                                     toast.error(e.message);
                                                 }
                                             }}
