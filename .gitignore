@@ -15,9 +15,6 @@
 # production
 /build
 
-# future updates 
-/future_updates
-
 # misc
 .DS_Store
 *.pem
