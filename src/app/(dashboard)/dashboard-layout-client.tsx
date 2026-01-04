@@ -38,7 +38,15 @@ export default function DashboardLayoutClient({
                     </div>
                     <div className="flex items-center gap-1">
                         <SearchTrigger variant="compact" />
-                        <UserButton />
+                        <UserButton>
+                            <UserButton.MenuItems>
+                                <UserButton.Action
+                                    label="Accounts"
+                                    labelIcon={<Menu className="w-4 h-4" />}
+                                    onClick={() => window.location.href = '/settings'}
+                                />
+                            </UserButton.MenuItems>
+                        </UserButton>
                     </div>
                 </header>
 

@@ -4,13 +4,16 @@
 
 **Less planning. More doing.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![License: Apache 2.0 + Commons Clause](https://img.shields.io/badge/License-Apache_2.0_with_Commons_Clause-blue.svg)](LICENSE.md)[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 
 [Features](#features) • [Quick Start](#quick-start) • [Extension](#browser-extension) • [Documentation](#documentation)
 
+
 </div>
+
+> [!IMPORTANT]
+> **🚧 Limited Private Beta**: DOs 4 DOERs is currently in a limited private beta. The first 50 users get immediate access, while others will be placed on a waitlist.
 
 ---
 
@@ -53,6 +56,10 @@
 - **Data Export**: Download all your data anytime
 - **Privacy First**: Your data stays yours
 
+### 🚧 Beta Features
+- **Waitlist System**: Smart access control for beta management
+- **In-App Feedback**: Direct line to the development team for feature requests and bug reports
+
 ---
 
 ## 🚀 Quick Start
@@ -66,6 +73,7 @@
 
 2. **Create an Account**
    - Sign up with email or social login
+   - **Note**: You may be placed on a waitlist if the beta cap (50 users) is reached.
    - Verify your email address
 
 3. **Install Browser Extension**
@@ -238,7 +246,11 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **Apache License 2.0 with Commons Clause**. See the [LICENSE.md](LICENSE.md) file for details.
+
+This means:
+- ✅ You can use, modify, and learn from the code for personal use.
+- ❌ You cannot sell, redistribute for profit, or offer it as a service (SaaS).
 
 ---
 

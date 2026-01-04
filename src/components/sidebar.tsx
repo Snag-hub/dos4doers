@@ -95,11 +95,19 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
             {/* User Profile / Sign Out */}
             <div className="border-t border-zinc-200 p-4 dark:border-zinc-800">
-                <div className="flex items-center gap-3">
-                    <UserButton afterSignOutUrl="/" />
-                    <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100 flex-1 truncate">
-                        {user?.fullName || user?.primaryEmailAddress?.emailAddress || 'User'}
-                    </div>
+                <div className="flex items-end justify-center w-full">
+                    <UserButton
+                        afterSignOutUrl="/"
+                        showName
+                        appearance={{
+                            elements: {
+                                userButtonBox: "flex flex-row gap-3 items-center",
+                                userButtonTrigger: "focus:shadow-none p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors",
+                                userButtonAvatarBox: "w-8 h-8",
+                                userButtonOuterIdentifier: "text-sm font-medium text-zinc-900 dark:text-zinc-100"
+                            }
+                        }}
+                    />
                 </div>
             </div>
         </div>
@@ -126,4 +134,3 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </>
     );
 }
-
