@@ -121,6 +121,7 @@ export default function SettingsClient({
     const [recurrence, setRecurrence] = useState<'none' | 'daily' | 'weekly' | 'monthly'>('none');
     const [addingReminder, setAddingReminder] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [sendingTest, setSendingTest] = useState(false);
 
     // Initial Load
     useEffect(() => {
@@ -167,22 +168,31 @@ export default function SettingsClient({
         try {
             // Logic for Push Subscription
             if (type === 'push' && newValue === true) {
+                console.log('🚀 [PUSH] Starting subscription process...');
                 if (!('serviceWorker' in navigator)) {
+                    console.error('❌ [PUSH] Service Worker not supported in this browser');
                     throw new Error('Service Worker not supported');
                 }
                 if (!('Notification' in window)) {
+                    console.error('❌ [PUSH] Notifications not supported in this browser');
                     throw new Error('Notifications not supported');
                 }
 
+                console.log('📡 [PUSH] Requesting permission...');
                 const perm = await Notification.requestPermission();
+                console.log(`🔑 [PUSH] Permission result: ${perm}`);
                 if (perm !== 'granted') {
                     throw new Error(`Permission ${perm}`);
                 }
 
+                console.log('⏳ [PUSH] Waiting for service worker ready...');
                 const reg = await navigator.serviceWorker.ready;
-                if (!reg) throw new Error('Service Worker not ready');
+                if (!reg) {
+                    console.error('❌ [PUSH] Service Worker ready timed out or failed');
+                    throw new Error('Service Worker not ready');
+                }
 
-                console.log('Creating push subscription...');
+                console.log('🧬 [PUSH] Creating push subscription via PushManager...');
                 toast.loading('Creating push subscription...');
 
                 try {
@@ -190,14 +200,16 @@ export default function SettingsClient({
                         userVisibleOnly: true,
                         applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
                     });
-                    console.log('Subscription created:', sub);
+                    console.log('✅ [PUSH] Subscription success:', sub);
 
                     const { savePushSubscription } = await import('@/app/actions');
                     await savePushSubscription(JSON.stringify(sub));
-                    console.log('Subscription saved to DB');
+                    console.log('💾 [PUSH] Saved to database');
+                    toast.dismiss();
                     toast.success('Push notifications enabled!');
                 } catch (subError: any) {
-                    console.error('Subscription error:', subError);
+                    console.error('❌ [PUSH] reg.pushManager.subscribe failed:', subError);
+                    toast.dismiss();
                     throw new Error(`Subscription failed: ${subError.message}`);
                 }
             }
@@ -206,14 +218,44 @@ export default function SettingsClient({
                 emailNotifications: type === 'email' ? newValue : emailEnabled,
                 pushNotifications: type === 'push' ? newValue : pushEnabled,
             });
+            console.log(`✅ [PREF] Updated ${type} to ${newValue}`);
         } catch (e: any) {
-            console.error(e);
+            console.error('❌ [PREF] Update failed:', e);
             // Revert
             if (type === 'email') setEmailEnabled(!newValue);
             else setPushEnabled(!newValue);
 
             // Show specific error
             toast.error(e.message || 'Failed to update preference');
+        }
+    };
+
+    const handleSendTest = async () => {
+        setSendingTest(true);
+        console.log('🧪 [PUSH] Sending test notification...');
+        try {
+            const reg = await navigator.serviceWorker.getRegistration();
+            const sub = await reg?.pushManager.getSubscription();
+
+            if (!sub) {
+                console.warn('⚠️ [PUSH] No active subscription on this device');
+                toast.error('No active subscription found. Try toggling off/on.');
+                return;
+            }
+
+            const result = await sendTestNotification();
+            if (result.success) {
+                console.log(`✅ [PUSH] Test sent. Registered subs: ${result.count}`);
+                toast.success(`Test sent! (Reached ${result.count} devices)`);
+            } else {
+                console.error('❌ [PUSH] Test failed:', result.message);
+                toast.error(result.message || 'Test failed');
+            }
+        } catch (e) {
+            console.error('❌ [PUSH] handleSendTest error:', e);
+            toast.error('Connection error sending test');
+        } finally {
+            setSendingTest(false);
         }
     };
 
@@ -325,6 +367,18 @@ export default function SettingsClient({
                                     checked={pushEnabled}
                                     onChange={() => handleTogglePreference('push')}
                                 />
+                                {pushEnabled && (
+                                    <div className="pt-2 px-2 pb-2">
+                                        <ActionRow
+                                            label="Test Push"
+                                            description="Send a dummy alert to this device."
+                                            buttonText={sendingTest ? 'Sending...' : 'Send Test'}
+                                            action={handleSendTest}
+                                            disabled={sendingTest}
+                                            variant="secondary"
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </SettingCard>
 

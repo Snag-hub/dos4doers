@@ -1,44 +1,51 @@
 console.log('[push-sw] Custom Worker Loaded');
 
 self.addEventListener('push', function (event) {
-    console.log('[push-sw] Push Received');
-    let data = { title: 'DOs 4 DOERs Notification', body: 'New alert!', url: '/', itemId: null, type: 'general' };
+    console.log('[push-sw] Push Event Received');
+    let data = { title: 'DOs 4 DOERs', body: 'New alert!', url: '/', itemId: null, type: 'general' };
 
     try {
         if (event.data) {
-            data = event.data.json();
+            const rawData = event.data.json();
+            console.log('[push-sw] Payload:', rawData);
+            data = { ...data, ...rawData };
         }
     } catch (e) {
-        console.error('[push-sw] JSON Parse Error:', e);
+        console.error('[push-sw] Data extraction error:', e);
+        // Fallback for non-JSON or malformed data
+        const text = event.data ? event.data.text() : 'No data';
+        data.body = text;
     }
 
     const actions = [];
-
-    // Add actions based on notification type
-    if ((data.type === 'reminder' || data.type === 'item') && data.itemId) {
+    if ((data.type === 'reminder' || data.type === 'item' || data.type === 'task') && data.itemId) {
         actions.push(
             { action: 'mark-read', title: '✅ Done' },
-            { action: 'snooze', title: '💤 Snooze 1h' },
-            { action: 'delete', title: '🗑️ Delete' }
+            { action: 'snooze', title: '💤 Snooze 1h' }
         );
     }
 
     const options = {
         body: data.body || 'New notification',
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
         vibrate: [100, 50, 100],
         actions: actions,
         data: {
             dateOfArrival: Date.now(),
-            primaryKey: '1',
             url: data.url || '/',
             itemId: data.itemId,
             type: data.type
-        }
+        },
+        tag: data.itemId || 'general-notification', // Overwrite old notification if same item
+        renotify: true
     };
 
+    console.log('[push-sw] Displaying notification:', data.title);
     event.waitUntil(
         self.registration.showNotification(data.title || 'DOs 4 DOERs', options)
-            .catch(err => console.error('[push-sw] Show Notification Error:', err))
+            .then(() => console.log('[push-sw] Notification shown successfully'))
+            .catch(err => console.error('[push-sw] showNotification failed:', err))
     );
 });
 

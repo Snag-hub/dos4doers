@@ -66,7 +66,10 @@ export async function sendTestNotification() {
             process.env.VAPID_PRIVATE_KEY
         );
     } else {
-        throw new Error('VAPID keys not configured');
+        const missing = [];
+        if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) missing.push('NEXT_PUBLIC_VAPID_PUBLIC_KEY');
+        if (!process.env.VAPID_PRIVATE_KEY) missing.push('VAPID_PRIVATE_KEY');
+        throw new Error(`VAPID keys not configured: Missing ${missing.join(', ')}`);
     }
 
     const subs = await db

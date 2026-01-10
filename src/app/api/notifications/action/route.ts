@@ -31,13 +31,36 @@ export async function POST(request: Request) {
             }
 
         } else if (action === 'mark-read') {
-            // Only applies to items really, but if it's a reminder for an item, we can mark the item read?
-            // Or just delete the reminder?
-            // Let's assume for reminders it means "Done" -> Delete reminder
-            // For items it means "Read" -> read=true
-
             if (type === 'reminder') {
-                await db.delete(reminders).where(eq(reminders.id, id));
+                const reminder = await db.query.reminders.findFirst({
+                    where: eq(reminders.id, id)
+                });
+
+                if (reminder && reminder.recurrence && reminder.recurrence !== 'none') {
+                    // Calculate next date based on original scheduled time to maintain "time of day"
+                    let nextDate = new Date(reminder.scheduledAt);
+                    const now = new Date();
+
+                    while (nextDate <= now) {
+                        if (reminder.recurrence === 'daily') {
+                            nextDate.setDate(nextDate.getDate() + 1);
+                        } else if (reminder.recurrence === 'weekly') {
+                            nextDate.setDate(nextDate.getDate() + 7);
+                        } else if (reminder.recurrence === 'monthly') {
+                            nextDate.setMonth(nextDate.getMonth() + 1);
+                        } else {
+                            break;
+                        }
+                    }
+
+                    await db.update(reminders)
+                        .set({ scheduledAt: nextDate })
+                        .where(eq(reminders.id, id));
+
+                    console.log(`🔁 [PUSH ACTION] Rescheduled recurring reminder ${id} to ${nextDate.toISOString()}`);
+                } else {
+                    await db.delete(reminders).where(eq(reminders.id, id));
+                }
             } else if (type === 'item') {
                 await db.update(items)
                     .set({ read: true, reminderAt: null }) // clear reminder too
