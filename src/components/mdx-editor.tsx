@@ -24,6 +24,7 @@ import {
     ListsToggle
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
+import './mdx-editor.css';
 import { useRef } from 'react';
 
 // Custom dark mode styles for MDXEditor to match the app
@@ -48,7 +49,7 @@ export function MDXEditorComponent({ markdown, onChange, placeholder, autoFocus 
                 onChange={onChange}
                 placeholder={placeholder}
                 autoFocus={autoFocus}
-                contentEditableClassName="prose prose-zinc dark:prose-invert max-w-none focus:outline-none h-full min-h-[500px] px-4 py-2"
+                contentEditableClassName="prose prose-zinc dark:prose-invert max-w-none focus:outline-none h-full min-h-[500px] px-4 py-2 bg-transparent"
                 plugins={[
                     headingsPlugin(),
                     listsPlugin(),

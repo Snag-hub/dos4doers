@@ -1,0 +1,77 @@
+/* Light Mode (Zinc-like) */
+:root {
+    --mdx-base-10: #ffffff;
+    --mdx-base-20: #fafafa;
+    /* zinc-50 */
+    --mdx-base-30: #e4e4e7;
+    /* zinc-200 */
+    --mdx-base-40: #a1a1aa;
+    /* zinc-400 */
+    --mdx-base-50: #71717a;
+    /* zinc-500 */
+    --mdx-text-body: #18181b;
+    /* zinc-900 */
+    --mdx-color-active: #e4e4e7;
+    /* zinc-200 (hover state) */
+    --mdx-color-active-fg: #18181b;
+}
+
+/* Dark Mode (Zinc-like) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --mdx-base-10: #09090b;
+        /* zinc-950 */
+        --mdx-base-20: #18181b;
+        /* zinc-900 */
+        --mdx-base-30: #27272a;
+        /* zinc-800 */
+        --mdx-base-40: #a1a1aa;
+        /* zinc-400 */
+        --mdx-base-50: #71717a;
+        /* zinc-500 */
+        --mdx-text-body: #f4f4f5;
+        /* zinc-100 */
+        --mdx-color-active: #27272a;
+        /* zinc-800 */
+        --mdx-color-active-fg: #ffffff;
+    }
+
+    /* Override editor background to match app */
+    .mdx-editor {
+        background-color: transparent !important;
+    }
+
+    /* Toolbar dark mode */
+    .mdx-editor-toolbar {
+        background-color: var(--mdx-base-20) !important;
+        border-color: var(--mdx-base-30) !important;
+    }
+
+    /* Content area text color fix if prose doesn't catch everything */
+    .mdx-editor-content {
+        color: var(--mdx-text-body);
+    }
+}
+
+/* General Tweaks */
+.mdx-editor {
+    font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    border-radius: 0.5rem;
+}
+
+/* Toolbar customization */
+.mdx-editor-toolbar {
+    border-bottom: 1px solid var(--mdx-base-30);
+    background-color: var(--mdx-base-20);
+    padding: 0.5rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+/* Remove default border if desired, as we might wrap it */
+.mdx-editor {
+    border: 1px solid var(--mdx-base-30);
+}
+
+.mdx-editor-wrapper .prose {
+    max-width: none;
+}
