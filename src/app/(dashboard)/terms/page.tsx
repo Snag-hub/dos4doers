@@ -101,7 +101,7 @@ export default function TermsPage() {
 
             <footer className="pt-12 mt-12 border-t border-zinc-200 dark:border-zinc-800 text-center">
                 <p className="text-zinc-400 text-sm">
-                    Questions? Contact us at support@dos4doers.com
+                    Questions? Contact us at support@support.dos4doers.snagdev.in
                 </p>
             </footer>
         </div>
