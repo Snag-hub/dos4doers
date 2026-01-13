@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
-const MarkdownEditor = dynamic(() => import('@/components/markdown-editor').then(mod => mod.MarkdownEditor), {
+const MarkdownEditor = dynamic(() => import('@/components/mdx-editor').then(mod => mod.MDXEditorComponent), {
     ssr: false,
     loading: () => (
         <div className="flex-1 flex items-center justify-center bg-zinc-50 dark:bg-zinc-900/50">
@@ -325,7 +325,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
             {/* Editor */}
             <div className="flex-1 overflow-hidden">
                 <MarkdownEditor
-                    value={content}
+                    markdown={content}
                     onChange={setContent}
                     placeholder="Start writing your note..."
                     autoFocus={!note}
