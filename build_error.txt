@@ -1,0 +1,31 @@
+
+> dos4doers@1.0.0 build
+> next build --webpack
+
+Γû▓ Next.js 16.1.1 (webpack)
+- Environments: .env.local
+
+ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+> [PWA] Compile server
+> [PWA] Compile server
+> [PWA] Compile client (static)
+> [PWA] Auto register service worker with: D:\Git\unnamed_tool\node_modules\next-pwa\register.js
+> [PWA] Service worker: D:\Git\unnamed_tool\public\sw.js
+> [PWA]   url: /sw.js
+> [PWA]   scope: /
+Γ£ô Compiled successfully in 20.6s
+  Running TypeScript ...
+Failed to compile.
+
+./src/components/tiptap-editor.tsx:194:39
+Type error: Property 'markdown' does not exist on type 'Storage'.
+
+  192 |         onUpdate: ({ editor }) => {
+  193 |             // Get markdown content
+> 194 |             const md = editor.storage.markdown.getMarkdown();
+      |                                       ^
+  195 |             onChange(md);
+  196 |         },
+  197 |         immediatelyRender: false // Fixes some SSR hydration mismatches in Next.js
+Next.js build worker exited with code: 1 and signal: null

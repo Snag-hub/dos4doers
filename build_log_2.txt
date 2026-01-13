@@ -1,0 +1,31 @@
+
+> dos4doers@1.0.0 build
+> next build --webpack
+
+Γû▓ Next.js 16.1.1 (webpack)
+- Environments: .env.local
+
+ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+> [PWA] Compile server
+> [PWA] Compile server
+> [PWA] Compile client (static)
+> [PWA] Auto register service worker with: D:\Git\unnamed_tool\node_modules\next-pwa\register.js
+> [PWA] Service worker: D:\Git\unnamed_tool\public\sw.js
+> [PWA]   url: /sw.js
+> [PWA]   scope: /
+Γ£ô Compiled successfully in 41s
+  Running TypeScript ...
+Failed to compile.
+
+./src/components/mdx-editor.tsx:25:8
+Type error: Cannot find module '@mdxeditor/editor' or its corresponding type declarations.
+
+  23 |     InsertThematicBreak,
+  24 |     ListsToggle
+> 25 | } from '@mdxeditor/editor';
+     |        ^
+  26 | import '@mdxeditor/editor/style.css';
+  27 | import './mdx-editor.css';
+  28 | import { useRef } from 'react';
+Next.js build worker exited with code: 1 and signal: null

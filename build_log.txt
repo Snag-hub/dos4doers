@@ -1,0 +1,30 @@
+
+> dos4doers@1.0.0 build
+> next build --webpack
+
+Γû▓ Next.js 16.1.1 (webpack)
+- Environments: .env.local
+
+ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+> [PWA] Compile server
+> [PWA] Compile server
+> [PWA] Compile client (static)
+> [PWA] Auto register service worker with: D:\Git\unnamed_tool\node_modules\next-pwa\register.js
+> [PWA] Service worker: D:\Git\unnamed_tool\public\sw.js
+> [PWA]   url: /sw.js
+> [PWA]   scope: /
+Γ£ô Compiled successfully in 42s
+  Running TypeScript ...
+Failed to compile.
+
+.next/dev/types/app/(public)/privacy/page.ts:2:24
+Type error: Cannot find module '../../../../../../src/app/(public)/privacy/page.js' or its corresponding type declarations.
+
+  1 | // File: D:\Git\unnamed_tool\src\app\(public)\privacy\page.tsx
+> 2 | import * as entry from '../../../../../../src/app/(public)/privacy/page.js'
+    |                        ^
+  3 | import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
+  4 |
+  5 | import type { PrefetchForTypeCheckInternal } from 'next/dist/build/segment-config/app/app-segment-config.js'
+Next.js build worker exited with code: 1 and signal: null
