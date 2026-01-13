@@ -334,7 +334,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
             )}
 
             {/* Editor */}
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 w-full max-w-full overflow-hidden flex flex-col">
                 <MarkdownEditor
                     markdown={content}
                     onChange={setContent}
