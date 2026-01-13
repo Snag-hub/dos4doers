@@ -28,7 +28,7 @@ export function ReminderScheduler({ itemId, onClose }: ReminderSchedulerProps) {
     // Form State
     const [datePart, setDatePart] = useState('');
     const [timePart, setTimePart] = useState('');
-    const [recurrence, setRecurrence] = useState<'none' | 'daily' | 'weekly' | 'monthly'>('none');
+    const [recurrence, setRecurrence] = useState<'none' | 'daily' | 'weekly' | 'monthly'>(isGeneral ? 'daily' : 'none');
     const [title, setTitle] = useState('');
     const [showCustom, setShowCustom] = useState(false);
 
@@ -211,15 +211,17 @@ export function ReminderScheduler({ itemId, onClose }: ReminderSchedulerProps) {
                                     <input type="time" value={timePart} onChange={e => setTimePart(e.target.value)} className="w-1/3 bg-white dark:bg-zinc-800 border-none rounded-xl p-3 text-sm font-bold shadow-inner" />
                                 </div>
                                 <div className="grid grid-cols-4 gap-2">
-                                    {(['none', 'daily', 'weekly', 'monthly'] as const).map(r => (
-                                        <button
-                                            key={r}
-                                            onClick={() => setRecurrence(r)}
-                                            className={`py-2 rounded-lg text-[10px] font-black uppercase tracking-tighter border transition-all ${recurrence === r ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700'}`}
-                                        >
-                                            {r === 'none' ? 'Once' : r}
-                                        </button>
-                                    ))}
+                                    {(['none', 'daily', 'weekly', 'monthly'] as const)
+                                        .filter(r => !isGeneral || r !== 'none')
+                                        .map(r => (
+                                            <button
+                                                key={r}
+                                                onClick={() => setRecurrence(r)}
+                                                className={`py-2 rounded-lg text-[10px] font-black uppercase tracking-tighter border transition-all ${recurrence === r ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700'}`}
+                                            >
+                                                {r === 'none' ? 'Once' : r}
+                                            </button>
+                                        ))}
                                 </div>
                             </div>
                         )}

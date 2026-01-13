@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Eye, Edit3, Bold, Italic, Link as LinkIcon, List } from 'lucide-react';
+import { Eye, Edit3, Bold, Italic, Link as LinkIcon, List, Table as TableIcon, CheckSquare } from 'lucide-react';
 
 type MarkdownEditorProps = {
     value: string;
@@ -72,6 +72,22 @@ export function MarkdownEditor({ value, onChange, placeholder, autoFocus }: Mark
                     >
                         <List className="w-4 h-4" />
                     </button>
+                    <button
+                        onClick={() => insertMarkdown('- [ ] ', '')}
+                        className="p-2 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+                        title="Checklist"
+                        type="button"
+                    >
+                        <CheckSquare className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={() => insertMarkdown('| Header | Header |\n| --- | --- |\n| Cell | Cell |', '')}
+                        className="p-2 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+                        title="Table"
+                        type="button"
+                    >
+                        <TableIcon className="w-4 h-4" />
+                    </button>
                 </div>
 
                 {/* Preview Toggle */}
@@ -130,31 +146,40 @@ export function MarkdownEditor({ value, onChange, placeholder, autoFocus }: Mark
                             .markdown-preview p {
                                 margin-top: 1em;
                                 margin-bottom: 1em;
+                                line-height: 1.6;
                             }
                             .markdown-preview ul, .markdown-preview ol {
                                 margin-top: 1em;
                                 margin-bottom: 1em;
                                 padding-left: 2em;
                             }
+                            .markdown-preview ul {
+                                list-style-type: disc;
+                            }
+                            .markdown-preview ol {
+                                list-style-type: decimal;
+                            }
                             .markdown-preview li {
-                                margin-top: 0.5em;
-                                margin-bottom: 0.5em;
+                                margin-top: 0.25em;
+                                margin-bottom: 0.25em;
                             }
                             .markdown-preview a {
                                 color: #3b82f6;
                                 text-decoration: underline;
                             }
                             .markdown-preview code {
-                                background-color: #f4f4f5;
+                                background-color: rgba(113, 113, 122, 0.2);
                                 padding: 0.2em 0.4em;
                                 border-radius: 0.25em;
                                 font-size: 0.875em;
+                                font-family: monospace;
                             }
                             .markdown-preview pre {
-                                background-color: #f4f4f5;
+                                background-color: rgba(113, 113, 122, 0.1);
                                 padding: 1em;
                                 border-radius: 0.5em;
                                 overflow-x: auto;
+                                margin: 1em 0;
                             }
                             .markdown-preview pre code {
                                 background-color: transparent;
@@ -165,6 +190,29 @@ export function MarkdownEditor({ value, onChange, placeholder, autoFocus }: Mark
                             }
                             .markdown-preview em {
                                 font-style: italic;
+                            }
+                            .markdown-preview blockquote {
+                                border-left: 4px solid #e4e4e7;
+                                margin: 1em 0;
+                                padding-left: 1em;
+                                color: #71717a;
+                            }
+                            .markdown-preview table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin: 1em 0;
+                            }
+                            .markdown-preview th, .markdown-preview td {
+                                border: 1px solid #e4e4e7;
+                                padding: 0.5em;
+                                text-align: left;
+                            }
+                            .markdown-preview th {
+                                background-color: rgba(113, 113, 122, 0.05);
+                                font-weight: bold;
+                            }
+                            .markdown-preview input[type="checkbox"] {
+                                margin-right: 0.5em;
                             }
                         `}</style>
                     </div>

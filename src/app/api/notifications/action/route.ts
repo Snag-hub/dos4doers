@@ -22,11 +22,11 @@ export async function POST(request: Request) {
 
             if (type === 'reminder') {
                 await db.update(reminders)
-                    .set({ scheduledAt: newTime })
+                    .set({ scheduledAt: newTime, lockedAt: null })
                     .where(eq(reminders.id, id));
             } else if (type === 'item') {
                 await db.update(items)
-                    .set({ reminderAt: newTime })
+                    .set({ reminderAt: newTime, lockedAt: null })
                     .where(eq(items.id, id));
             }
 
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
                     }
 
                     await db.update(reminders)
-                        .set({ scheduledAt: nextDate })
+                        .set({ scheduledAt: nextDate, lockedAt: null })
                         .where(eq(reminders.id, id));
 
                     console.log(`🔁 [PUSH ACTION] Rescheduled recurring reminder ${id} to ${nextDate.toISOString()}`);
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
                 }
             } else if (type === 'item') {
                 await db.update(items)
-                    .set({ read: true, reminderAt: null }) // clear reminder too
+                    .set({ read: true, reminderAt: null, lockedAt: null }) // clear reminder too
                     .where(eq(items.id, id));
             }
 

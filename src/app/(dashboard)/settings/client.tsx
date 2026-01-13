@@ -8,6 +8,7 @@ import { useState, useEffect, ReactNode } from 'react';
 import { InferSelectModel } from 'drizzle-orm';
 import { reminders } from '@/db/schema';
 import { toast } from 'sonner';
+import { NotificationLogs } from './notification-logs';
 
 // --- Types ---
 type Reminder = InferSelectModel<typeof reminders>;
@@ -337,6 +338,9 @@ export default function SettingsClient({
                                     checked={pushEnabled}
                                     onChange={() => handleTogglePreference('push')}
                                 />
+                                <div className="py-3">
+                                    <NotificationLogs />
+                                </div>
                             </div>
                         </SettingCard>
 

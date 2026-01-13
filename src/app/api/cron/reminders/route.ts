@@ -32,15 +32,23 @@ export async function GET(req: Request) {
     // 1. ATOMIC CLAIM: Items
     const claimedItems = await db
       .update(items)
-      .set({ reminderAt: safetyLockTime })
-      .where(and(isNotNull(items.reminderAt), lt(items.reminderAt, now)))
+      .set({ lockedAt: safetyLockTime })
+      .where(and(
+        isNotNull(items.reminderAt),
+        lt(items.reminderAt, now),
+        // Either not locked, or lock expired
+        sql`(${items.lockedAt} IS NULL OR ${items.lockedAt} < ${now})`
+      ))
       .returning();
 
     // 2. ATOMIC CLAIM: Reminders
     const claimedReminders = await db
       .update(reminders)
-      .set({ scheduledAt: safetyLockTime })
-      .where(lt(reminders.scheduledAt, now))
+      .set({ lockedAt: safetyLockTime })
+      .where(and(
+        lt(reminders.scheduledAt, now),
+        sql`(${reminders.lockedAt} IS NULL OR ${reminders.lockedAt} < ${now})`
+      ))
       .returning();
 
     if (claimedItems.length === 0 && claimedReminders.length === 0) {

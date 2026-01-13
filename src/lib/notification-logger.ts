@@ -1,5 +1,7 @@
 // Simple notification logging utility
 // Logs to console with structured format for easy monitoring
+import { db } from '@/db';
+import { notificationLogs } from '@/db/schema';
 
 export type NotificationType = 'email' | 'push';
 export type NotificationStatus = 'success' | 'failure';
@@ -14,7 +16,7 @@ export interface NotificationLog {
     metadata?: Record<string, any>;
 }
 
-export function logNotification(log: Omit<NotificationLog, 'timestamp'>) {
+export async function logNotification(log: Omit<NotificationLog, 'timestamp'>) {
     const fullLog: NotificationLog = {
         ...log,
         timestamp: new Date().toISOString(),
@@ -30,10 +32,19 @@ export function logNotification(log: Omit<NotificationLog, 'timestamp'>) {
         console.log(message, fullLog);
     }
 
-    // In production, you could also:
-    // - Write to a file
-    // - Send to a logging service (e.g., Sentry, LogRocket)
-    // - Store in database for analytics
+    // Persist to Database
+    try {
+        await db.insert(notificationLogs).values({
+            userId: log.userId,
+            type: log.type,
+            channel: log.recipient,
+            status: log.status,
+            error: log.error,
+            metadata: log.metadata,
+        });
+    } catch (err) {
+        console.error('Failed to write notification log to DB:', err);
+    }
 
     return fullLog;
 }
@@ -48,7 +59,7 @@ export async function withNotificationLogging<T>(
 ): Promise<{ success: boolean; result?: T; error?: string }> {
     try {
         const result = await fn();
-        logNotification({
+        await logNotification({
             userId,
             type,
             status: 'success',
@@ -58,7 +69,7 @@ export async function withNotificationLogging<T>(
         return { success: true, result };
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        logNotification({
+        await logNotification({
             userId,
             type,
             status: 'failure',

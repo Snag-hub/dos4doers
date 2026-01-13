@@ -66,6 +66,12 @@ export default function RootLayout({
       }}
     >
       <html lang="en" suppressHydrationWarning>
+        <head>
+          <link rel="preconnect" href="https://clerk.dos4doers.snagdev.in" />
+          <link rel="preconnect" href="https://img.clerk.com" />
+          <link rel="dns-prefetch" href="https://clerk.dos4doers.snagdev.in" />
+          <link rel="dns-prefetch" href="https://img.clerk.com" />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           suppressHydrationWarning

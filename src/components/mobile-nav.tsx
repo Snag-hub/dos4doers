@@ -24,7 +24,19 @@ export function MobileNav() {
     const [isMoreOpen, setIsMoreOpen] = useState(false);
 
     // Visible items (4 slots + More = 5 total)
-    const visibleItems = navItems.slice(0, 4);
+    // "Add notes to bottom tabs" -> We can replace one or just add it to 'More' if full. 
+    // Current: Timeline, Inbox, Tasks, Meetings. 
+    // Let's replace 'Meetings' with 'Notes' or similar? Or just add it if space allows.
+    // User asked "Add notes to bottom tabs". 
+    // Let's optimize: Timeline, Tasks, Notes, Settings?
+
+    // Changing order to prioritize Notes as requested
+    const visibleItems = [
+        navItems.find(i => i.label === 'Timeline')!,
+        navItems.find(i => i.label === 'Tasks')!,
+        navItems.find(i => i.label === 'Notes')!,
+        navItems.find(i => i.label === 'Inbox')!,
+    ];
     // All items for the drawer/sidebar
     const allItems = navItems;
 

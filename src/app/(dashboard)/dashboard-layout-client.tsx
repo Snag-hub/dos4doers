@@ -5,16 +5,20 @@ import { Sidebar } from '@/components/sidebar';
 import { MobileNav } from '@/components/mobile-nav';
 import { Menu } from 'lucide-react';
 import Image from 'next/image';
-import { UserButton } from '@clerk/nextjs';
+import { UserButton, useUser } from '@clerk/nextjs';
 import { SearchTrigger } from '@/components/search-trigger';
 import { FeedbackWidget } from '@/components/feedback-widget';
+import { CreateTaskDialog } from '@/components/create-task-dialog';
+import { Plus } from 'lucide-react';
 
 export default function DashboardLayoutClient({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const { user } = useUser();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
 
     return (
         <div className="flex h-[100dvh] bg-zinc-50 dark:bg-black overflow-hidden">
@@ -59,6 +63,22 @@ export default function DashboardLayoutClient({
             {/* Bottom Navigation for Mobile */}
             <MobileNav />
             <FeedbackWidget />
+
+            {/* Floating Action Button (Mobile Only) */}
+            <button
+                onClick={() => setIsCreateTaskOpen(true)}
+                className="md:hidden fixed bottom-20 right-4 z-50 p-4 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all"
+                aria-label="Create Task"
+            >
+                <Plus className="w-6 h-6" />
+            </button>
+
+            {isCreateTaskOpen && (
+                <CreateTaskDialog
+                    onClose={() => setIsCreateTaskOpen(false)}
+                    projects={user?.publicMetadata?.projects as any}
+                />
+            )}
         </div>
     );
 }

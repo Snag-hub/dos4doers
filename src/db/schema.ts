@@ -104,6 +104,7 @@ export const items = pgTable('items', {
   type: itemTypeEnum('type').default('other').notNull(),
   isFavorite: boolean('isFavorite').default(false).notNull(),
   reminderAt: timestamp('reminderAt'),
+  lockedAt: timestamp('lockedAt'),
 
   // Enhanced Metadata
   siteName: text('siteName'),
@@ -151,6 +152,7 @@ export const reminders = pgTable('reminders', {
     .references(() => meetings.id, { onDelete: 'cascade' }),
   title: text('title'),
   scheduledAt: timestamp('scheduledAt').notNull(),
+  lockedAt: timestamp('lockedAt'),
   recurrence: recurrenceEnum('recurrence').default('none').notNull(),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
 }, (t) => [
@@ -286,3 +288,16 @@ export const systemLogs = pgTable('system_logs', {
   context: jsonb('context'), // Stores metadata like userId, path, etc.
   createdAt: timestamp('createdAt').notNull().defaultNow(),
 });
+
+export const notificationLogs = pgTable('notification_logs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(), // 'push', 'email'
+  channel: text('channel'), // endpoint or email
+  status: text('status').notNull(), // 'success', 'failed'
+  error: text('error'),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+}, (t) => [
+  index('notification_logs_user_created_idx').on(t.userId, t.createdAt),
+]);
