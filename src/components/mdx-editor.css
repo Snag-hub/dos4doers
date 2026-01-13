@@ -118,6 +118,28 @@
 .mdx-editor-wrapper .prose {
     max-width: none;
     width: 100%;
-    overflow-x: hidden;
     /* Prevent horizontal scroll on content */
+}
+
+/* Force text color in dark mode to ensure readability against dark background */
+.dark .mdx-editor-content,
+.dark .mdx-editor-content p,
+.dark .mdx-editor-content h1,
+.dark .mdx-editor-content h2,
+.dark .mdx-editor-content h3,
+.dark .mdx-editor-content h4,
+.dark .mdx-editor-content h5,
+.dark .mdx-editor-content h6,
+.dark .mdx-editor-content li,
+.dark .mdx-editor-content blockquote,
+.dark .mdx-editor-content td,
+.dark .mdx-editor-content th,
+.dark .mdx-editor-content span {
+    color: var(--mdx-text-body) !important;
+}
+
+/* Ensure links are visible and distinct */
+.dark .mdx-editor-content a {
+    color: #60a5fa !important;
+    /* blue-400 */
 }
