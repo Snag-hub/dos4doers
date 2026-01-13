@@ -33,8 +33,8 @@ export function MobileNav() {
     // Changing order to prioritize Notes as requested
     const visibleItems = [
         navItems.find(i => i.label === 'Timeline')!,
-        navItems.find(i => i.label === 'Tasks')!,
         navItems.find(i => i.label === 'Notes')!,
+        navItems.find(i => i.label === 'Tasks')!,
         navItems.find(i => i.label === 'Inbox')!,
     ];
     // All items for the drawer/sidebar

@@ -7,7 +7,6 @@ import { Menu } from 'lucide-react';
 import Image from 'next/image';
 import { UserButton, useUser } from '@clerk/nextjs';
 import { SearchTrigger } from '@/components/search-trigger';
-import { FeedbackWidget } from '@/components/feedback-widget';
 import { CreateTaskDialog } from '@/components/create-task-dialog';
 import { Plus } from 'lucide-react';
 
@@ -62,7 +61,6 @@ export default function DashboardLayoutClient({
 
             {/* Bottom Navigation for Mobile */}
             <MobileNav />
-            <FeedbackWidget />
 
             {/* Floating Action Button (Mobile Only) */}
             <button

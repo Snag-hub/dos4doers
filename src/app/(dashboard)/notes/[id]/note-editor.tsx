@@ -7,10 +7,21 @@ import dynamic from 'next/dynamic';
 const MarkdownEditor = dynamic(() => import('@/components/mdx-editor').then(mod => mod.MDXEditorComponent), {
     ssr: false,
     loading: () => (
-        <div className="flex-1 flex items-center justify-center bg-zinc-50 dark:bg-zinc-900/50">
-            <div className="flex flex-col items-center gap-3">
-                <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-xs font-medium text-zinc-500">Loading editor...</p>
+        <div className="flex-1 flex flex-col h-full bg-transparent animate-pulse">
+            {/* Toolbar Skeleton */}
+            <div className="h-10 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 rounded-t-lg flex items-center gap-2 px-2">
+                <div className="w-6 h-6 rounded bg-zinc-200 dark:bg-zinc-800"></div>
+                <div className="w-px h-4 bg-zinc-300 dark:bg-zinc-700 mx-1"></div>
+                <div className="w-20 h-6 rounded bg-zinc-200 dark:bg-zinc-800"></div>
+                <div className="w-6 h-6 rounded bg-zinc-200 dark:bg-zinc-800"></div>
+                <div className="flex-1"></div>
+            </div>
+            {/* Content Skeleton */}
+            <div className="flex-1 p-4 space-y-4">
+                <div className="h-8 w-1/3 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                <div className="h-4 w-full bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                <div className="h-4 w-full bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                <div className="h-4 w-2/3 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
             </div>
         </div>
     )

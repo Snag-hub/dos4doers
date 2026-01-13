@@ -6,7 +6,11 @@ import { toast } from 'sonner';
 import { submitFeedback } from '@/app/feedback-actions';
 import { usePathname } from 'next/navigation';
 
-export function FeedbackWidget() {
+interface FeedbackWidgetProps {
+    trigger?: React.ReactNode;
+}
+
+export function FeedbackWidget({ trigger }: FeedbackWidgetProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState('');
     const [isSending, setIsSending] = useState(false);
@@ -32,13 +36,19 @@ export function FeedbackWidget() {
     return (
         <>
             {/* Trigger Button */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`fixed bottom-24 right-4 md:bottom-8 md:right-8 z-50 flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 ${isOpen ? 'bg-zinc-800 text-white dark:bg-zinc-700' : 'bg-blue-600 text-white'}`}
-                aria-label={isOpen ? "Close Feedback" : "Send Feedback"}
-            >
-                {isOpen ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
-            </button>
+            {trigger ? (
+                <div onClick={() => setIsOpen(true)} className="contents cursor-pointer">
+                    {trigger}
+                </div>
+            ) : (
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className={`fixed bottom-24 right-4 md:bottom-8 md:right-8 z-50 flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 ${isOpen ? 'bg-zinc-800 text-white dark:bg-zinc-700' : 'bg-blue-600 text-white'}`}
+                    aria-label={isOpen ? "Close Feedback" : "Send Feedback"}
+                >
+                    {isOpen ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
+                </button>
+            )}
 
             {/* Modal */}
             {isOpen && (
