@@ -73,7 +73,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                         <Link
                             key={item.name}
                             href={item.href}
-                            onClick={onClose} // Close sidebar on mobile when navigating
+                            onClick={() => onClose && onClose()}
                             className={classNames(
                                 isActive
                                     ? 'bg-zinc-100 text-blue-600 dark:bg-zinc-900 dark:text-blue-400'
