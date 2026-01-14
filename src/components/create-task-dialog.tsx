@@ -3,12 +3,15 @@
 import { createTask } from '@/app/task-actions';
 import { useState } from 'react';
 
+import { useLoading } from '@/components/providers/loading-provider';
+
 interface CreateTaskDialogProps {
     onClose: () => void;
     projects?: { id: string; name: string; color: string }[];
 }
 
 export function CreateTaskDialog({ onClose, projects = [] }: CreateTaskDialogProps) {
+    const { showLoading, hideLoading } = useLoading();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [projectId, setProjectId] = useState('');
@@ -24,6 +27,7 @@ export function CreateTaskDialog({ onClose, projects = [] }: CreateTaskDialogPro
         if (!title.trim()) return;
 
         setIsPending(true);
+        showLoading();
         try {
             await createTask({
                 title,
@@ -42,6 +46,7 @@ export function CreateTaskDialog({ onClose, projects = [] }: CreateTaskDialogPro
             alert('Failed to create task');
         } finally {
             setIsPending(false);
+            hideLoading();
         }
     };
 

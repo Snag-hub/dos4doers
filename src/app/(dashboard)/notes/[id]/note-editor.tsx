@@ -9,6 +9,8 @@ import { createNote, updateNote, deleteNote, getAttachmentTargets } from '@/app/
 import { ArrowLeft, Save, Trash2, Link2, X, CheckSquare, Calendar, BookOpen, ChevronRight, Plus } from 'lucide-react';
 import Link from 'next/link';
 
+import { useLoading } from '@/components/providers/loading-provider';
+
 type Note = {
     id: string;
     title: string | null;
@@ -25,6 +27,7 @@ type NoteEditorProps = {
 };
 
 export default function NoteEditor({ note }: NoteEditorProps) {
+    const { showLoading, hideLoading } = useLoading();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [title, setTitle] = useState(note?.title || '');
@@ -88,6 +91,9 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         if (!content.trim()) return;
 
         setIsSaving(true);
+        // showLoading only for creation
+        if (!note) showLoading();
+
         try {
             const data = {
                 title: title || undefined,
@@ -108,6 +114,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
             console.error('Failed to save note:', error);
         } finally {
             setIsSaving(false);
+            if (!note) hideLoading();
         }
     };
 
@@ -116,12 +123,14 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         if (!confirm('Are you sure you want to delete this note?')) return;
 
         setIsDeleting(true);
+        showLoading();
         try {
             await deleteNote(note.id);
             router.push('/notes');
         } catch (error) {
             console.error('Failed to delete note:', error);
             setIsDeleting(false);
+            hideLoading();
         }
     };
 

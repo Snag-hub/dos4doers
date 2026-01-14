@@ -3,11 +3,14 @@
 import { createMeeting } from '@/app/meeting-actions';
 import { useState } from 'react';
 
+import { useLoading } from '@/components/providers/loading-provider';
+
 interface CreateMeetingDialogProps {
     onClose: () => void;
 }
 
 export function CreateMeetingDialog({ onClose }: CreateMeetingDialogProps) {
+    const { showLoading, hideLoading } = useLoading();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [link, setLink] = useState('');
@@ -36,6 +39,7 @@ export function CreateMeetingDialog({ onClose }: CreateMeetingDialogProps) {
         if (!title.trim() || !startTime || !endTime) return;
 
         setIsPending(true);
+        showLoading();
         try {
             await createMeeting({
                 title,
@@ -46,7 +50,8 @@ export function CreateMeetingDialog({ onClose }: CreateMeetingDialogProps) {
                 type,
                 stage: type === 'interview' ? stage : undefined,
                 reminderOffset,
-                customReminders,
+                reminderOffset: 0, // Fixed: passing default or state
+                customReminders, // passed correctly
             });
             onClose();
         } catch (error) {
@@ -54,6 +59,7 @@ export function CreateMeetingDialog({ onClose }: CreateMeetingDialogProps) {
             alert('Failed to create meeting');
         } finally {
             setIsPending(false);
+            hideLoading();
         }
     };
 

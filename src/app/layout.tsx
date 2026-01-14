@@ -38,12 +38,13 @@ export const viewport = {
 };
 
 import dynamic from "next/dynamic";
-
-const Omnisearch = dynamic(() => import("@/components/omnisearch").then(mod => mod.Omnisearch));
 import { Toaster } from 'sonner';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { OfflineBanner } from '@/components/offline-banner';
 import { ServiceWorkerRegistration } from '@/components/sw-registration';
+import { LoadingProvider } from '@/components/providers/loading-provider';
+
+const Omnisearch = dynamic(() => import("@/components/omnisearch").then(mod => mod.Omnisearch));
 
 export default function RootLayout({
   children,
@@ -78,10 +79,12 @@ export default function RootLayout({
           suppressHydrationWarning
         >
           <ErrorBoundary>
-            <ServiceWorkerRegistration />
-            <OfflineBanner />
-            <Omnisearch />
-            {children}
+            <LoadingProvider>
+              <ServiceWorkerRegistration />
+              <OfflineBanner />
+              <Omnisearch />
+              {children}
+            </LoadingProvider>
             <Toaster position="bottom-right" theme="system" />
           </ErrorBoundary>
         </body>
