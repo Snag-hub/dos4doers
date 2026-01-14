@@ -50,7 +50,6 @@ export function CreateMeetingDialog({ onClose }: CreateMeetingDialogProps) {
                 type,
                 stage: type === 'interview' ? stage : undefined,
                 reminderOffset,
-                reminderOffset: 0, // Fixed: passing default or state
                 customReminders, // passed correctly
             });
             onClose();
