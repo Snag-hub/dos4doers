@@ -33,7 +33,7 @@ export default async function MeetingsPage() {
 
     return (
         <main className="p-4 md:p-8">
-            <div className="mb-8 flex items-center justify-between">
+            <div className="sticky top-0 z-30 bg-zinc-50/80 dark:bg-black/80 backdrop-blur-md -mx-4 px-4 pt-4 pb-4 mb-6 flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/50 transition-all">
                 <div>
                     <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Meetings</h1>
                     <p className="mt-1 text-zinc-500 dark:text-zinc-400">

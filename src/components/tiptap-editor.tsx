@@ -6,7 +6,6 @@ import LinkExtension from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
-import { Markdown } from 'tiptap-markdown';
 import {
     Bold, Italic, Strikethrough, Code, List, ListOrdered,
     CheckSquare, Quote, Link as LinkIcon, Undo, Redo,
@@ -151,20 +150,19 @@ const EditorToolbar = ({ editor }: { editor: Editor | null }) => {
 // --- Main Component ---
 
 interface TipTapEditorProps {
-    markdown: string;
-    onChange: (markdown: string) => void;
+    value: string;
+    onChange: (content: string) => void;
     placeholder?: string;
     autoFocus?: boolean;
 }
 
-export function TipTapEditor({ markdown, onChange, placeholder = 'Start writing...', autoFocus = false }: TipTapEditorProps) {
+export function TipTapEditor({ value, onChange, placeholder = 'Start writing...', autoFocus = false }: TipTapEditorProps) {
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
                 heading: {
                     levels: [1, 2, 3],
                 },
-                codeBlock: false, // We use the simple code inline for now, or add extension if needed
             }),
             LinkExtension.configure({
                 openOnClick: false,
@@ -177,41 +175,39 @@ export function TipTapEditor({ markdown, onChange, placeholder = 'Start writing.
             TaskItem.configure({
                 nested: true,
             }),
-            Markdown.configure({
-                html: false,
-                transformPastedText: true,
-                transformCopiedText: true,
-            }),
         ],
-        content: markdown, // Initial content
+        content: value, // Initial content (HTML)
         editorProps: {
             attributes: {
-                class: 'prose prose-zinc dark:prose-invert max-w-none focus:outline-none min-h-[500px] px-4 py-4',
+                class: 'prose prose-zinc dark:prose-invert max-w-none focus:outline-none min-h-[50vh] px-4 py-4 pb-20',
             },
         },
         onUpdate: ({ editor }) => {
-            // Get markdown content using tiptap-markdown extension
-            const md = (editor as any).getMarkdown();
-            onChange(md);
+            // Get HTML content
+            const html = editor.getHTML();
+            onChange(html);
         },
-        immediatelyRender: false // Fixes some SSR hydration mismatches in Next.js
+        immediatelyRender: false
     });
 
-    // Handle external markdown changes (e.g. initial load)
+    // Handle external content changes
     useEffect(() => {
-        if (editor && markdown) {
-            const currentMarkdown = (editor as any).getMarkdown();
-            if (markdown !== currentMarkdown) {
-                // Only update if content is different to avoid cursor jumps
-                // For now, we rely on the initial content prop and don't sync external changes
-                // to avoid cursor position issues
+        if (editor && value) {
+            const currentHTML = editor.getHTML();
+            if (value !== currentHTML) {
+                // We typically don't want to force update from parent while editing to avoid cursor jumps
+                // editor.commands.setContent(value);
             }
         }
-    }, [markdown, editor]);
+    }, [value, editor]);
 
     return (
-        <div className="flex flex-col h-full border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden bg-transparent">
-            <EditorToolbar editor={editor} />
+        <div className="flex flex-col h-full md:border md:border-zinc-200 md:dark:border-zinc-800 md:rounded-xl overflow-hidden bg-transparent">
+            {/* Toolbar - Sticky on mobile */}
+            <div className="sticky top-0 z-10 bg-white dark:bg-zinc-950 md:bg-zinc-50 md:dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
+                <EditorToolbar editor={editor} />
+            </div>
+
             <div className="flex-1 overflow-y-auto cursor-text bg-transparent" onClick={() => editor?.chain().focus().run()}>
                 <EditorContent editor={editor} className="bg-transparent" />
             </div>

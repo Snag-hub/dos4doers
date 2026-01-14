@@ -13,9 +13,10 @@ export function NewMeetingButton() {
 
     return (
         <>
+            {/* Desktop Button */}
             <button
                 onClick={() => setShowDialog(true)}
-                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
+                className="hidden sm:flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
             >
                 <Calendar className="h-4 w-4" />
                 New Meeting

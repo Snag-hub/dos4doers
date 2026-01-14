@@ -24,13 +24,6 @@ export default async function TasksPage() {
 
     return (
         <main className="p-4 md:p-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Tasks</h1>
-                <p className="mt-1 text-zinc-500 dark:text-zinc-400">
-                    Manage your action items
-                </p>
-            </div>
-
             <TaskList initialTasks={tasks} projects={projects} />
         </main>
     );

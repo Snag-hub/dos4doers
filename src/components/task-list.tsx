@@ -45,10 +45,15 @@ export function TaskList({ initialTasks, projects = [] }: { initialTasks: Task[]
     const done = initialTasks.filter(t => t.status === 'done');
 
     return (
-        <div>
-            <div className="mb-6 flex items-center justify-between">
-                <div />
-                <div className="flex items-center gap-2">
+        <div className="relative">
+            <div className="sticky top-0 z-30 bg-zinc-50/80 dark:bg-black/80 backdrop-blur-md -mx-4 px-4 pt-4 pb-4 mb-6 flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/50 transition-all">
+                <div>
+                    <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Tasks</h1>
+                    <p className="mt-1 text-zinc-500 dark:text-zinc-400">
+                        Manage your action items
+                    </p>
+                </div>
+                <div className="hidden sm:flex items-center gap-2">
                     <button
                         onClick={() => setShowProjectDialog(true)}
                         className="flex items-center gap-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
@@ -119,6 +124,7 @@ export function TaskList({ initialTasks, projects = [] }: { initialTasks: Task[]
                 </div>
             </PullToRefresh>
 
+
             {showCreateDialog && (
                 <CreateTaskDialog onClose={() => setShowCreateDialog(false)} projects={projects} />
             )}
@@ -130,6 +136,7 @@ export function TaskList({ initialTasks, projects = [] }: { initialTasks: Task[]
             {showManageProjectsDialog && (
                 <ManageProjectsDialog onClose={() => setShowManageProjectsDialog(false)} projects={projects} />
             )}
+
         </div>
     );
 }

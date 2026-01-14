@@ -98,8 +98,11 @@ export default function NotesView({ initialNotes, initialSearch, filterLabel }: 
     };
 
     const truncateContent = (content: string, maxLength: number = 150) => {
-        if (content.length <= maxLength) return content;
-        return content.substring(0, maxLength) + '...';
+        // Strip HTML tags using a temporary DOM element or regex
+        // Since we are in SSR/Next.js environment, simple regex is safer for basic stripping
+        const stripped = content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
+        if (stripped.length <= maxLength) return stripped;
+        return stripped.substring(0, maxLength) + '...';
     };
 
     const handleRefresh = async () => {
@@ -109,33 +112,36 @@ export default function NotesView({ initialNotes, initialSearch, filterLabel }: 
     };
 
     return (
-        <div className="flex flex-col h-full max-w-4xl mx-auto">
-            {/* Header */}
-            <div className="mb-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-                    <div>
-                        <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white">
-                            Notes
-                        </h1>
-                        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-                            Your knowledge base
-                        </p>
+        <div className="flex flex-col h-full max-w-4xl mx-auto relative">
+            {/* Header - Sticky */}
+            <div className="sticky top-0 z-30 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md pt-4 px-4 -mx-4 mb-2 border-b border-transparent transition-all">
+                <div className="flex flex-col gap-4 mb-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white">
+                                Notes
+                            </h1>
+                            <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm sm:text-base">
+                                Your knowledge base
+                            </p>
+                        </div>
+
+                        {/* Desktop Create Note Button */}
+                        <Link
+                            href="/notes/new"
+                            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm active:scale-95 transform duration-100"
+                        >
+                            <Plus className="w-5 h-5" />
+                            New Note
+                        </Link>
                     </div>
 
-                    {/* Create Note Button */}
-                    <Link
-                        href="/notes/new"
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                    >
-                        <Plus className="w-5 h-5" />
-                        New Note
-                    </Link>
                 </div>
 
 
                 {/* Filter Label */}
                 {filterLabel && (
-                    <div className="mt-4 flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg">
+                    <div className="mb-4 flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg animate-in fade-in slide-in-from-top-2">
                         <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                             <span className="text-sm font-medium text-blue-800 dark:text-blue-300">
@@ -153,9 +159,9 @@ export default function NotesView({ initialNotes, initialSearch, filterLabel }: 
             </div>
 
             {/* Notes List with PullToRefresh */}
-            <div className="flex-1 overflow-y-auto pb-20">
+            <div className="flex-1 overflow-y-auto pb-24 sm:pb-20 px-1">
                 <PullToRefresh onRefresh={handleRefresh}>
-                    <div className="space-y-3 min-h-[200px]"> {/* min-h for drag area */}
+                    <div className="space-y-3 min-h-[50vh]">
                         {initialNotes.length === 0 ? (
                             search ? (
                                 <EmptyState
@@ -179,7 +185,7 @@ export default function NotesView({ initialNotes, initialSearch, filterLabel }: 
                                 {optimisticNotes.map((note) => (
                                     <div key={note.id} className="relative group touch-pan-y">
                                         {/* Red Background Layer */}
-                                        <div className="absolute inset-0 bg-red-500 rounded-lg flex items-center justify-end px-6 z-0 mb-3">
+                                        <div className="absolute inset-0 bg-red-500 rounded-xl flex items-center justify-end px-6 z-0 mb-3">
                                             <Trash2 className="text-white w-6 h-6" />
                                         </div>
 
@@ -194,28 +200,28 @@ export default function NotesView({ initialNotes, initialSearch, filterLabel }: 
                                             dragElastic={0.1}
 
                                             onDragEnd={(e, info) => onDragEnd(e, info, note.id)}
-                                            className="relative z-10 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm mb-3 overflow-hidden"
+                                            className="relative z-10 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm mb-3 overflow-hidden active:scale-[0.99] transition-transform duration-200"
                                             style={{ touchAction: 'pan-y' }} // Important for vertical scrolling
                                         >
                                             <Link
                                                 href={`/notes/${note.id}`}
-                                                className="block p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+                                                className="block p-4 sm:p-5 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors"
                                             >
                                                 {/* Note that we wrap the content in Link now, removed the absolute overlay for cleaner DOM with motion */}
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-2 mb-1">
+                                                        <div className="flex items-center gap-2 mb-1.5">
                                                             {getAttachmentIcon(note)}
-                                                            <h3 className="font-semibold text-zinc-900 dark:text-white truncate">
+                                                            <h3 className="font-semibold text-base sm:text-lg text-zinc-900 dark:text-white truncate">
                                                                 {note.title || 'Untitled Note'}
                                                             </h3>
                                                         </div>
-                                                        <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 mb-2">
+                                                        <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-3 leading-relaxed">
                                                             {truncateContent(note.content as string)}
                                                         </p>
-                                                        <div className="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-500">
+                                                        <div className="flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-500 font-medium">
                                                             <span>{getAttachmentLabel(note)}</span>
-                                                            <span>•</span>
+                                                            <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
                                                             <span>{formatDate(note.updatedAt)}</span>
                                                         </div>
                                                     </div>
@@ -227,7 +233,7 @@ export default function NotesView({ initialNotes, initialSearch, filterLabel }: 
                                                             handleDelete(note.id);
                                                         }}
                                                         // Retaining the button for click-users
-                                                        className="pointer-events-auto p-3 sm:p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 z-20 relative"
+                                                        className="pointer-events-auto p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 z-20"
                                                         aria-label="Delete note"
                                                     >
                                                         <Trash2 className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -242,6 +248,7 @@ export default function NotesView({ initialNotes, initialSearch, filterLabel }: 
                     </div>
                 </PullToRefresh>
             </div>
+
         </div>
     );
 }
