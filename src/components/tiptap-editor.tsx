@@ -20,22 +20,25 @@ const ToolbarButton = ({
     isActive = false,
     disabled = false,
     children,
-    title
+    title,
+    className
 }: {
     onClick: () => void,
     isActive?: boolean,
     disabled?: boolean,
     children: React.ReactNode,
-    title?: string
+    title?: string,
+    className?: string
 }) => (
     <button
         onClick={onClick}
         disabled={disabled}
         title={title}
         className={cn(
-            "p-2 rounded-lg transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400",
+            "p-2 rounded-lg transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 shrink-0",
             isActive && "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
-            disabled && "opacity-50 cursor-not-allowed"
+            disabled && "opacity-50 cursor-not-allowed",
+            className
         )}
     >
         {children}
@@ -65,6 +68,7 @@ const EditorToolbar = ({ editor }: { editor: Editor | null }) => {
                 onClick={() => editor.chain().focus().toggleStrike().run()}
                 isActive={editor.isActive('strike')}
                 title="Strikethrough"
+                className="hidden sm:block"
             >
                 <Strikethrough className="w-4 h-4" />
             </ToolbarButton>
@@ -72,6 +76,7 @@ const EditorToolbar = ({ editor }: { editor: Editor | null }) => {
                 onClick={() => editor.chain().focus().toggleCode().run()}
                 isActive={editor.isActive('code')}
                 title="Code"
+                className="hidden sm:block"
             >
                 <Code className="w-4 h-4" />
             </ToolbarButton>
@@ -117,17 +122,18 @@ const EditorToolbar = ({ editor }: { editor: Editor | null }) => {
                 <CheckSquare className="w-4 h-4" />
             </ToolbarButton>
 
-            <div className="w-px h-5 bg-zinc-300 dark:bg-zinc-700 mx-1 shrink-0" />
+            <div className="hidden sm:block w-px h-5 bg-zinc-300 dark:bg-zinc-700 mx-1 shrink-0" />
 
             <ToolbarButton
                 onClick={() => editor.chain().focus().toggleBlockquote().run()}
                 isActive={editor.isActive('blockquote')}
                 title="Quote"
+                className="hidden sm:block"
             >
                 <Quote className="w-4 h-4" />
             </ToolbarButton>
 
-            <div className="w-px h-5 bg-zinc-300 dark:bg-zinc-700 mx-1 shrink-0" />
+            <div className="hidden sm:block w-px h-5 bg-zinc-300 dark:bg-zinc-700 mx-1 shrink-0" />
 
             <ToolbarButton
                 onClick={() => editor.chain().focus().undo().run()}
