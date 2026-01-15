@@ -115,7 +115,21 @@ export async function GET(req: Request) {
           await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload);
         }, { reminderId: reminder.id });
       }
+
+      // Handle recurrence or deletion
+      if (reminder.recurrence === 'none') {
+        // One-time reminder: delete after sending
+        await db.delete(reminders).where(eq(reminders.id, reminder.id));
+      } else {
+        // Recurring reminder: calculate next occurrence and reschedule
+        const { calculateNextOccurrence } = await import('@/lib/reminder-utils');
+        const nextScheduledAt = calculateNextOccurrence(reminder.scheduledAt, reminder.recurrence, now);
+        await db.update(reminders)
+          .set({ scheduledAt: nextScheduledAt, lockedAt: null })
+          .where(eq(reminders.id, reminder.id));
+      }
     }
+
 
     const totalDuration = Date.now() - cronStartTime;
     console.log(`✅ [CRON] Completed in ${totalDuration}ms`);

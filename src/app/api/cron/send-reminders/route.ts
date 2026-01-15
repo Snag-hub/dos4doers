@@ -70,31 +70,14 @@ export async function GET(request: Request) {
             if (reminder.recurrence === 'none') {
                 await db.delete(reminders).where(eq(reminders.id, reminder.id));
             } else {
-                let nextDate = new Date(reminder.scheduledAt);
-                switch (reminder.recurrence) {
-                    case 'daily':
-                        nextDate.setDate(nextDate.getDate() + 1);
-                        break;
-                    case 'weekly':
-                        nextDate.setDate(nextDate.getDate() + 7);
-                        break;
-                    case 'monthly':
-                        nextDate.setMonth(nextDate.getMonth() + 1);
-                        break;
-                }
-
-                // If next date is still in the past (e.g. server was down for a week), 
-                // push it to future relative to NOW (or just catch up? Catch up might spam. Let's push to future based on NOW)
-                // Simple version: just add the interval to the old scheduledAt. 
-                // Ideally we should ensure it's > now. 
-                // For simplified "Daily" logic, if I missed yesterday's, I probably want tomorrow's, not one 5 mins from now.
-                // Keeping strict interval for now.
-
+                const { calculateNextOccurrence } = await import('@/lib/reminder-utils');
+                const nextScheduledAt = calculateNextOccurrence(reminder.scheduledAt, reminder.recurrence, now);
                 await db
                     .update(reminders)
-                    .set({ scheduledAt: nextDate })
+                    .set({ scheduledAt: nextScheduledAt })
                     .where(eq(reminders.id, reminder.id));
             }
+
 
             processedCount++;
         }
