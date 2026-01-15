@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build --webpack",
-    "build:ci": "npm test -- --run && next build --webpack",
+    "build": "cross-env NODE_OPTIONS='--max-old-space-size=4096' next build --webpack",
+    "build:ci": "npm test -- --run && cross-env NODE_OPTIONS='--max-old-space-size=4096' next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
@@ -70,6 +70,7 @@
     "@types/react-dom": "^19",
     "@types/web-push": "^3.6.4",
     "@vitejs/plugin-react": "^5.1.2",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "^16.1.1",
     "happy-dom": "^20.0.11",
