@@ -57,13 +57,18 @@ body {
     @apply overflow-x-auto max-w-full;
   }
 
-  .prose img, 
+  .prose img,
   .prose iframe,
-  .prose video {
-    @apply max-w-full h-auto rounded-xl;
+  .prose video,
+  .prose figure,
+  .prose picture {
+    max-width: 100% !important;
+    height: auto !important;
+    @apply rounded-xl;
   }
 
   .prose table {
     @apply block overflow-x-auto whitespace-nowrap;
+    max-width: 100%;
   }
 }
