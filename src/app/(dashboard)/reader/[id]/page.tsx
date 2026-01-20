@@ -19,6 +19,7 @@ export default async function ReaderPage({ params }: { params: Promise<{ id: str
     const siteName = item.siteName;
     const favicon = item.favicon;
     const url = item.url;
+    const heroImage = item.image;
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -54,6 +55,16 @@ export default async function ReaderPage({ params }: { params: Promise<{ id: str
                                 <img src={favicon} alt="" className="h-4 w-4 rounded-sm" />
                             )}
                             {siteName}
+                        </div>
+                    )}
+
+                    {heroImage && (
+                        <div className="mb-8 overflow-hidden rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800">
+                            <img
+                                src={heroImage}
+                                alt=""
+                                className="w-full h-auto object-cover max-h-[400px]"
+                            />
                         </div>
                     )}
                     <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl dark:text-zinc-100">
