@@ -1,0 +1,99 @@
+@reference "../../globals.css";
+
+/* Calendar Container */
+.react-calendar {
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    font-family: inherit !important;
+}
+
+/* Header/Navigation */
+.react-calendar__navigation {
+    display: none !important;
+    /* We use a custom toolbar */
+}
+
+/* Month View Grid */
+.react-calendar__month-view__weekdays {
+    @apply text-zinc-400 dark:text-zinc-500 font-semibold text-xs uppercase tracking-wider mb-2;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+    padding: 0.5rem !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+    text-decoration: none !important;
+}
+
+/* Day Tiles */
+.react-calendar__month-view__days {
+    @apply border-l border-t border-zinc-100 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm;
+}
+
+.react-calendar__month-view__days__day {
+    @apply relative p-0 h-24 sm:h-32 border-zinc-100 dark:border-zinc-800 transition-all duration-200;
+    background: transparent !important;
+}
+
+.react-calendar__tile {
+    @apply border-r border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 flex flex-col items-start justify-start;
+}
+
+.react-calendar__tile {
+    display: flex !important;
+}
+
+/* Current Day */
+.react-calendar__tile--now {
+    @apply bg-zinc-50 dark:bg-zinc-900/30 font-bold;
+}
+
+.react-calendar__tile--now:not(.react-calendar__tile--active) {
+    background: #f9fafb !important;
+}
+
+.react-calendar__tile--now .tile-date {
+    background-color: #2563eb !important;
+    color: white !important;
+}
+
+/* Selected Day */
+.react-calendar__tile--active {
+    @apply bg-blue-50/50 dark:bg-blue-900/20;
+    border-color: #3b82f6 !important;
+}
+
+.react-calendar__tile--active:not(.react-calendar__tile--now) .tile-date {
+    color: #2563eb !important;
+}
+
+/* Neighboring Months */
+.react-calendar__month-view__days__day--neighboringMonth {
+    opacity: 0.3 !important;
+    filter: grayscale(1) !important;
+}
+
+/* Tile Content Layout */
+.tile-wrapper {
+    @apply flex flex-col w-full h-full p-1 sm:p-2;
+}
+
+.tile-date {
+    @apply w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm rounded-full mb-1 sm:mb-2 transition-colors;
+}
+
+.tile-events {
+    @apply flex flex-col gap-0.5 sm:gap-1 w-full overflow-hidden;
+}
+
+.tile-event-dot {
+    @apply w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full;
+}
+
+.tile-event-badge {
+    @apply hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium leading-none truncate;
+}
