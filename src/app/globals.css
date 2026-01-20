@@ -47,4 +47,23 @@ body {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Typography Mobile Fixes */
+  .prose {
+    @apply max-w-full overflow-x-hidden;
+  }
+
+  .prose pre {
+    @apply overflow-x-auto max-w-full;
+  }
+
+  .prose img, 
+  .prose iframe,
+  .prose video {
+    @apply max-w-full h-auto rounded-xl;
+  }
+
+  .prose table {
+    @apply block overflow-x-auto whitespace-nowrap;
+  }
 }

@@ -83,7 +83,7 @@ export default async function ReaderPage({ params }: { params: Promise<{ id: str
                 </header>
 
                 <div
-                    className="prose prose-zinc lg:prose-xl dark:prose-invert max-w-none
+                    className="prose prose-zinc lg:prose-xl dark:prose-invert max-w-none break-words
                         prose-headings:font-bold prose-a:text-blue-600 dark:prose-a:text-blue-400
                         prose-img:rounded-2xl prose-img:shadow-lg"
                     dangerouslySetInnerHTML={{ __html: content }}
