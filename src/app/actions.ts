@@ -128,6 +128,34 @@ const getCachedTimelineEvents = async (userId: string, dateStr: string) => {
     )();
 };
 
+const getCachedCalendarEvents = async (userId: string, startStr: string, endStr: string) => {
+    return unstable_cache(
+        async () => {
+            const start = new Date(startStr);
+            const end = new Date(endStr);
+
+            const { meetings: meetingTable, tasks: taskTable } = await import('@/db/schema');
+
+            const [rangeMeetings, rangeTasks, rangeItems, rangeReminders] = await Promise.all([
+                db.select().from(meetingTable).where(and(eq(meetingTable.userId, userId), sql`${meetingTable.startTime} >= ${start}`, sql`${meetingTable.startTime} <= ${end}`)).orderBy(meetingTable.startTime),
+                db.select().from(taskTable).where(and(eq(taskTable.userId, userId), sql`${taskTable.dueDate} >= ${start}`, sql`${taskTable.dueDate} <= ${end}`, sql`${taskTable.status} != 'done'`)).orderBy(taskTable.dueDate),
+                db.select().from(items).where(and(eq(items.userId, userId), sql`${items.reminderAt} >= ${start}`, sql`${items.reminderAt} <= ${end}`)).orderBy(items.reminderAt),
+                db.select().from(reminders).where(and(eq(reminders.userId, userId), sql`${reminders.scheduledAt} >= ${start}`, sql`${reminders.scheduledAt} <= ${end}`)).orderBy(reminders.scheduledAt)
+            ]);
+
+            const events: any[] = [];
+            for (const meeting of rangeMeetings) events.push({ id: meeting.id, type: 'meeting', title: meeting.title, startTime: meeting.startTime, endTime: meeting.endTime, duration: meeting.endTime ? Math.round((meeting.endTime.getTime() - meeting.startTime.getTime()) / (1000 * 60)) : 60, metadata: { meetingLink: meeting.link, meetingType: meeting.type, interviewStage: meeting.stage, calendarId: meeting.calendarId, calendarName: meeting.calendarName, calendarColor: meeting.calendarColor, accountEmail: meeting.accountEmail } });
+            for (const task of rangeTasks) events.push({ id: task.id, type: 'task', title: task.title, startTime: task.dueDate, duration: 30, status: task.status, metadata: { projectId: task.projectId, priority: task.priority, taskType: task.type } });
+            for (const item of rangeItems) events.push({ id: item.id, type: 'item', title: item.title || 'Untitled', startTime: item.reminderAt!, duration: 15, url: item.url, favicon: item.favicon, metadata: { itemType: item.type, siteName: item.siteName } });
+            for (const reminder of rangeReminders) events.push({ id: reminder.id, type: 'reminder', title: reminder.title, startTime: reminder.scheduledAt, duration: 5, metadata: { recurrence: reminder.recurrence, meetingId: reminder.meetingId, taskId: reminder.taskId, itemId: reminder.itemId } });
+
+            return events;
+        },
+        [`user-calendar-${userId}-${startStr}-${endStr}`],
+        { revalidate: 3600, tags: [`timeline-${userId}`, `items-${userId}`, `tasks-${userId}`, `meetings-${userId}`] }
+    )();
+};
+
 const getCachedUserStats = async (userId: string) => {
     return unstable_cache(
         async () => {
@@ -443,6 +471,12 @@ export async function getTimelineEvents(date: Date = new Date()) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
     return getCachedTimelineEvents(userId, date.toISOString());
+}
+
+export async function getCalendarEvents(start: Date, end: Date) {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+    return getCachedCalendarEvents(userId, start.toISOString(), end.toISOString());
 }
 
 export async function getItem(itemId: string) {

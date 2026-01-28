@@ -1,7 +1,8 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { getTimelineEvents } from '@/app/actions';
-import TimelineView from './timeline-view';
+import { getCalendarEvents } from '@/app/actions';
+import CalendarView from './calendar-view';
+import { startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
 
 export default async function TimelinePage({
     searchParams,
@@ -16,15 +17,14 @@ export default async function TimelinePage({
     const params = await searchParams;
     const selectedDate = params.date ? new Date(params.date) : new Date();
 
-    // Fetch timeline events for the selected day
-    const events = await getTimelineEvents(selectedDate);
+    // Fetch calendar events for a wider range (3 months)
+    const start = subMonths(startOfMonth(selectedDate), 1);
+    const end = addMonths(endOfMonth(selectedDate), 1);
+    const events = await getCalendarEvents(start, end);
 
     return (
         <main className="p-4 md:p-8 h-full">
-            <TimelineView
-                initialEvents={events}
-                selectedDate={selectedDate}
-            />
+            <CalendarView initialEvents={events} />
         </main>
     );
 }
