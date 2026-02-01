@@ -2,8 +2,8 @@
 
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
-import { items, reminders, pushSubscriptions, users, notes, tags, itemsToTags } from '@/db/schema';
-import { eq, and, desc, sql, ilike, or, inArray } from 'drizzle-orm';
+import { eq, and, desc, sql, ilike, or, inArray, gte, lte } from 'drizzle-orm';
+import { items, reminders, notes, tags, itemsToTags, users, pushSubscriptions, meetings as meetingTable, tasks as taskTable } from '@/db/schema';
 import { unstable_cache, revalidateTag, revalidatePath } from 'next/cache';
 import { v4 as uuidv4 } from 'uuid';
 import { getMetadata } from '@/lib/metadata';
@@ -124,6 +124,106 @@ const getCachedTimelineEvents = async (userId: string, dateStr: string) => {
             return events;
         },
         [`user-timeline-${userId}-${dateStr}`],
+        { revalidate: 3600, tags: [`timeline-${userId}`, `items-${userId}`, `tasks-${userId}`, `meetings-${userId}`] }
+    )();
+};
+
+const getCachedCalendarEvents = async (userId: string, startStr: string, endStr: string) => {
+    return unstable_cache(
+        async () => {
+            const start = new Date(startStr);
+            const end = new Date(endStr);
+
+            const [rangeMeetings, rangeTasks, rangeItems, rangeReminders] = await Promise.all([
+                db.select().from(meetingTable).where(and(eq(meetingTable.userId, userId), gte(meetingTable.startTime, start), lte(meetingTable.startTime, end))).orderBy(meetingTable.startTime),
+                db.select().from(taskTable).where(and(eq(taskTable.userId, userId), gte(taskTable.dueDate, start), lte(taskTable.dueDate, end), sql`${taskTable.status} != 'done'`)).orderBy(taskTable.dueDate),
+                db.select().from(items).where(and(eq(items.userId, userId), gte(items.reminderAt, start), lte(items.reminderAt, end))).orderBy(items.reminderAt),
+                db.select().from(reminders).where(and(eq(reminders.userId, userId), gte(reminders.scheduledAt, start), lte(reminders.scheduledAt, end))).orderBy(reminders.scheduledAt)
+            ]);
+
+            const events: any[] = [];
+
+            // Add Meetings
+            for (const meeting of rangeMeetings) {
+                events.push({
+                    id: meeting.id,
+                    type: 'meeting',
+                    title: meeting.title,
+                    startTime: meeting.startTime,
+                    endTime: meeting.endTime,
+                    duration: meeting.endTime ? Math.round((meeting.endTime.getTime() - meeting.startTime.getTime()) / (1000 * 60)) : 60,
+                    metadata: {
+                        meetingLink: meeting.link,
+                        meetingType: meeting.type,
+                        interviewStage: meeting.stage,
+                        calendarId: meeting.calendarId,
+                        calendarName: meeting.calendarName,
+                        calendarColor: meeting.calendarColor,
+                        accountEmail: meeting.accountEmail
+                    }
+                });
+            }
+
+            // Add Tasks
+            for (const task of rangeTasks) {
+                events.push({
+                    id: task.id,
+                    type: 'task',
+                    title: task.title,
+                    startTime: task.dueDate!,
+                    duration: 30,
+                    status: task.status,
+                    metadata: {
+                        projectId: task.projectId,
+                        priority: task.priority,
+                        taskType: task.type
+                    }
+                });
+            }
+
+            // Add Reminders (This covers Meeting/Task/Item reminders if they are in the reminders table)
+            const processedItemIds = new Set<string>();
+            for (const reminder of rangeReminders) {
+                if (reminder.itemId) processedItemIds.add(reminder.itemId);
+
+                events.push({
+                    id: reminder.id,
+                    type: 'reminder',
+                    title: reminder.title || 'Untitled Reminder',
+                    startTime: reminder.scheduledAt,
+                    duration: 5,
+                    metadata: {
+                        recurrence: reminder.recurrence,
+                        meetingId: reminder.meetingId,
+                        taskId: reminder.taskId,
+                        itemId: reminder.itemId
+                    }
+                });
+            }
+
+            // Add Items with simple reminderAt (that are NOT already in the reminders table)
+            for (const item of rangeItems) {
+                if (!processedItemIds.has(item.id)) {
+                    events.push({
+                        id: item.id,
+                        type: 'item',
+                        title: item.title || 'Untitled Content',
+                        startTime: item.reminderAt!,
+                        duration: 15,
+                        url: item.url,
+                        favicon: item.favicon,
+                        metadata: {
+                            itemType: item.type,
+                            siteName: item.siteName,
+                            isLegacyReminder: true
+                        }
+                    });
+                }
+            }
+
+            return events;
+        },
+        [`user-calendar-${userId}-${startStr}-${endStr}`],
         { revalidate: 3600, tags: [`timeline-${userId}`, `items-${userId}`, `tasks-${userId}`, `meetings-${userId}`] }
     )();
 };
@@ -390,22 +490,29 @@ export async function createItem(url: string, title?: string, description?: stri
 export async function savePushSubscription(subscription: string) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
-    const sub = JSON.parse(subscription);
-    await db.insert(pushSubscriptions).values({ id: uuidv4(), userId, endpoint: sub.endpoint, p256dh: sub.keys.p256dh, auth: sub.keys.auth }).onConflictDoNothing();
+    if (!subscription) return;
+    try {
+        const sub = JSON.parse(subscription);
+        await db.insert(pushSubscriptions).values({ id: uuidv4(), userId, endpoint: sub.endpoint, p256dh: sub.keys.p256dh, auth: sub.keys.auth }).onConflictDoNothing();
+    } catch (e) {
+        console.error('Failed to parse push subscription:', e);
+    }
 }
 
 export async function sendTestNotification(subscription: string) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
     if (!process.env.VAPID_PRIVATE_KEY) throw new Error('VAPID_PRIVATE_KEY missing');
-    const sub = JSON.parse(subscription);
-    const payload = JSON.stringify({ title: '🔔 Test Notification', body: 'It works!', icon: '/icon-192.png', url: '/settings' });
+    if (!subscription) throw new Error('Subscription missing');
+
     try {
+        const sub = JSON.parse(subscription);
+        const payload = JSON.stringify({ title: '🔔 Test Notification', body: 'It works!', icon: '/icon-192.png', url: '/settings' });
         await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth } }, payload);
         return { success: true };
     } catch (error) {
         console.error('Test Notification Failed:', error);
-        throw new Error('Failed to send test notification');
+        return { success: false, message: 'Failed to send test notification' };
     }
 }
 
@@ -443,6 +550,12 @@ export async function getTimelineEvents(date: Date = new Date()) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
     return getCachedTimelineEvents(userId, date.toISOString());
+}
+
+export async function getCalendarEvents(start: Date, end: Date) {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+    return getCachedCalendarEvents(userId, start.toISOString(), end.toISOString());
 }
 
 export async function getItem(itemId: string) {
