@@ -71,4 +71,30 @@ body {
     @apply block overflow-x-auto whitespace-nowrap;
     max-width: 100%;
   }
+
+  .reader-content {
+    @apply overflow-x-hidden;
+  }
+
+  .reader-content img,
+  .reader-content picture,
+  .reader-content figure,
+  .reader-content iframe,
+  .reader-content video {
+    max-width: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    margin-inline: auto;
+  }
+
+  .reader-content figure {
+    width: 100% !important;
+  }
+
+  @media (max-width: 640px) {
+    .reader-content img {
+      max-height: 45vh;
+      object-fit: contain;
+    }
+  }
 }
