@@ -335,3 +335,7 @@ CREATE TABLE reminderAssignees (
 - Ensure accessibility (WCAG 2.1 AA)
 - Monitor performance impact
 - Get user feedback before building
+# Legacy roadmap notice
+
+This file contains historical ideas from the broader pre-reduction scope.
+Current production scope is capture + reader + reminders only.

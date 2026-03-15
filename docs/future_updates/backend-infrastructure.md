@@ -456,3 +456,7 @@ services:
 - Advanced monitoring
 - Disaster recovery testing
 - Performance tuning
+# Legacy roadmap notice
+
+This file contains historical ideas from the broader pre-reduction scope.
+Current production scope is capture + reader + reminders only.

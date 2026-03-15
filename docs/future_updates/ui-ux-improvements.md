@@ -333,3 +333,7 @@ The app has a modern, clean design with good dark mode support. However, there a
 - **Accessibility**: WCAG compliance score
 - **Performance**: Core Web Vitals scores
 - **User Satisfaction**: NPS score improvement
+# Legacy roadmap notice
+
+This file contains historical ideas from the broader pre-reduction scope.
+Current production scope is capture + reader + reminders only.

@@ -1,4 +1,6 @@
-# 📦 Extension Documentation Package - Summary
+# Extension Documentation Package - Summary
+
+> Note: The app scope is now capture + reader + reminders. This file covers extension documentation.
 
 ## What Was Created
 
@@ -9,7 +11,7 @@ I've created a comprehensive documentation package for the Read-Later browser ex
 ## 📄 Documentation Files Created
 
 ### 1. **EXTENSION_GUIDE.md** (Root Directory)
-**Location:** `d:\Git\unnamed_tool\EXTENSION_GUIDE.md`  
+**Location:** `docs/EXTENSION_GUIDE.md`  
 **Size:** ~8,500 words  
 **Purpose:** Complete installation and usage guide
 
@@ -19,7 +21,7 @@ I've created a comprehensive documentation package for the Read-Later browser ex
 - API token generation and setup
 - Using the extension
 - Troubleshooting common issues
-- Security notes
+- Security considerations
 - Feature overview
 
 **Best for:** First-time users who want detailed setup instructions
@@ -27,7 +29,7 @@ I've created a comprehensive documentation package for the Read-Later browser ex
 ---
 
 ### 2. **extension/QUICK_START.md**
-**Location:** `d:\Git\unnamed_tool\extension\QUICK_START.md`  
+**Location:** `extension/QUICK_START.md`  
 **Size:** ~1,000 words  
 **Purpose:** Fast 5-minute setup guide
 
@@ -43,7 +45,7 @@ I've created a comprehensive documentation package for the Read-Later browser ex
 ---
 
 ### 3. **extension/TROUBLESHOOTING.md**
-**Location:** `d:\Git\unnamed_tool\extension\TROUBLESHOOTING.md`  
+**Location:** `extension/TROUBLESHOOTING.md`  
 **Size:** ~5,000 words  
 **Purpose:** Comprehensive problem-solving guide
 
@@ -60,7 +62,7 @@ I've created a comprehensive documentation package for the Read-Later browser ex
 ---
 
 ### 4. **extension/DEMO_SCRIPT.md**
-**Location:** `d:\Git\unnamed_tool\extension\DEMO_SCRIPT.md`  
+**Location:** `extension/DEMO_SCRIPT.md`  
 **Size:** ~4,000 words  
 **Purpose:** Guide for creating demo videos
 
@@ -77,7 +79,7 @@ I've created a comprehensive documentation package for the Read-Later browser ex
 ---
 
 ### 5. **extension/README.md**
-**Location:** `d:\Git\unnamed_tool\extension\README.md`  
+**Location:** `extension/README.md`  
 **Size:** ~3,500 words  
 **Purpose:** Documentation index and overview
 
@@ -86,7 +88,7 @@ I've created a comprehensive documentation package for the Read-Later browser ex
 - Quick navigation guide
 - Feature overview
 - Browser compatibility table
-- Security and privacy notes
+- Security and privacy considerations
 - Development tips
 - Roadmap
 
@@ -95,7 +97,7 @@ I've created a comprehensive documentation package for the Read-Later browser ex
 ---
 
 ### 6. **extension/TESTING_CHECKLIST.md**
-**Location:** `d:\Git\unnamed_tool\extension\TESTING_CHECKLIST.md`  
+**Location:** `extension/TESTING_CHECKLIST.md`  
 **Size:** ~4,500 words  
 **Purpose:** Comprehensive testing guide
 
@@ -142,7 +144,7 @@ I've created a comprehensive documentation package for the Read-Later browser ex
 - Added links to all documentation
 - Added quick setup instructions
 
-### 2. **src/app/settings/client.tsx**
+### 2. **src/app/(dashboard)/settings/client.tsx**
 **Changes:**
 - Added link to extension installation guide
 - Improved user guidance for extension setup

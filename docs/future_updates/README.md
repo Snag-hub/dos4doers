@@ -238,3 +238,7 @@ Have ideas for future features?
 
 **Last Updated**: January 4, 2026
 **Next Review**: April 1, 2026
+# Legacy roadmap notice
+
+This folder is an archived backlog from the pre-reduction product scope.
+Current production scope is capture + reader + reminders only.

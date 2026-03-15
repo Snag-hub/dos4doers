@@ -424,3 +424,7 @@ Email: "Can you send the report by EOD Friday?"
 - [Hugging Face Models](https://huggingface.co/models)
 - [ML Best Practices](https://developers.google.com/machine-learning/guides/rules-of-ml)
 - [Responsible AI](https://www.microsoft.com/en-us/ai/responsible-ai)
+# Legacy roadmap notice
+
+This file contains historical ideas from the broader pre-reduction scope.
+Current production scope is capture + reader + reminders only.
