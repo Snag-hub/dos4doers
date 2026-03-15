@@ -9,6 +9,7 @@ import { createItemSchema } from '@/lib/validations';
 import { extractContent } from '@/lib/reader';
 import { rateLimit } from '@/lib/rate-limit';
 import { ensureUser } from '@/lib/user';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 // CORS headers for browser extension
 const corsHeaders = {
@@ -70,7 +71,21 @@ export async function POST(req: Request) {
       .limit(1);
 
     if (existingItem.length > 0) {
-      return NextResponse.json({ message: 'Item already exists' }, { status: 200, headers: corsHeaders });
+      const updated = await db
+        .update(items)
+        .set({
+          status: 'inbox',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(items.id, existingItem[0].id))
+        .returning();
+
+      revalidateTag(`items-${userId}`, 'default' as any);
+      revalidateTag(`stats-${userId}`, 'default' as any);
+      revalidatePath('/inbox');
+
+      return NextResponse.json({ message: 'Item already exists. Moved to inbox.', item: updated[0] }, { status: 200, headers: corsHeaders });
     }
 
     let metadata;
@@ -115,6 +130,10 @@ export async function POST(req: Request) {
       content: extracted?.content,
       textContent: extracted?.textContent,
     }).returning();
+
+    revalidateTag(`items-${userId}`, 'default' as any);
+    revalidateTag(`stats-${userId}`, 'default' as any);
+    revalidatePath('/inbox');
 
     return NextResponse.json(newItem[0], { status: 201, headers: corsHeaders });
   } catch (error) {

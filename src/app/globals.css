@@ -74,15 +74,24 @@ body {
 
   .reader-content {
     @apply overflow-x-hidden;
+    word-break: break-word;
+  }
+
+  .reader-content * {
+    box-sizing: border-box;
+    max-width: 100%;
   }
 
   .reader-content img,
   .reader-content picture,
   .reader-content figure,
   .reader-content iframe,
-  .reader-content video {
+  .reader-content video,
+  .reader-content svg,
+  .reader-content canvas {
     max-width: 100% !important;
-    width: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
     height: auto !important;
     margin-inline: auto;
   }
@@ -91,8 +100,27 @@ body {
     width: 100% !important;
   }
 
+  .reader-content iframe {
+    min-height: 200px;
+  }
+
+  .reader-content pre,
+  .reader-content table {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    white-space: pre-wrap;
+  }
+
   @media (max-width: 640px) {
     .reader-content img {
+      max-height: 45vh;
+      object-fit: contain;
+    }
+
+    .reader-content iframe,
+    .reader-content video,
+    .reader-content canvas {
       max-height: 45vh;
       object-fit: contain;
     }
