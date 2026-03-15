@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { rateLimits } from '@/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 /**
  * A database-backed rate limiter for server actions.
@@ -10,30 +10,61 @@ export async function rateLimit(key: string, limit: number = 10, windowMs: numbe
     const now = new Date();
     const futureReset = new Date(now.getTime() + windowMs);
 
-    // Atomic Upsert with Conditional Reset logic
-    const results = await db.insert(rateLimits)
-        .values({
-            key,
-            count: 1,
-            reset: futureReset
-        })
-        .onConflictDoUpdate({
-            target: rateLimits.key,
-            set: {
-                count: sql`CASE WHEN rate_limits.reset < ${now} THEN 1 ELSE rate_limits.count + 1 END`,
-                reset: sql`CASE WHEN rate_limits.reset < ${now} THEN ${futureReset} ELSE rate_limits.reset END`
+    try {
+        return await db.transaction(async (tx) => {
+            const existingRows = await tx
+                .select()
+                .from(rateLimits)
+                .where(eq(rateLimits.key, key))
+                .limit(1);
+
+            const existing = existingRows[0];
+
+            if (!existing) {
+                await tx.insert(rateLimits).values({
+                    key,
+                    count: 1,
+                    reset: futureReset,
+                });
+
+                return {
+                    success: true,
+                    limit,
+                    remaining: Math.max(0, limit - 1),
+                    reset: futureReset.getTime(),
+                };
             }
-        })
-        .returning();
 
-    const result = results[0];
-    const success = result.count <= limit;
-    const remaining = Math.max(0, limit - result.count);
+            const existingReset = existing.reset instanceof Date
+                ? existing.reset
+                : new Date(existing.reset as unknown as string);
 
-    return {
-        success,
-        limit,
-        remaining,
-        reset: result.reset.getTime(),
-    };
+            const withinNewWindow = existingReset.getTime() < now.getTime();
+            const nextCount = withinNewWindow ? 1 : existing.count + 1;
+            const nextReset = withinNewWindow ? futureReset : existingReset;
+
+            await tx
+                .update(rateLimits)
+                .set({
+                    count: nextCount,
+                    reset: nextReset,
+                })
+                .where(eq(rateLimits.key, key));
+
+            return {
+                success: nextCount <= limit,
+                limit,
+                remaining: Math.max(0, limit - nextCount),
+                reset: nextReset.getTime(),
+            };
+        });
+    } catch (error) {
+        console.error('[RATE_LIMIT] Failed, allowing request:', { key, error });
+        return {
+            success: true,
+            limit,
+            remaining: limit,
+            reset: futureReset.getTime(),
+        };
+    }
 }

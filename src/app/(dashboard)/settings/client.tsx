@@ -424,7 +424,7 @@ export default function SettingsClient({
                                 description="Save links and set reminders." />
                             <div className="flex flex-col gap-3">
                                 <a
-                                    href="/DOs 4 DOERs-extension.zip"
+                                    href="/dos4doers-extension-chromium.zip"
                                     download
                                     className="flex items-center justify-between p-3 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/30 hover:bg-sky-100 dark:hover:bg-sky-900/40 transition-colors group"
                                 >
@@ -440,7 +440,7 @@ export default function SettingsClient({
                                     <svg className="w-4 h-4 text-sky-400 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                                 </a>
                                 <a
-                                    href="/DOs 4 DOERs-extension-firefox.zip"
+                                    href="/dos4doers-extension-firefox.zip"
                                     download
                                     className="flex items-center justify-between p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/30 hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors group"
                                 >

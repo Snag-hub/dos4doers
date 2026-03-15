@@ -33,23 +33,52 @@ document.addEventListener('DOMContentLoaded', async () => {
   const api = typeof browser !== 'undefined' ? browser : chrome;
 
   async function getStorage(key) {
-    if (window.browser && browser.storage) return browser.storage.local.get(key);
-    return new Promise(resolve => chrome.storage.local.get(key, resolve));
+    if (api.storage && api.storage.local && typeof api.storage.local.get === 'function') {
+      if (typeof browser !== 'undefined' && api === browser) {
+        return api.storage.local.get(key);
+      }
+      return new Promise(resolve => api.storage.local.get(key, resolve));
+    }
+    return {};
   }
 
   async function setStorage(data) {
-    if (window.browser && browser.storage) return browser.storage.local.set(data);
-    return new Promise(resolve => chrome.storage.local.set(data, resolve));
+    if (api.storage && api.storage.local && typeof api.storage.local.set === 'function') {
+      if (typeof browser !== 'undefined' && api === browser) {
+        return api.storage.local.set(data);
+      }
+      return new Promise(resolve => api.storage.local.set(data, resolve));
+    }
   }
 
   async function getCurrentTab() {
-    if (window.browser && browser.tabs) {
-      const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    if (api.tabs && typeof api.tabs.query === 'function' && typeof browser !== 'undefined' && api === browser) {
+      const tabs = await api.tabs.query({ active: true, currentWindow: true });
       return tabs[0];
     }
     return new Promise(resolve => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => resolve(tabs[0]));
+      api.tabs.query({ active: true, currentWindow: true }, (tabs) => resolve(tabs[0]));
     });
+  }
+
+  function normalizeSaveUrl(rawUrl) {
+    if (!rawUrl) return null;
+
+    if (rawUrl.startsWith('about:reader?')) {
+      try {
+        const readerUrl = new URL(rawUrl);
+        const innerUrl = readerUrl.searchParams.get('url');
+        if (innerUrl) return innerUrl;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+      return rawUrl;
+    }
+
+    return null;
   }
 
   function setStatus(msg, type = 'normal') {
@@ -144,15 +173,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { apiToken } = await getStorage('apiToken');
       const tab = await getCurrentTab();
 
+      if (!apiToken) {
+        setStatus('Missing API token. Reconnect extension.', 'error');
+        return;
+      }
+
       if (!tab || !tab.url) {
-        setStatus('No URL found', 'error');
+        setStatus('No active tab URL found', 'error');
+        return;
+      }
+
+      const normalizedUrl = normalizeSaveUrl(tab.url);
+      if (!normalizedUrl) {
+        setStatus('This page type cannot be saved. Open the original web URL first.', 'error');
         return;
       }
 
       const res = await fetch(`${API_BASE}/items`, {
         method: 'POST',
+        mode: 'cors',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiToken}` },
-        body: JSON.stringify({ url: tab.url })
+        body: JSON.stringify({ url: normalizedUrl })
       });
 
       if (res.ok) {
@@ -161,10 +202,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         setStatus('Rate limit exceeded (3/min). Please wait.', 'error');
       } else {
         const data = await res.json().catch(() => ({}));
-        setStatus(data.error || 'Failed to save', 'error');
+        const errorMessage = Array.isArray(data.error)
+          ? (data.error[0]?.message || 'Invalid request')
+          : (data.error || `Failed to save (${res.status})`);
+        setStatus(errorMessage, 'error');
       }
     } catch (e) {
-      setStatus('Network error', 'error');
+      setStatus(`Network error: ${e?.message || 'request failed'}`, 'error');
     }
   });
 
