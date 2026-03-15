@@ -2,8 +2,8 @@
 
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
-import { eq, and, desc, sql, ilike, or, inArray, gte, lte } from 'drizzle-orm';
-import { items, reminders, notes, tags, itemsToTags, users, pushSubscriptions, meetings as meetingTable, tasks as taskTable } from '@/db/schema';
+import { eq, and, desc, sql, ilike, or, inArray } from 'drizzle-orm';
+import { items, reminders, users, pushSubscriptions } from '@/db/schema';
 import { unstable_cache, revalidateTag, revalidatePath } from 'next/cache';
 import { v4 as uuidv4 } from 'uuid';
 import { getMetadata } from '@/lib/metadata';
@@ -51,180 +51,11 @@ const getCachedItems = async (userId: string, page: number, limit: number, statu
 
             const hasMore = userItems.length > limit;
             const slicedItems = hasMore ? userItems.slice(0, limit) : userItems;
-            const itemIds = slicedItems.map(i => i.id);
 
-            try {
-                const itemNotes = itemIds.length > 0
-                    ? await db.select({
-                        id: notes.id,
-                        title: notes.title,
-                        content: notes.content,
-                        itemId: notes.itemId,
-                        createdAt: notes.createdAt
-                    }).from(notes).where(inArray(notes.itemId, itemIds))
-                    : [];
-
-                const itemTagsFlat = itemIds.length > 0
-                    ? await db.select({
-                        itemId: itemsToTags.itemId,
-                        tagId: tags.id,
-                        tagName: tags.name,
-                        tagColor: tags.color
-                    })
-                        .from(itemsToTags)
-                        .innerJoin(tags, eq(itemsToTags.tagId, tags.id))
-                        .where(inArray(itemsToTags.itemId, itemIds))
-                    : [];
-
-                const itemsWithNotes = slicedItems.map(item => ({
-                    ...item,
-                    notes: itemNotes
-                        .filter(n => n.itemId === item.id)
-                        .map(n => ({ id: n.id, title: n.title, content: n.content, createdAt: n.createdAt })),
-                    tags: itemTagsFlat
-                        .filter(it => it.itemId === item.id)
-                        .map(it => ({ id: it.tagId, name: it.tagName, color: it.tagColor }))
-                }));
-
-                return { items: itemsWithNotes, hasMore };
-            } catch (error) {
-                console.error('Error in fetchItems post-processing:', error);
-                return { items: slicedItems.map(item => ({ ...item, notes: [], tags: [] })), hasMore };
-            }
+            return { items: slicedItems, hasMore };
         },
         [`user-items-${userId}-${page}-${limit}-${status}-${isFavorite}-${search}-${type}`],
         { revalidate: 3600, tags: [`items-${userId}`] }
-    )();
-};
-
-const getCachedTimelineEvents = async (userId: string, dateStr: string) => {
-    return unstable_cache(
-        async () => {
-            const date = new Date(dateStr);
-            const dayStart = new Date(date);
-            dayStart.setHours(0, 0, 0, 0);
-            const dayEnd = new Date(date);
-            dayEnd.setHours(23, 59, 59, 999);
-
-            const { meetings: meetingTable, tasks: taskTable } = await import('@/db/schema');
-
-            const [todayMeetings, todayTasks, todayItems, todayReminders] = await Promise.all([
-                db.select().from(meetingTable).where(and(eq(meetingTable.userId, userId), sql`${meetingTable.startTime} >= ${dayStart}`, sql`${meetingTable.startTime} <= ${dayEnd}`)).orderBy(meetingTable.startTime),
-                db.select().from(taskTable).where(and(eq(taskTable.userId, userId), sql`${taskTable.dueDate} >= ${dayStart}`, sql`${taskTable.dueDate} <= ${dayEnd}`, sql`${taskTable.status} != 'done'`)).orderBy(taskTable.dueDate),
-                db.select().from(items).where(and(eq(items.userId, userId), sql`${items.reminderAt} >= ${dayStart}`, sql`${items.reminderAt} <= ${dayEnd}`)).orderBy(items.reminderAt),
-                db.select().from(reminders).where(and(eq(reminders.userId, userId), sql`${reminders.scheduledAt} >= ${dayStart}`, sql`${reminders.scheduledAt} <= ${dayEnd}`)).orderBy(reminders.scheduledAt)
-            ]);
-
-            const events: any[] = [];
-            for (const meeting of todayMeetings) events.push({ id: meeting.id, type: 'meeting', title: meeting.title, startTime: meeting.startTime, endTime: meeting.endTime, duration: meeting.endTime ? Math.round((meeting.endTime.getTime() - meeting.startTime.getTime()) / (1000 * 60)) : 60, metadata: { meetingLink: meeting.link, meetingType: meeting.type, interviewStage: meeting.stage, calendarId: meeting.calendarId, calendarName: meeting.calendarName, calendarColor: meeting.calendarColor, accountEmail: meeting.accountEmail } });
-            for (const task of todayTasks) events.push({ id: task.id, type: 'task', title: task.title, startTime: task.dueDate, duration: 30, status: task.status, metadata: { projectId: task.projectId, priority: task.priority, taskType: task.type } });
-            for (const item of todayItems) events.push({ id: item.id, type: 'item', title: item.title || 'Untitled', startTime: item.reminderAt!, duration: 15, url: item.url, favicon: item.favicon, metadata: { itemType: item.type, siteName: item.siteName } });
-            for (const reminder of todayReminders) events.push({ id: reminder.id, type: 'reminder', title: reminder.title, startTime: reminder.scheduledAt, duration: 5, metadata: { recurrence: reminder.recurrence, meetingId: reminder.meetingId, taskId: reminder.taskId, itemId: reminder.itemId } });
-
-            return events;
-        },
-        [`user-timeline-${userId}-${dateStr}`],
-        { revalidate: 3600, tags: [`timeline-${userId}`, `items-${userId}`, `tasks-${userId}`, `meetings-${userId}`] }
-    )();
-};
-
-const getCachedCalendarEvents = async (userId: string, startStr: string, endStr: string) => {
-    return unstable_cache(
-        async () => {
-            const start = new Date(startStr);
-            const end = new Date(endStr);
-
-            const [rangeMeetings, rangeTasks, rangeItems, rangeReminders] = await Promise.all([
-                db.select().from(meetingTable).where(and(eq(meetingTable.userId, userId), gte(meetingTable.startTime, start), lte(meetingTable.startTime, end))).orderBy(meetingTable.startTime),
-                db.select().from(taskTable).where(and(eq(taskTable.userId, userId), gte(taskTable.dueDate, start), lte(taskTable.dueDate, end), sql`${taskTable.status} != 'done'`)).orderBy(taskTable.dueDate),
-                db.select().from(items).where(and(eq(items.userId, userId), gte(items.reminderAt, start), lte(items.reminderAt, end))).orderBy(items.reminderAt),
-                db.select().from(reminders).where(and(eq(reminders.userId, userId), gte(reminders.scheduledAt, start), lte(reminders.scheduledAt, end))).orderBy(reminders.scheduledAt)
-            ]);
-
-            const events: any[] = [];
-
-            // Add Meetings
-            for (const meeting of rangeMeetings) {
-                events.push({
-                    id: meeting.id,
-                    type: 'meeting',
-                    title: meeting.title,
-                    startTime: meeting.startTime,
-                    endTime: meeting.endTime,
-                    duration: meeting.endTime ? Math.round((meeting.endTime.getTime() - meeting.startTime.getTime()) / (1000 * 60)) : 60,
-                    metadata: {
-                        meetingLink: meeting.link,
-                        meetingType: meeting.type,
-                        interviewStage: meeting.stage,
-                        calendarId: meeting.calendarId,
-                        calendarName: meeting.calendarName,
-                        calendarColor: meeting.calendarColor,
-                        accountEmail: meeting.accountEmail
-                    }
-                });
-            }
-
-            // Add Tasks
-            for (const task of rangeTasks) {
-                events.push({
-                    id: task.id,
-                    type: 'task',
-                    title: task.title,
-                    startTime: task.dueDate!,
-                    duration: 30,
-                    status: task.status,
-                    metadata: {
-                        projectId: task.projectId,
-                        priority: task.priority,
-                        taskType: task.type
-                    }
-                });
-            }
-
-            // Add Reminders (This covers Meeting/Task/Item reminders if they are in the reminders table)
-            const processedItemIds = new Set<string>();
-            for (const reminder of rangeReminders) {
-                if (reminder.itemId) processedItemIds.add(reminder.itemId);
-
-                events.push({
-                    id: reminder.id,
-                    type: 'reminder',
-                    title: reminder.title || 'Untitled Reminder',
-                    startTime: reminder.scheduledAt,
-                    duration: 5,
-                    metadata: {
-                        recurrence: reminder.recurrence,
-                        meetingId: reminder.meetingId,
-                        taskId: reminder.taskId,
-                        itemId: reminder.itemId
-                    }
-                });
-            }
-
-            // Add Items with simple reminderAt (that are NOT already in the reminders table)
-            for (const item of rangeItems) {
-                if (!processedItemIds.has(item.id)) {
-                    events.push({
-                        id: item.id,
-                        type: 'item',
-                        title: item.title || 'Untitled Content',
-                        startTime: item.reminderAt!,
-                        duration: 15,
-                        url: item.url,
-                        favicon: item.favicon,
-                        metadata: {
-                            itemType: item.type,
-                            siteName: item.siteName,
-                            isLegacyReminder: true
-                        }
-                    });
-                }
-            }
-
-            return events;
-        },
-        [`user-calendar-${userId}-${startStr}-${endStr}`],
-        { revalidate: 3600, tags: [`timeline-${userId}`, `items-${userId}`, `tasks-${userId}`, `meetings-${userId}`] }
     )();
 };
 
@@ -278,19 +109,17 @@ export async function addReminder(
     date: Date,
     recurrence: 'none' | 'daily' | 'weekly' | 'monthly' = 'none',
     itemId?: string,
-    title?: string,
-    taskId?: string
+    title?: string
 ) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    const validated = addReminderSchema.parse({ date, recurrence, itemId, title, taskId });
+    const validated = addReminderSchema.parse({ date, recurrence, itemId, title });
 
     await db.insert(reminders).values({
         id: uuidv4(),
         userId,
         itemId: validated.itemId || null,
-        taskId: validated.taskId || null,
         title: validated.title || null,
         scheduledAt: validated.date,
         recurrence: validated.recurrence,
@@ -301,7 +130,6 @@ export async function addReminder(
         revalidateTag(`items-${userId}`, 'default' as any);
         revalidatePath('/inbox');
     }
-    revalidateTag(`timeline-${userId}`, 'default' as any);
     revalidatePath('/settings');
 }
 
@@ -311,7 +139,6 @@ export async function deleteReminder(reminderId: string) {
 
     await db.delete(reminders).where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
 
-    revalidateTag(`timeline-${userId}`, 'default' as any);
     revalidateTag(`items-${userId}`, 'default' as any);
     revalidatePath('/inbox');
     revalidatePath('/settings');
@@ -325,7 +152,6 @@ export async function snoozeReminder(reminderId: string, minutes: number) {
 
     await db.update(reminders).set({ scheduledAt: newTime }).where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
 
-    revalidateTag(`timeline-${userId}`, 'default' as any);
     revalidateTag(`items-${userId}`, 'default' as any);
     revalidatePath('/inbox');
     revalidatePath('/settings');
@@ -337,7 +163,6 @@ export async function updateReminder(reminderId: string, date: Date, recurrence:
 
     await db.update(reminders).set({ scheduledAt: date, recurrence, title: title || null }).where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
 
-    revalidateTag(`timeline-${userId}`, 'default' as any);
     revalidateTag(`items-${userId}`, 'default' as any);
     revalidatePath('/inbox');
     revalidatePath('/settings');
@@ -546,18 +371,6 @@ export async function getUserStats() {
     return getCachedUserStats(userId);
 }
 
-export async function getTimelineEvents(date: Date = new Date()) {
-    const { userId } = await auth();
-    if (!userId) throw new Error('Unauthorized');
-    return getCachedTimelineEvents(userId, date.toISOString());
-}
-
-export async function getCalendarEvents(start: Date, end: Date) {
-    const { userId } = await auth();
-    if (!userId) throw new Error('Unauthorized');
-    return getCachedCalendarEvents(userId, start.toISOString(), end.toISOString());
-}
-
 export async function getItem(itemId: string) {
     const { userId } = await auth();
     if (!userId) return null;
@@ -567,7 +380,7 @@ export async function getItem(itemId: string) {
 
 export async function globalSearch(query: string) {
     const { userId } = await auth();
-    if (!userId || !query) return { items: [], tasks: [], meetings: [], notes: [] };
+    if (!userId || !query) return { items: [] };
 
     const { success } = await rateLimit(`search:${userId}`, 20);
     if (!success) throw new Error('Too many searches. Please slow down.');
@@ -575,14 +388,7 @@ export async function globalSearch(query: string) {
     const searchPattern = `%${query}%`;
     const searchedItems = await db.select().from(items).where(and(eq(items.userId, userId), or(ilike(items.title, searchPattern), ilike(items.url, searchPattern), ilike(items.description, searchPattern), ilike(items.textContent, searchPattern)))).limit(5);
 
-    const { tasks: taskTable, meetings: meetingTable } = await import('@/db/schema');
-    const [searchedTasks, searchedMeetings, searchedNotes] = await Promise.all([
-        db.select().from(taskTable).where(and(eq(taskTable.userId, userId), or(ilike(taskTable.title, searchPattern), ilike(taskTable.description, searchPattern)))).limit(5),
-        db.select().from(meetingTable).where(and(eq(meetingTable.userId, userId), or(ilike(meetingTable.title, searchPattern), ilike(meetingTable.description, searchPattern)))).limit(5),
-        db.select().from(notes).where(and(eq(notes.userId, userId), or(ilike(notes.title, searchPattern), ilike(notes.content, searchPattern)))).limit(5)
-    ]);
-
-    return { items: searchedItems, tasks: searchedTasks, meetings: searchedMeetings, notes: searchedNotes };
+    return { items: searchedItems };
 }
 
 export async function batchUpdateStatus(itemIds: string[], status: 'inbox' | 'reading' | 'archived' | 'trash') {

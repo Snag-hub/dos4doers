@@ -3,7 +3,6 @@
 import { generateApiToken, deleteAccount } from './actions';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { getGeneralReminders, addReminder, deleteReminder, updateReminder, updatePreferences } from '@/app/actions';
-import { syncGoogleCalendar } from '@/app/calendar-actions';
 import { useState, useEffect, ReactNode } from 'react';
 import { InferSelectModel } from 'drizzle-orm';
 import { reminders } from '@/db/schema';
@@ -416,27 +415,6 @@ export default function SettingsClient({
 
                     {/* RIGHT COLUMN */}
                     <div className="space-y-6">
-
-                        {/* Integrations */}
-                        <SettingCard>
-                            <SectionHeader
-                                icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
-                                title="Integrations"
-                                description="Connect external services." />
-                            <div className="space-y-4">
-                                <ActionRow
-                                    label="Google Calendar"
-                                    description="Sync your events to the timeline."
-                                    buttonText="Sync Now"
-                                    action={async () => {
-                                        try {
-                                            const res = await syncGoogleCalendar();
-                                            toast.success(res.message);
-                                        } catch (e) { toast.error('Sync failed'); }
-                                    }}
-                                    variant="secondary" />
-                            </div>
-                        </SettingCard>
 
                         {/* Extension */}
                         <SettingCard className="border-sky-100 dark:border-sky-900/30">

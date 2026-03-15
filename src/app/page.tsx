@@ -233,50 +233,50 @@ export default async function Home() {
                 One unified <span className="text-blue-600">Digital Brain.</span>
               </h2>
               <p className="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
-                DOs 4 DOERs is more than just a reader. It&apos;s where your knowledge lives, your tasks grow, and your schedule stays in sync.
+                DOs 4 DOERs is your focused reading workflow: capture great content, read deeply, and get reminded at the right time.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Note Pillar */}
+              {/* Capture Pillar */}
               <div className="relative group p-8 rounded-[40px] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500">
                 <div className="mb-8 h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform">
                   <BookOpen className="h-8 w-8" />
                 </div>
-                <h3 className="text-2xl font-black mb-4 tracking-tight">Digital Notes</h3>
+                <h3 className="text-2xl font-black mb-4 tracking-tight">Instant Capture</h3>
                 <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
-                  Context-aware capture. Attach notes to articles, tasks, or meetings for effortless recall and project deep-dives.
+                  Save links from web, mobile share sheet, or extension in seconds. Metadata and previews are extracted automatically.
                 </p>
                 <div className="mt-8 flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-10px] group-hover:translate-x-0 transition-all">
                   Learn more <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
 
-              {/* Task Pillar */}
+              {/* Read Pillar */}
               <div className="relative group p-8 rounded-[40px] border border-zinc-200 bg-zinc-900 text-white dark:border-zinc-800 dark:bg-white dark:text-zinc-900 hover:shadow-2xl transition-all duration-500 scale-105 shadow-xl sm:z-10">
                 <div className="mb-8 h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 text-white dark:bg-zinc-900 dark:text-white flex shadow-lg group-hover:scale-110 group-hover:-rotate-3 transition-transform">
                   <CheckCircle className="h-8 w-8" />
                 </div>
-                <h3 className="text-2xl font-black mb-4 tracking-tight">Actionable Tasks</h3>
+                <h3 className="text-2xl font-black mb-4 tracking-tight">Deep Reading</h3>
                 <p className="text-zinc-400 dark:text-zinc-500 leading-relaxed font-medium">
-                  Don&apos;t just save links, act on them. Create tasks, group them into projects, and track progress without leaving your research flow.
+                  Open clean reader mode whenever you are ready. Move items through inbox, reading, archive, and trash without clutter.
                 </p>
                 <div className="mt-8 flex items-center gap-2 text-blue-400 dark:text-blue-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-10px] group-hover:translate-x-0 transition-all">
-                  Organize now <ArrowRight className="w-4 h-4" />
+                  Read smarter <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
 
-              {/* Meeting Pillar */}
+              {/* Reminder Pillar */}
               <div className="relative group p-8 rounded-[40px] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500">
                 <div className="mb-8 h-16 w-16 items-center justify-center rounded-2xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 flex shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform">
                   <Clock className="h-8 w-8" />
                 </div>
-                <h3 className="text-2xl font-black mb-4 tracking-tight">Smart Meetings</h3>
+                <h3 className="text-2xl font-black mb-4 tracking-tight">Smart Reminders</h3>
                 <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
-                  Centralized scheduling. Manage interviews, calls, and syncs. Prepare instantly by linking notes directly to your calendar.
+                  Set general reminders or item-specific reminders. Snooze quickly and return to the right content at the right moment.
                 </p>
                 <div className="mt-8 flex items-center gap-2 text-purple-600 dark:text-purple-400 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-10px] group-hover:translate-x-0 transition-all">
-                  View Calendar <ArrowRight className="w-4 h-4" />
+                  Stay on track <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
             </div>
@@ -339,14 +339,14 @@ export default async function Home() {
                 </div>
               </div>
 
-              {/* Timeline (Medium) */}
+              {/* Smart Queue (Medium) */}
               <div className="md:col-span-2 relative group overflow-hidden rounded-[48px] border border-zinc-200 bg-white p-10 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
                 <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 shadow-inner group-hover:scale-90 transition-transform">
                   <Clock className="h-8 w-8" />
                 </div>
-                <h3 className="text-2xl font-black text-zinc-900 dark:text-white mb-2">Infinite Timeline</h3>
+                <h3 className="text-2xl font-black text-zinc-900 dark:text-white mb-2">Smart Queue</h3>
                 <p className="text-zinc-500 dark:text-zinc-400 font-medium">
-                  A unified chronological stream of your activity. See exactly when you saved, read, or acted.
+                  Keep only what matters in front of you. Favorites, archive, and reminders help you focus instead of hoarding tabs.
                 </p>
               </div>
 
@@ -357,7 +357,7 @@ export default async function Home() {
                 </div>
                 <h3 className="text-2xl font-black text-zinc-900 dark:text-white mb-2">Omnisearch</h3>
                 <p className="text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">
-                  Find anything across articles, tasks, and meetings instantly with `Cmd+K`. Zero latency recall.
+                  Find anything across your saved links, titles, and extracted content instantly with `Cmd+K`.
                 </p>
               </div>
 

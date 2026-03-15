@@ -1,7 +1,7 @@
 import { db } from '@/db';
-import { items, reminders, users, meetings } from '@/db/schema';
+import { items, reminders, users } from '@/db/schema';
 import { sendEmail } from '@/lib/email';
-import { and, eq, gt, gte, lt, lte, sql, or, isNull } from 'drizzle-orm';
+import { and, eq, gte, lt, lte, sql, or, isNull } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -63,20 +63,7 @@ export async function GET(request: Request) {
       console.log(`🔒 [DIGEST] Locked ${user.email} for processing...`);
 
       try {
-        // A. Fetch Upcoming Meetings (Next 24h)
-        const upcomingMeetings = await db
-          .select()
-          .from(meetings)
-          .where(
-            and(
-              eq(meetings.userId, user.id),
-              gte(meetings.startTime, now),
-              lt(meetings.startTime, tomorrow)
-            )
-          )
-          .orderBy(meetings.startTime);
-
-        // B. Fetch Due Reminders (Past due or due in next 24h)
+        // A. Fetch Due Reminders (Past due or due in next 24h)
         const dueReminders = await db
           .select({
             id: reminders.id,
@@ -100,7 +87,7 @@ export async function GET(request: Request) {
           .orderBy(reminders.scheduledAt)
           .limit(10);
 
-        // C. Fetch Latest Inbox Items (Created in last 24h)
+        // B. Fetch Latest Inbox Items (Created in last 24h)
         const newInboxItems = await db
           .select()
           .from(items)
@@ -115,7 +102,7 @@ export async function GET(request: Request) {
           .limit(5);
 
         // If nothing to report, Release Lock and skip
-        if (upcomingMeetings.length === 0 && dueReminders.length === 0 && newInboxItems.length === 0) {
+        if (dueReminders.length === 0 && newInboxItems.length === 0) {
           console.log(`⏭️  [DIGEST] Skipping ${user.email} - No content. Releasing lock.`);
           // Revert timestamp to what it was before (from the fetched user object)
           await db.update(users)
@@ -164,27 +151,7 @@ export async function GET(request: Request) {
                     </div>
 
                     <div class="content">
-                        
-                        <!-- 1. Meetings -->
-                        ${upcomingMeetings.length > 0 ? `
-                        <div class="section">
-                        <h2 class="section-title">📅 Today's Agenda</h2>
-                        ${upcomingMeetings.map(m => `
-                            <div class="card" style="border-left: 4px solid #3b82f6;">
-                            <div style="font-weight: 600; color: #18181b;">${m.title}</div>
-                            <div style="margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
-                                <span class="meeting-time">
-                                ${new Date(m.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                                ${new Date(m.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                                ${m.link ? `<a href="${m.link}" class="link" style="font-size: 13px;">Join Meeting →</a>` : ''}
-                            </div>
-                            </div>
-                        `).join('')}
-                        </div>
-                        ` : ''}
-
-                        <!-- 2. Reminders -->
+                        <!-- 1. Reminders -->
                         ${dueReminders.length > 0 ? `
                         <div class="section">
                         <h2 class="section-title">⏰ Don't Forget</h2>
@@ -204,7 +171,7 @@ export async function GET(request: Request) {
                         </div>
                         ` : ''}
 
-                        <!-- 3. New Inbox Items -->
+                        <!-- 2. New Inbox Items -->
                         ${newInboxItems.length > 0 ? `
                         <div class="section">
                         <h2 class="section-title">📥 Recently Saved</h2>
@@ -241,7 +208,7 @@ export async function GET(request: Request) {
         // Then send email
         await sendEmail({
           to: user.email,
-          subject: `Daily Briefing: ${upcomingMeetings.length} Meetings, ${dueReminders.length} Reminders`,
+          subject: `Daily Briefing: ${dueReminders.length} Reminders, ${newInboxItems.length} New Items`,
           html
         });
 

@@ -49,8 +49,8 @@ export async function GET(req: Request) {
       },
       {
         title: 'Team standup meeting',
-        url: '/meetings',
-        siteName: 'DOs 4 DOERs Meeting',
+        url: '/inbox',
+        siteName: 'DOs 4 DOERs',
         recurrence: 'none'
       }
     ];

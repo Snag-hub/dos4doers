@@ -23,17 +23,15 @@
 - **Save Anything**: Articles, videos, PDFs, and webpages with one click
 - **Rich Metadata**: Automatic title, description, and image extraction
 - **Full-Text Search**: Find anything instantly with powerful search
-- **Tags & Organization**: Categorize and filter your saved content
+- **Reader Mode**: Clean, distraction-free article reading
 
-### 🎯 Productivity Tools
+### 🎯 Focused Workflow
 - **Reading List**: Curated inbox for articles you want to read
-- **Notes**: Attach notes to any saved item
-- **Tasks**: Built-in task management with due dates
-- **Meetings**: Schedule and track meetings with notes
-- **Timeline**: Visual calendar view of your saved content
+- **Status Flow**: Inbox, reading, favorites, archive, and trash
+- **Share to Save**: Save from browser extension or mobile share sheet
 
 ### 🔔 Smart Reminders
-- **Flexible Scheduling**: Set reminders for any item
+- **Flexible Scheduling**: Set item-specific or general reminders
 - **Email Notifications**: Get daily summaries and reminders
 - **Push Notifications**: Real-time alerts on your devices
 - **Recurring Reminders**: Daily, weekly, or monthly schedules

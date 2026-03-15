@@ -6,8 +6,6 @@ import { createItem } from '../actions';
 import { SignInButton, useUser, SignedOut } from '@clerk/nextjs';
 import Image from 'next/image';
 
-import { createNote } from '@/app/note-actions';
-
 function ShareContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -58,17 +56,9 @@ function ShareContent() {
                     }
                     setMessage('Saved as Item!');
                 }
-                // 3. If NO URL, but we have text/title, save as NOTE
-                else if (finalDesc || finalTitle) {
-                    await createNote({
-                        title: finalTitle,
-                        content: finalDesc || finalTitle // Fallback content
-                    });
-                    setMessage('Saved as Note!');
-                }
-                // 4. Nothing to save
+                // 3. Nothing to save
                 else {
-                    throw new Error('No content found to save.');
+                    throw new Error('No valid URL found to save.');
                 }
 
                 setStatus('success');

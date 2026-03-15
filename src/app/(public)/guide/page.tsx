@@ -44,37 +44,37 @@ export default function GuidePage() {
                 </div>
 
                 <div className="space-y-40">
-                    {/* section: Chronology */}
-                    <section id="timeline" className="scroll-mt-32">
+                    {/* section: Reminder Queue */}
+                    <section id="workflow" className="scroll-mt-32">
                         <div className="flex flex-col md:flex-row gap-16 items-center">
                             <div className="flex-1 order-2 md:order-1">
                                 <div className="p-8 rounded-[40px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
                                     <div className="absolute top-0 right-0 p-4 opacity-5">
                                         <Clock className="w-32 h-32" />
                                     </div>
-                                    <h3 className="text-3xl font-black mb-6 tracking-tight">Mastering the Timeline</h3>
+                                    <h3 className="text-3xl font-black mb-6 tracking-tight">Mastering Your Reading Queue</h3>
                                     <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6 font-medium">
-                                        The Timeline is your single source of truth. It stitches together every action into a seamless historical stream.
+                                        Inbox, reading, archive, and reminders give you a clean system to decide what to read next.
                                     </p>
                                     <ul className="space-y-4">
                                         <li className="flex items-start gap-3">
                                             <div className="mt-1 h-5 w-5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 text-blue-600 dark:text-blue-400 font-bold text-[10px]">1</div>
-                                            <p className="text-sm text-zinc-500 dark:text-zinc-400"><span className="font-bold text-zinc-900 dark:text-white">Chronological Flow:</span> Jump back to any date to see what you were working on.</p>
+                                            <p className="text-sm text-zinc-500 dark:text-zinc-400"><span className="font-bold text-zinc-900 dark:text-white">Clear Flow:</span> Capture to inbox, read when ready, archive what you've finished.</p>
                                         </li>
                                         <li className="flex items-start gap-3">
                                             <div className="mt-1 h-5 w-5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 text-blue-600 dark:text-blue-400 font-bold text-[10px]">2</div>
-                                            <p className="text-sm text-zinc-500 dark:text-zinc-400"><span className="font-bold text-zinc-900 dark:text-white">Unified Context:</span> Articles, tasks, and meetings are displayed together as they happened.</p>
+                                            <p className="text-sm text-zinc-500 dark:text-zinc-400"><span className="font-bold text-zinc-900 dark:text-white">Right-Time Recall:</span> Use reminders to bring back important reads exactly when you need them.</p>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                             <div className="flex-1 order-1 md:order-2">
                                 <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest mb-6">
-                                    Historical Recall
+                                    Reading Workflow
                                 </span>
                                 <h2 className="text-5xl font-black mb-6 tracking-tight">Your digital history, <br />re-visualized.</h2>
                                 <p className="text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
-                                    Ever wondered when exactly you saved that one article or when you finished that major project? The Timeline makes recall effortless.
+                                    Stop losing great content in browser tabs. DOs 4 DOERs turns capture into a reliable read-later habit.
                                 </p>
                             </div>
                         </div>
@@ -144,7 +144,7 @@ export default function GuidePage() {
                                 title="Omnisearch"
                                 color="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
                             >
-                                Find any URL, note, or task across your entire OS in milliseconds. It searches metadata and even your personal notes instantly.
+                                Find any saved URL, title, or extracted content in milliseconds. Jump back into any item instantly.
                             </FeatureCard>
                             <FeatureCard
                                 icon={<Clock className="w-8 h-8" />}
@@ -156,12 +156,12 @@ export default function GuidePage() {
                         </div>
                     </section>
 
-                    {/* section: The Trinity */}
+                    {/* section: Core Workflow */}
                     <section id="trinity" className="scroll-mt-32">
                         <div className="text-center mb-16">
-                            <h2 className="text-5xl font-black mb-6 tracking-tight">The Trinity</h2>
+                            <h2 className="text-5xl font-black mb-6 tracking-tight">Capture, Read, Remind</h2>
                             <p className="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
-                                DOs 4 DOERs is your Personal Operating System. It's built on three core pillars that keep your life in sync.
+                                DOs 4 DOERs is intentionally simple: save fast, read clearly, and get timely reminders.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -169,36 +169,36 @@ export default function GuidePage() {
                                 <div className="h-14 w-14 rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 flex items-center justify-center">
                                     <ListFilter className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-2xl font-black tracking-tight">Actionable Tasks</h3>
+                                <h3 className="text-2xl font-black tracking-tight">Instant Capture</h3>
                                 <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                    Don't just save links, act on them. Create tasks, group them into projects, and track your progress without leaving your research.
+                                    Use extension or share sheet to capture links in one tap with metadata and previews.
                                 </p>
                             </div>
                             <div className="space-y-6">
                                 <div className="h-14 w-14 rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center">
                                     <BookOpen className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-2xl font-black tracking-tight">Digital Notes</h3>
+                                <h3 className="text-2xl font-black tracking-tight">Focused Reading</h3>
                                 <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                    Capture thoughts instantly. Notes in DOs 4 DOERs are context-aware—attach them to articles, tasks, or meetings for effortless recall.
+                                    Open reader mode for distraction-free reading and move finished items to archive.
                                 </p>
                             </div>
                             <div className="space-y-6">
                                 <div className="h-14 w-14 rounded-2xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 flex items-center justify-center">
                                     <Clock className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-2xl font-black tracking-tight">Smart Meetings</h3>
+                                <h3 className="text-2xl font-black tracking-tight">Smart Reminders</h3>
                                 <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                    Your schedule, centralized. Manage interviews, calls, and syncs. Attach notes directly to meetings to prepare and follow up.
+                                    Set item-specific or general reminders, snooze in one tap, and never lose important reads.
                                 </p>
                             </div>
                         </div>
                     </section>
-                    <section id="timeline" className="scroll-mt-32">
+                    <section id="reminders" className="scroll-mt-32">
                         <div className="text-center mb-16">
-                            <h2 className="text-5xl font-black mb-6 tracking-tight">Mastering the Timeline</h2>
+                            <h2 className="text-5xl font-black mb-6 tracking-tight">Mastering Reminders</h2>
                             <p className="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
-                                The central heartbeat of your digital life. Recall every activity in a unified chronological stream.
+                                Keep your backlog alive with scheduled nudges and recurring reminders.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -206,16 +206,16 @@ export default function GuidePage() {
                                 <div className="p-8 rounded-[40px] bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/20">
                                     <h4 className="text-xl font-black mb-4 flex items-center gap-3">
                                         <Clock className="w-6 h-6 text-emerald-600" />
-                                        Single Source of Truth
+                                        Built for Follow-Through
                                     </h4>
                                     <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
-                                        The Timeline unifies articles, tasks, and meetings into one seamless stream. Never ask &quot;When did I do that?&quot; again. Just scroll and recall.
+                                        General reminders help with habits, and item reminders pull the exact link back into focus when it matters.
                                     </p>
                                 </div>
                                 <div className="p-8 rounded-[40px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
-                                    <h4 className="text-xl font-black mb-4">Historical Recall</h4>
+                                    <h4 className="text-xl font-black mb-4">Flexible Snooze</h4>
                                     <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
-                                        Jump to any specific date using the calendar picker. Perfect for reviewing meeting notes from last month or finding that one article you read on a random Tuesday.
+                                        Not the right moment? Snooze quickly and let the app resurface content later without losing momentum.
                                     </p>
                                 </div>
                             </div>
@@ -250,10 +250,10 @@ export default function GuidePage() {
                             <div className="mt-20 pt-12 border-t border-zinc-800 dark:border-zinc-200">
                                 <h3 className="text-white dark:text-zinc-900 font-bold mb-4 flex items-center gap-2">
                                     <ListFilter className="w-5 h-5 text-blue-500" />
-                                    Smart Tagging
+                                    Smart Filtering
                                 </h3>
                                 <p className="text-zinc-400 dark:text-zinc-500 leading-relaxed">
-                                    Organize items into workspaces using <span className="text-white dark:text-zinc-900 font-bold italic">Tags</span>. You can filter your entire view by clicking a tag badge, allowing you to separate "Work" research from "Personal" reading instantly.
+                                    Keep your queue clean with built-in views: inbox, reading, favorites, archive, and trash.
                                 </p>
                             </div>
                         </div>

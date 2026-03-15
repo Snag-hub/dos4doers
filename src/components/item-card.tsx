@@ -4,10 +4,9 @@ import { items } from '@/db/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import { toggleFavorite, updateStatus, deleteItem, trackItemView } from '@/app/actions';
 import { useState } from 'react';
-import { Bell, Archive, Star, Pencil, FileText, BookOpen, Trash2, RotateCcw, ExternalLink } from 'lucide-react';
+import { Bell, Archive, Star, Pencil, BookOpen, Trash2, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { TagBadge } from '@/components/tag-badge';
 import { useHaptic } from '@/hooks/use-haptic';
 import { toast } from 'sonner';
 
@@ -15,10 +14,7 @@ const ConfirmDialog = dynamic(() => import('@/components/confirm-dialog').then(m
 const ReminderScheduler = dynamic(() => import('@/components/reminder-scheduler').then(mod => mod.ReminderScheduler), { ssr: false });
 const EditItemDialog = dynamic(() => import('@/components/edit-item-dialog').then(mod => mod.EditItemDialog), { ssr: false });
 
-type Item = InferSelectModel<typeof items> & {
-    notes?: any[];
-    tags?: any[];
-};
+type Item = InferSelectModel<typeof items>;
 
 export function ItemCard({
     item,
@@ -218,56 +214,6 @@ export function ItemCard({
                         <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 mb-3 leading-relaxed">
                             {item.description}
                         </p>
-                    )}
-
-                    {/* Tags */}
-                    {item.tags && item.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mb-3">
-                            {item.tags.slice(0, 3).map(tag => (
-                                <TagBadge key={tag.id} tag={tag} />
-                            ))}
-                            {item.tags.length > 3 && (
-                                <span className="px-2 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 rounded-full">
-                                    +{item.tags.length - 3}
-                                </span>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Notes Preview */}
-                    {item.notes && item.notes.length > 0 && (
-                        <div className="mb-3 space-y-2">
-                            {item.notes.slice(0, 1).map(note => (
-                                <Link
-                                    key={note.id}
-                                    href={`/notes/${note.id}`}
-                                    className="block p-2.5 rounded-lg bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-800/30 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group/note"
-                                >
-                                    <div className="flex items-start gap-2">
-                                        <FileText className="w-3.5 h-3.5 mt-0.5 text-blue-500 shrink-0" />
-                                        <div className="flex-1 min-w-0">
-                                            {note.title && (
-                                                <div className="text-xs font-semibold text-blue-700 dark:text-blue-400 truncate mb-0.5">
-                                                    {note.title}
-                                                </div>
-                                            )}
-                                            <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-1">
-                                                {note.content}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                            {item.notes.length > 1 && (
-                                <Link
-                                    href={`/notes?itemId=${item.id}`}
-                                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors inline-flex items-center gap-1"
-                                >
-                                    View {item.notes.length - 1} more note{item.notes.length > 2 ? 's' : ''}
-                                    <ExternalLink className="w-3 h-3" />
-                                </Link>
-                            )}
-                        </div>
                     )}
 
                     {/* Actions Bar */}

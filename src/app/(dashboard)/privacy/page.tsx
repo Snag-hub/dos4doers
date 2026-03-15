@@ -21,7 +21,7 @@ export default function PrivacyPage() {
                         <ul className="list-disc pl-5 space-y-1 text-sm">
                             <li>Account information (name, email, profile picture)</li>
                             <li>Saved items (URLs, titles, descriptions, images)</li>
-                            <li>Notes, tasks, and meetings you create</li>
+                            <li>Reminders you create (general or item-specific)</li>
                             <li>Usage data (page views, feature usage)</li>
                             <li>Device information (browser type, IP address)</li>
                         </ul>

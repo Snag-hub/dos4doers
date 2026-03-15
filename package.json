@@ -1,7 +1,7 @@
 {
   "name": "dos4doers",
   "version": "1.0.0",
-  "description": "A personal productivity system that helps people turn reading, planning, meetings, and ideas into real execution through a unified daily timeline.",
+  "description": "A focused capture-and-remind app for saving web content, reading distraction-free, and getting timely reminders.",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",

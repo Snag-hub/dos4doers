@@ -2,17 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Inbox, Star, Archive, Settings, CheckSquare, Calendar, MoreHorizontal, X, Trash2, Clock, FileText, Hash } from 'lucide-react';
+import { Inbox, Star, Archive, Settings, MoreHorizontal, X, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { SearchTrigger } from '@/components/search-trigger';
 
 const navItems = [
-    { href: '/timeline', label: 'Timeline', icon: Clock },
     { href: '/inbox', label: 'Inbox', icon: Inbox },
-    { href: '/tasks', label: 'Tasks', icon: CheckSquare },
-    { href: '/meetings', label: 'Meetings', icon: Calendar },
-    { href: '/notes', label: 'Notes', icon: FileText },
-    { href: '/tags', label: 'Tags', icon: Hash },
     { href: '/favorites', label: 'Favorites', icon: Star },
     { href: '/archive', label: 'Archive', icon: Archive },
     { href: '/trash', label: 'Trash', icon: Trash2 },
@@ -23,19 +18,11 @@ export function MobileNav() {
     const pathname = usePathname();
     const [isMoreOpen, setIsMoreOpen] = useState(false);
 
-    // Visible items (4 slots + More = 5 total)
-    // "Add notes to bottom tabs" -> We can replace one or just add it to 'More' if full. 
-    // Current: Timeline, Inbox, Tasks, Meetings. 
-    // Let's replace 'Meetings' with 'Notes' or similar? Or just add it if space allows.
-    // User asked "Add notes to bottom tabs". 
-    // Let's optimize: Timeline, Tasks, Notes, Settings?
-
-    // Changing order to prioritize Notes as requested
     const visibleItems = [
-        navItems.find(i => i.label === 'Timeline')!,
-        navItems.find(i => i.label === 'Notes')!,
-        navItems.find(i => i.label === 'Tasks')!,
         navItems.find(i => i.label === 'Inbox')!,
+        navItems.find(i => i.label === 'Favorites')!,
+        navItems.find(i => i.label === 'Archive')!,
+        navItems.find(i => i.label === 'Settings')!,
     ];
     // All items for the drawer/sidebar
     const allItems = navItems;

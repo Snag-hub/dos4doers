@@ -2,7 +2,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { items, tasks, notes, meetings, reminders } from '@/db/schema';
+import { items, reminders } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function GET() {
@@ -14,24 +14,15 @@ export async function GET() {
     try {
         const [
             userItems,
-            userTasks,
-            userNotes,
-            userMeetings,
             userReminders
         ] = await Promise.all([
             db.select().from(items).where(eq(items.userId, userId)),
-            db.select().from(tasks).where(eq(tasks.userId, userId)),
-            db.select().from(notes).where(eq(notes.userId, userId)),
-            db.select().from(meetings).where(eq(meetings.userId, userId)),
             db.select().from(reminders).where(eq(reminders.userId, userId))
         ]);
 
         const exportData = {
             exportDate: new Date().toISOString(),
             items: userItems,
-            tasks: userTasks,
-            notes: userNotes,
-            meetings: userMeetings,
             reminders: userReminders
         };
 

@@ -1,25 +1,19 @@
 'use client';
 
 import { updateItem } from '@/app/actions';
-import { useState, useEffect } from 'react';
-import { TagManager } from '@/components/tag-manager';
-import { attachTagToItem, detachTagFromItem } from '@/app/tag-actions';
+import { useState } from 'react';
 
 interface EditItemDialogProps {
     item: {
         id: string;
         title: string | null;
         reminderAt: Date | null;
-        tags?: any[];
     };
     onClose: () => void;
 }
 
 export function EditItemDialog({ item, onClose }: EditItemDialogProps) {
     const [title, setTitle] = useState(item.title || '');
-    const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
-        item.tags?.map(t => t.id) || []
-    );
 
     // Format Date for datetime-local input (YYYY-MM-DDTHH:mm)
     const formatDateForInput = (date: Date | null) => {
@@ -31,16 +25,6 @@ export function EditItemDialog({ item, onClose }: EditItemDialogProps) {
 
     const [reminderAt, setReminderAt] = useState(formatDateForInput(item.reminderAt));
     const [isPending, setIsPending] = useState(false);
-
-    const handleToggleTag = async (tagId: string) => {
-        if (selectedTagIds.includes(tagId)) {
-            setSelectedTagIds(prev => prev.filter(id => id !== tagId));
-            await detachTagFromItem(item.id, tagId);
-        } else {
-            setSelectedTagIds(prev => [...prev, tagId]);
-            await attachTagToItem(item.id, tagId);
-        }
-    };
 
     const handleSave = async () => {
         setIsPending(true);
@@ -85,11 +69,6 @@ export function EditItemDialog({ item, onClose }: EditItemDialogProps) {
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Item Title"
                         />
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-semibold text-zinc-500 mb-1.5 ml-1">Tags</label>
-                        <TagManager selectedTags={selectedTagIds} onToggleTag={handleToggleTag} />
                     </div>
 
                     <div>

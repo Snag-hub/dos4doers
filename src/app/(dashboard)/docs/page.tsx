@@ -19,7 +19,7 @@ export default function UserGuidePage() {
                     <div className="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
                         <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">1. Save Everything</h3>
                         <p className="text-zinc-600 dark:text-zinc-400">
-                            Use the browser extension to save articles, videos, and tasks in one click. We automatically extract the title and image.
+                            Use the browser extension to save articles and videos in one click. We automatically extract the title and image.
                         </p>
                     </div>
                     <div className="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
@@ -74,7 +74,6 @@ export default function UserGuidePage() {
                             Instead of spamming you with emails, we send a single <strong>Daily Briefing</strong> at 6 PM. It contains:
                         </p>
                         <ul className="mt-4 space-y-2 list-disc list-inside text-zinc-600 dark:text-zinc-400 ml-4">
-                            <li><strong>Today's Agenda:</strong> Upcoming meetings for the next 24 hours.</li>
                             <li><strong>Don't Forget:</strong> Reminders relevant to now.</li>
                             <li><strong>Recently Saved:</strong> A quick recap of your latest inbox items.</li>
                         </ul>
@@ -87,11 +86,11 @@ export default function UserGuidePage() {
                             <span className="text-2xl">🔔</span> Interactive Notifications
                         </h3>
                         <p className="mt-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                            Push notifications are actionable. You can manage tasks directly from the notification:
+                            Push notifications are actionable. You can manage reminders directly from the notification:
                         </p>
                         <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div className="px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900/30 text-center font-medium">
-                                ✅ Mark Done
+                                ✅ Mark Read
                             </div>
                             <div className="px-4 py-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border border-orange-100 dark:border-orange-900/30 text-center font-medium">
                                 💤 Snooze 1h

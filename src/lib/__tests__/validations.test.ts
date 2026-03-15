@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createItemSchema, taskSchema, tagSchema } from '../validations';
+import { createItemSchema, addReminderSchema } from '../validations';
 
 describe('Zod Validations', () => {
     describe('createItemSchema', () => {
@@ -14,32 +14,20 @@ describe('Zod Validations', () => {
         });
     });
 
-    describe('taskSchema', () => {
-        it('should fail if title is missing', () => {
-            const result = taskSchema.safeParse({ description: 'No title' });
+    describe('addReminderSchema', () => {
+        it('should fail when both itemId and title are missing', () => {
+            const result = addReminderSchema.safeParse({ date: new Date() });
             expect(result.success).toBe(false);
         });
 
-        it('should pass with only a title', () => {
-            const result = taskSchema.safeParse({ title: 'Task Title' });
+        it('should pass with a title for general reminder', () => {
+            const result = addReminderSchema.safeParse({ date: new Date(), title: 'Read later' });
             expect(result.success).toBe(true);
         });
 
-        it('should validate priority enums', () => {
-            const result = taskSchema.safeParse({ title: 'Task', priority: 'ultra-high' });
-            expect(result.success).toBe(false);
-        });
-    });
-
-    describe('tagSchema', () => {
-        it('should validate hex colors', () => {
-            const result = tagSchema.safeParse({ name: 'Tag', color: '#FF0000' });
+        it('should pass with an itemId for item reminder', () => {
+            const result = addReminderSchema.safeParse({ date: new Date(), itemId: 'item-123' });
             expect(result.success).toBe(true);
-        });
-
-        it('should fail on invalid hex colors', () => {
-            const result = tagSchema.safeParse({ name: 'Tag', color: 'red' });
-            expect(result.success).toBe(false);
         });
     });
 });

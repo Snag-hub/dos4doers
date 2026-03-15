@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { items, tasks } from '@/db/schema';
+import { items } from '@/db/schema';
 import { eq, lt, and } from 'drizzle-orm';
 
 export async function GET(req: Request) {
@@ -22,20 +22,10 @@ export async function GET(req: Request) {
             ))
             .returning({ id: items.id });
 
-        // 2. Archive tasks that have been 'done' for more than 30 days
-        const archivedTasks = await db.update(tasks)
-            .set({ status: 'archived' })
-            .where(and(
-                eq(tasks.status, 'done'),
-                lt(tasks.updatedAt, thirtyDaysAgo)
-            ))
-            .returning({ id: tasks.id });
-
         return NextResponse.json({
             success: true,
             deletedItemsCount: deletedItems.length,
-            archivedTasksCount: archivedTasks.length,
-            message: `Cleaned ${deletedItems.length} items and archived ${archivedTasks.length} tasks.`
+            message: `Cleaned ${deletedItems.length} trashed item(s).`
         });
     } catch (error) {
         console.error('Database cleanup failed:', error);

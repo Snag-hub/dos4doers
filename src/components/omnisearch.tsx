@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, FileText, CheckCircle, Calendar, Globe, BookOpen, X } from 'lucide-react';
+import { Search, Globe, BookOpen, X } from 'lucide-react';
 import { globalSearch } from '@/app/actions';
 import { useTransition } from 'react';
 import { useHotkeys } from '@/hooks/use-hotkeys';
@@ -12,16 +12,13 @@ export function Omnisearch() {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<{
         items: any[];
-        tasks: any[];
-        meetings: any[];
-        notes: any[];
-    }>({ items: [], tasks: [], meetings: [], notes: [] });
+    }>({ items: [] });
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
 
     const handleSearch = useCallback(async (q: string) => {
         if (!q) {
-            setResults({ items: [], tasks: [], meetings: [], notes: [] });
+            setResults({ items: [] });
             return;
         }
 
@@ -29,7 +26,7 @@ export function Omnisearch() {
         setResults(data);
     }, []);
 
-    const [filter, setFilter] = useState<'all' | 'items' | 'tasks' | 'notes'>('all');
+    const [filter, setFilter] = useState<'all' | 'items'>('all');
 
     // Shortcuts
     useHotkeys('k', () => setIsOpen((open) => !open), { metaKey: true, preventDefault: true });
@@ -99,7 +96,7 @@ export function Omnisearch() {
                 </div>
 
                 <div className="flex border-b border-zinc-100 dark:border-zinc-800 px-4 gap-4 overflow-x-auto no-scrollbar bg-zinc-50/50 dark:bg-zinc-950/50">
-                    {(['all', 'items', 'tasks', 'notes'] as const).map((f) => (
+                    {(['all', 'items'] as const).map((f) => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
@@ -137,56 +134,9 @@ export function Omnisearch() {
                                 </Section>
                             )}
 
-                            {/* Tasks Section */}
-                            {(filter === 'all' || filter === 'tasks') && results.tasks.length > 0 && (
-                                <Section title="Tasks" icon={<CheckCircle className="h-4 w-4" />}>
-                                    {results.tasks.map(task => (
-                                        <ResultItem
-                                            key={task.id}
-                                            title={task.title}
-                                            subtitle={task.status}
-                                            icon={<CheckCircle className={`h-4 w-4 ${task.status === 'done' ? 'text-green-500' : 'text-zinc-400'}`} />}
-                                            onClick={() => navigate('/tasks')}
-                                        />
-                                    ))}
-                                </Section>
-                            )}
-
-                            {/* Meetings Section */}
-                            {filter === 'all' && results.meetings.length > 0 && (
-                                <Section title="Meetings" icon={<Calendar className="h-4 w-4" />}>
-                                    {results.meetings.map(meeting => (
-                                        <ResultItem
-                                            key={meeting.id}
-                                            title={meeting.title}
-                                            subtitle={new Date(meeting.startTime).toLocaleDateString()}
-                                            icon={<Calendar className="h-4 w-4 text-zinc-400" />}
-                                            onClick={() => navigate('/timeline')}
-                                        />
-                                    ))}
-                                </Section>
-                            )}
-
-                            {/* Notes Section */}
-                            {(filter === 'all' || filter === 'notes') && results.notes.length > 0 && (
-                                <Section title="Notes" icon={<FileText className="h-4 w-4" />}>
-                                    {results.notes.map(note => (
-                                        <ResultItem
-                                            key={note.id}
-                                            title={note.title || 'Untitled Note'}
-                                            subtitle={note.content.substring(0, 50) + '...'}
-                                            icon={<FileText className="h-4 w-4 text-orange-400" />}
-                                            onClick={() => navigate(`/notes/${note.id}`)}
-                                        />
-                                    ))}
-                                </Section>
-                            )}
-
                             {!isPending && (
-                                (filter === 'all' && results.items.length === 0 && results.tasks.length === 0 && results.meetings.length === 0 && results.notes.length === 0) ||
-                                (filter === 'items' && results.items.length === 0) ||
-                                (filter === 'tasks' && results.tasks.length === 0) ||
-                                (filter === 'notes' && results.notes.length === 0)
+                                (filter === 'all' && results.items.length === 0) ||
+                                (filter === 'items' && results.items.length === 0)
                             ) && (
                                     <div className="py-12 text-center text-zinc-500">
                                         <p className="text-sm">No results found for "{query}" in {filter}</p>

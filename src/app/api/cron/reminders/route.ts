@@ -1,7 +1,6 @@
-﻿import { db } from '@/db';
-import { items, users, pushSubscriptions, reminders, meetings } from '@/db/schema';
+import { db } from '@/db';
+import { items, users, pushSubscriptions, reminders } from '@/db/schema';
 import { eq, and, lt, isNotNull, sql } from 'drizzle-orm';
-import { sendEmail } from '@/lib/email';
 import { NextResponse } from 'next/server';
 import webpush from 'web-push';
 import { withNotificationLogging } from '@/lib/notification-logger';
@@ -90,16 +89,8 @@ export async function GET(req: Request) {
       const subs = await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, user.id));
       if (subs.length === 0) continue;
 
-      let title = reminder.title || 'Reminder';
-      let url = '/settings';
-
-      if (reminder.meetingId) {
-        const meeting = await db.query.meetings.findFirst({ where: eq(meetings.id, reminder.meetingId) });
-        if (meeting) {
-          title = `Meeting: ${meeting.title}`;
-          url = '/meetings';
-        }
-      }
+      const title = reminder.title || 'Reminder';
+      const url = reminder.itemId ? '/inbox' : '/settings';
 
       const payload = JSON.stringify({
         title: 'DOs 4 DOERs',
