@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { items, users, pushSubscriptions, reminders } from '@/db/schema';
-import { eq, and, lt, isNotNull, sql } from 'drizzle-orm';
+import { eq, and, lt, isNotNull, isNull, or } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import webpush from 'web-push';
 import { withNotificationLogging } from '@/lib/notification-logger';
@@ -36,7 +36,7 @@ export async function GET(req: Request) {
         isNotNull(items.reminderAt),
         lt(items.reminderAt, now),
         // Either not locked, or lock expired
-        sql`(${items.lockedAt} IS NULL OR ${items.lockedAt} < ${now})`
+        or(isNull(items.lockedAt), lt(items.lockedAt, now))
       ))
       .returning();
 
@@ -46,7 +46,7 @@ export async function GET(req: Request) {
       .set({ lockedAt: safetyLockTime })
       .where(and(
         lt(reminders.scheduledAt, now),
-        sql`(${reminders.lockedAt} IS NULL OR ${reminders.lockedAt} < ${now})`
+        or(isNull(reminders.lockedAt), lt(reminders.lockedAt, now))
       ))
       .returning();
 
