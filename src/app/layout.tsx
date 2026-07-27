@@ -53,6 +53,10 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      signInForceRedirectUrl="/inbox"
+      signUpForceRedirectUrl="/inbox"
       appearance={{
         baseTheme: dark,
         elements: {

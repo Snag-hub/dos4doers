@@ -33,12 +33,12 @@ export default async function Home() {
             ) : (
               <>
                 <SignedOut>
-                  <ClerkSignInButton mode="modal">
+                  <ClerkSignInButton mode="redirect" forceRedirectUrl="/inbox">
                     <button className="hidden sm:inline-block text-sm font-semibold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors">
                       Log in
                     </button>
                   </ClerkSignInButton>
-                  <SignUpButton mode="modal">
+                  <SignUpButton mode="redirect" forceRedirectUrl="/inbox">
                     <button className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 active:scale-95 shadow-lg shadow-black/10">
                       Get Started
                     </button>
@@ -80,7 +80,7 @@ export default async function Home() {
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               ) : (
-                <SignUpButton mode="modal">
+                <SignUpButton mode="redirect" forceRedirectUrl="/inbox">
                   <button className="group rounded-2xl bg-blue-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-blue-500/20 transition-all hover:bg-blue-500 hover:-translate-y-1 active:scale-95 flex items-center gap-2">
                     Start Saving Now — Free
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -417,7 +417,7 @@ export default async function Home() {
                       Launch Application
                     </Link>
                   ) : (
-                    <SignUpButton mode="modal">
+                    <SignUpButton mode="redirect" forceRedirectUrl="/inbox">
                       <button className="w-full rounded-xl bg-blue-600 py-4 font-bold text-white shadow-xl shadow-blue-500/20 transition-all hover:bg-blue-500 active:scale-95 text-lg">
                         Create Account Free
                       </button>

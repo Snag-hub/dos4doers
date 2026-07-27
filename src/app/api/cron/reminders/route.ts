@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { items, users, pushSubscriptions, reminders } from '@/db/schema';
-import { eq, and, lt, isNotNull, isNull, or } from 'drizzle-orm';
+import { eq, and, lt, lte, isNotNull, isNull, or, notExists } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import webpush from 'web-push';
 import { withNotificationLogging } from '@/lib/notification-logger';
@@ -34,7 +34,14 @@ export async function GET(req: Request) {
       .set({ lockedAt: safetyLockTime })
       .where(and(
         isNotNull(items.reminderAt),
-        lt(items.reminderAt, now),
+        lte(items.reminderAt, now),
+        // Item reminders created by the scheduler also have a matching row in
+        // `reminders`. That row is the source of truth, so don't send twice.
+        notExists(
+          db.select({ id: reminders.id })
+            .from(reminders)
+            .where(eq(reminders.itemId, items.id))
+        ),
         // Either not locked, or lock expired
         or(isNull(items.lockedAt), lt(items.lockedAt, now))
       ))
@@ -45,7 +52,7 @@ export async function GET(req: Request) {
       .update(reminders)
       .set({ lockedAt: safetyLockTime })
       .where(and(
-        lt(reminders.scheduledAt, now),
+        lte(reminders.scheduledAt, now),
         or(isNull(reminders.lockedAt), lt(reminders.lockedAt, now))
       ))
       .returning();
@@ -69,6 +76,8 @@ export async function GET(req: Request) {
         title: 'DOs 4 DOERs: Time to read',
         body: item.title || item.url,
         url: '/inbox',
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
         itemId: item.id,
         type: 'item',
         userId: user.id,
@@ -79,6 +88,12 @@ export async function GET(req: Request) {
           await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload);
         }, { itemId: item.id });
       }
+
+      // Legacy item reminders don't have a `reminders` record. Clear the due
+      // timestamp after this delivery so the two-minute cron cannot resend it.
+      await db.update(items)
+        .set({ reminderAt: null, lockedAt: null })
+        .where(eq(items.id, item.id));
     }
 
     // 4. Process Reminders
@@ -96,6 +111,8 @@ export async function GET(req: Request) {
         title: 'DOs 4 DOERs',
         body: title,
         url: url,
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
         itemId: reminder.id, // Notification action handler uses itemId for reminderId too
         type: 'reminder',
         userId: user.id,
@@ -105,6 +122,15 @@ export async function GET(req: Request) {
         await withNotificationLogging(user.id, 'push', sub.endpoint, async () => {
           await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload);
         }, { reminderId: reminder.id });
+      }
+
+      // Item reminders are also mirrored on the item for the inbox UI. Clear
+      // that legacy timestamp before removing/rescheduling the reminder row so
+      // it cannot be picked up as a separate notification on the next run.
+      if (reminder.itemId) {
+        await db.update(items)
+          .set({ reminderAt: null, lockedAt: null })
+          .where(eq(items.id, reminder.itemId));
       }
 
       // Handle recurrence or deletion
@@ -118,6 +144,12 @@ export async function GET(req: Request) {
         await db.update(reminders)
           .set({ scheduledAt: nextScheduledAt, lockedAt: null })
           .where(eq(reminders.id, reminder.id));
+
+        if (reminder.itemId) {
+          await db.update(items)
+            .set({ reminderAt: nextScheduledAt, lockedAt: null })
+            .where(eq(items.id, reminder.itemId));
+        }
       }
     }
 

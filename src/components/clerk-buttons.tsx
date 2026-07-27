@@ -10,7 +10,7 @@ export function SignInButton() {
     }
 
     return (
-        <ClerkSignInButton mode="modal">
+        <ClerkSignInButton mode="redirect" forceRedirectUrl="/inbox">
             <button className="rounded-full bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition-colors">
                 Sign In
             </button>

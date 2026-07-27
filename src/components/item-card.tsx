@@ -294,7 +294,11 @@ export function ItemCard({
             />
 
             {showReminderDialog && (
-                <ReminderScheduler itemId={item.id} onClose={() => setShowReminderDialog(false)} />
+                <ReminderScheduler
+                    itemId={item.id}
+                    initialReminderAt={item.reminderAt}
+                    onClose={() => setShowReminderDialog(false)}
+                />
             )}
 
             {showEditDialog && (

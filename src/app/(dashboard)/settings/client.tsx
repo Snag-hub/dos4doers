@@ -234,13 +234,18 @@ export default function SettingsClient({
         if (!reminderTitle || !reminderTime) return;
         setAddingReminder(true);
         try {
-            const dateObj = new Date(reminderTime);
+            const [hours, minutes] = reminderTime.split(':').map(Number);
+            const dateObj = new Date();
+            dateObj.setHours(hours, minutes, 0, 0);
+            // General reminders are daily routines. If today's time has passed,
+            // schedule the first reminder for tomorrow.
+            if (dateObj <= new Date()) dateObj.setDate(dateObj.getDate() + 1);
             if (editingId) {
                 await updateReminder(editingId, dateObj, recurrence, reminderTitle);
                 setEditingId(null);
                 toast.success('Reminder updated');
             } else {
-                await addReminder(dateObj, recurrence, undefined, reminderTitle);
+                await addReminder(dateObj, 'daily', undefined, reminderTitle);
                 toast.success('Reminder set');
             }
             await loadReminders();
@@ -359,7 +364,7 @@ export default function SettingsClient({
                                         className="w-full px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all" />
                                     <div className="flex gap-2">
                                         <input
-                                            type="datetime-local"
+                                            type="time"
                                             value={reminderTime}
                                             onChange={(e) => setReminderTime(e.target.value)}
                                             className="flex-1 min-w-0 px-3 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white text-zinc-600 dark:text-zinc-400" />
@@ -382,7 +387,9 @@ export default function SettingsClient({
                                             <div key={r.id} className="flex items-center justify-between p-3 rounded-lg bg-zinc-50/50 dark:bg-zinc-800/20 border border-zinc-100 dark:border-zinc-800">
                                                 <div className="min-w-0 flex-1 pr-3">
                                                     <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{r.title}</p>
-                                                    <p className="text-xs text-zinc-500">{new Date(r.scheduledAt).toLocaleDateString()}</p>
+                                                    <p className="text-xs text-zinc-500">
+                                                        Every day at {new Date(r.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </p>
                                                 </div>
                                                 <button onClick={() => handleDeleteReminder(r.id)} className="text-zinc-400 hover:text-red-500 transition-colors p-1">
                                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>

@@ -27,8 +27,10 @@ self.addEventListener('push', function (event) {
 
     const options = {
         body: data.body || 'New notification',
-        icon: '/icon-192.png',
-        badge: '/icon-192.png',
+        // `icon` is displayed in the notification drawer; `badge` is used by
+        // Android's status bar. Both point to the installed app's icon.
+        icon: data.icon || '/icon-192.png',
+        badge: data.badge || '/icon-192.png',
         vibrate: [100, 50, 100],
         actions: actions,
         data: {

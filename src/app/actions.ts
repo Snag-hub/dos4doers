@@ -137,7 +137,17 @@ export async function deleteReminder(reminderId: string) {
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
+    const [reminder] = await db.select({ itemId: reminders.itemId })
+        .from(reminders)
+        .where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+
     await db.delete(reminders).where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+
+    if (reminder?.itemId) {
+        await db.update(items)
+            .set({ reminderAt: null, lockedAt: null })
+            .where(and(eq(items.id, reminder.itemId), eq(items.userId, userId)));
+    }
 
     revalidateTag(`items-${userId}`, 'default' as any);
     revalidatePath('/inbox');
@@ -150,7 +160,17 @@ export async function snoozeReminder(reminderId: string, minutes: number) {
 
     const newTime = new Date(Date.now() + minutes * 60000);
 
+    const [reminder] = await db.select({ itemId: reminders.itemId })
+        .from(reminders)
+        .where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+
     await db.update(reminders).set({ scheduledAt: newTime }).where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+
+    if (reminder?.itemId) {
+        await db.update(items)
+            .set({ reminderAt: newTime, lockedAt: null })
+            .where(and(eq(items.id, reminder.itemId), eq(items.userId, userId)));
+    }
 
     revalidateTag(`items-${userId}`, 'default' as any);
     revalidatePath('/inbox');
@@ -161,7 +181,17 @@ export async function updateReminder(reminderId: string, date: Date, recurrence:
     const { userId } = await auth();
     if (!userId) throw new Error('Unauthorized');
 
-    await db.update(reminders).set({ scheduledAt: date, recurrence, title: title || null }).where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+    const [reminder] = await db.select({ itemId: reminders.itemId })
+        .from(reminders)
+        .where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+
+    await db.update(reminders).set({ scheduledAt: date, recurrence, title: title || null, lockedAt: null }).where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+
+    if (reminder?.itemId) {
+        await db.update(items)
+            .set({ reminderAt: date, lockedAt: null })
+            .where(and(eq(items.id, reminder.itemId), eq(items.userId, userId)));
+    }
 
     revalidateTag(`items-${userId}`, 'default' as any);
     revalidatePath('/inbox');

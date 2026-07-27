@@ -2,7 +2,7 @@
 
 import { reminders } from '@/db/schema';
 import { InferSelectModel } from 'drizzle-orm';
-import { addReminder, deleteReminder, getReminders, getGeneralReminders, snoozeReminder } from '@/app/actions';
+import { addReminder, deleteReminder, getReminders, getGeneralReminders, snoozeReminder, updateReminder } from '@/app/actions';
 import { useState, useEffect, useMemo } from 'react';
 import {
     Clock, Trash2, Calendar, Bell, Plus, ChevronRight,
@@ -14,16 +14,18 @@ type Reminder = InferSelectModel<typeof reminders>;
 
 interface ReminderSchedulerProps {
     itemId?: string;
+    initialReminderAt?: Date | null;
     onClose: () => void;
 }
 
-export function ReminderScheduler({ itemId, onClose }: ReminderSchedulerProps) {
+export function ReminderScheduler({ itemId, initialReminderAt, onClose }: ReminderSchedulerProps) {
     const isGeneral = !itemId;
     const [isPending, setIsPending] = useState(false);
 
     // Reminder State
     const [existingReminders, setExistingReminders] = useState<Reminder[]>([]);
     const [isLoadingReminders, setIsLoadingReminders] = useState(false);
+    const [editingReminderId, setEditingReminderId] = useState<string | null>(null);
 
     // Form State
     const [datePart, setDatePart] = useState('');
@@ -34,6 +36,16 @@ export function ReminderScheduler({ itemId, onClose }: ReminderSchedulerProps) {
 
     // Snooze Menu State
     const [snoozeExpandedId, setSnoozeExpandedId] = useState<string | null>(null);
+
+    const setDateTimeFields = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        setDatePart(`${year}-${month}-${day}`);
+        setTimePart(`${hours}:${minutes}`);
+    };
 
     useEffect(() => {
         const handleClickOutside = () => setSnoozeExpandedId(null);
@@ -46,6 +58,19 @@ export function ReminderScheduler({ itemId, onClose }: ReminderSchedulerProps) {
         try {
             const data = isGeneral ? await getGeneralReminders() : await getReminders(itemId!);
             setExistingReminders(data);
+
+            // When editing an item reminder, keep its currently scheduled time
+            // in the form instead of making the user enter it again.
+            if (!isGeneral) {
+                const upcomingReminder = data.find((reminder) => new Date(reminder.scheduledAt) > new Date());
+                const reminderDate = upcomingReminder?.scheduledAt || initialReminderAt;
+                if (reminderDate && new Date(reminderDate) > new Date()) {
+                    setDateTimeFields(new Date(reminderDate));
+                    setEditingReminderId(upcomingReminder?.id || null);
+                    setRecurrence(upcomingReminder?.recurrence || 'none');
+                    setShowCustom(true);
+                }
+            }
         } finally {
             setIsLoadingReminders(false);
         }
@@ -53,7 +78,7 @@ export function ReminderScheduler({ itemId, onClose }: ReminderSchedulerProps) {
 
     useEffect(() => {
         fetchReminders();
-    }, [itemId, isGeneral]);
+    }, [itemId, isGeneral, initialReminderAt]);
 
     // Helpers for Presets
     const setPreset = (type: 'later' | 'evening' | 'tomorrow' | 'weekend') => {
@@ -113,11 +138,17 @@ export function ReminderScheduler({ itemId, onClose }: ReminderSchedulerProps) {
         const fullDate = new Date(`${datePart}T${timePart}`);
         setIsPending(true);
         try {
-            await addReminder(fullDate, recurrence, itemId, isGeneral ? title : undefined);
+            if (editingReminderId) {
+                await updateReminder(editingReminderId, fullDate, recurrence, isGeneral ? title : undefined);
+            } else {
+                await addReminder(fullDate, recurrence, itemId, isGeneral ? title : undefined);
+            }
             await fetchReminders();
-            setDatePart('');
-            setTimePart('');
-            setRecurrence('none');
+            if (!editingReminderId) {
+                setDatePart('');
+                setTimePart('');
+                setRecurrence('none');
+            }
             setTitle('');
         } catch (error) {
             console.error(error);
@@ -240,7 +271,7 @@ export function ReminderScheduler({ itemId, onClose }: ReminderSchedulerProps) {
                             onClick={handleAddReminder}
                             className="w-full py-5 rounded-[24px] bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-black text-lg shadow-xl shadow-blue-500/30 transition-all disabled:opacity-20 flex items-center justify-center gap-3"
                         >
-                            {isPending ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" /> : 'Set Reminder'}
+                            {isPending ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" /> : editingReminderId ? 'Update Reminder' : 'Set Reminder'}
                         </button>
                     </div>
 
