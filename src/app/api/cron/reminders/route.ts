@@ -5,6 +5,11 @@ import { NextResponse } from 'next/server';
 import webpush from 'web-push';
 import { withNotificationLogging } from '@/lib/notification-logger';
 
+function getItemReminderTitle(item: { type: string; title: string | null; url: string }) {
+  const prefix = item.type === 'video' ? 'Watch' : 'Read';
+  return `${prefix}: ${item.title || item.url}`;
+}
+
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
     `mailto:${process.env.EMAIL_FROM || 'test@example.com'}`,
@@ -73,8 +78,8 @@ export async function GET(req: Request) {
       if (subs.length === 0) continue;
 
       const payload = JSON.stringify({
-        title: 'DOs 4 DOERs: Time to read',
-        body: item.title || item.url,
+        title: getItemReminderTitle(item),
+        body: 'Reminder',
         url: '/inbox',
         icon: '/icon-192.png',
         badge: '/icon-192.png',
@@ -104,12 +109,21 @@ export async function GET(req: Request) {
       const subs = await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, user.id));
       if (subs.length === 0) continue;
 
-      const title = reminder.title || 'Reminder';
+      const reminderItem = reminder.itemId
+        ? await db.query.items.findFirst({ where: eq(items.id, reminder.itemId) })
+        : null;
+      const isItemReminder = Boolean(reminder.itemId && reminderItem);
+      const title = isItemReminder
+        ? getItemReminderTitle(reminderItem!)
+        : 'DOs 4 DOERs';
+      const body = isItemReminder
+        ? reminder.title || 'Reminder'
+        : reminder.title || 'Reminder';
       const url = reminder.itemId ? '/inbox' : '/settings';
 
       const payload = JSON.stringify({
-        title: 'DOs 4 DOERs',
-        body: title,
+        title,
+        body,
         url: url,
         icon: '/icon-192.png',
         badge: '/icon-192.png',
