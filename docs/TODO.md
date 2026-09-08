@@ -83,6 +83,22 @@ session (`npx tsc --noEmit`, `npm test`, `npm run build` all pass after these ch
 - [x] Password minimum length bumped to 10 in the actual `<input minLength>` on both the sign-up
   and reset-password forms, matching the server-side `minPasswordLength: 10`.
 
+### Also fixed — email sending was broken (discovered while testing verification emails)
+- [x] **`dos4doers.n1k-tech.com` was never verified with Resend** — confirmed by test-sending from
+  both the new and old domain, both rejected with `domain is not verified`; `onboarding@resend.dev`
+  worked, confirming the account/key were otherwise fine. This meant every email the app has ever
+  tried to send from its own address (digest, reminders, feedback, and the new verification/reset
+  emails) was failing. Not caused by this session's domain migration — the old domain was never
+  verified either. Fixed: domain added + DNS records (DKIM on `resend._domainkey.`, SPF + MX on
+  `send.`) configured and verified in Resend.
+- [x] **The `RESEND_API_KEY` in use was domain-restricted** — even after the domain verified, sends
+  kept failing with the same error because the existing key predated the domain and didn't have
+  permission to send from it. Replaced with a new key that works (confirmed via a real test send)
+  in `.env.local` and all three Vercel environments (`production`/`preview`/`development`).
+  **Follow-up**: the old key (`re_8hdHgnFD...`) is no longer used anywhere — worth revoking it in
+  the Resend dashboard (API Keys) as cleanup, since an unused live key sitting around is needless
+  risk.
+
 ### Not fixed yet — needs a decision or bigger effort
 - [ ] **`/api/cron/send-reminders` vs `/api/cron/reminders` look like duplicate/superseded
   implementations** (the latter is more complete: push notifications + proper locking). Re-secured
