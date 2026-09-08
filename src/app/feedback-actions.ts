@@ -1,17 +1,17 @@
 'use server';
 
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/auth';
 import { sendEmail } from '@/lib/email';
 
 export async function submitFeedback(message: string, path: string) {
-    const user = await currentUser();
+    const session = await getSession();
 
-    if (!user) {
+    if (!session) {
         throw new Error('Unauthorized');
     }
 
-    const email = user.emailAddresses[0]?.emailAddress;
-    const name = `${user.firstName} ${user.lastName}`;
+    const email = session.user.email;
+    const name = session.user.name || email;
 
     // Send email to admin (using the defined admin email or same as sender for now if not config)
     // Assuming admin email is configured or just hardcoded for beta.

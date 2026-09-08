@@ -1,21 +1,11 @@
-import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { db } from '@/db';
-import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { getSession } from '@/lib/auth';
 
 export default async function WaitlistPage() {
-    const user = await currentUser();
+    const session = await getSession();
 
-    if (user) {
-        // Double check status. If active, redirect to inbox.
-        const dbUser = await db.query.users.findFirst({
-            where: eq(users.id, user.id),
-        });
-
-        if (dbUser?.status === 'active') {
-            redirect('/inbox');
-        }
+    if (session?.user.status === 'active') {
+        redirect('/inbox');
     }
 
     return (
@@ -41,7 +31,7 @@ export default async function WaitlistPage() {
                 </div>
 
                 <div className="pt-8 text-sm text-zinc-500">
-                    <p>Signed in as {user?.emailAddresses[0]?.emailAddress}</p>
+                    <p>Signed in as {session?.user.email}</p>
                     {/* Optional: Sign out button could go here */}
                 </div>
             </div>

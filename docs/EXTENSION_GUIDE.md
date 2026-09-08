@@ -20,7 +20,7 @@ Save any webpage to DOs 4 DOERs with a single click! This guide covers installat
 
 **5-Minute Setup:**
 
-1. Get your API token from [DOs 4 DOERs Settings](https://DOs 4 DOERs.snagdev.in/settings)
+1. Get your API token from [DOs 4 DOERs Settings](https://dos4doers.n1k-tech.com/settings)
 2. Download the extension for your browser
 3. Install the extension
 4. Configure with your API token
@@ -40,7 +40,7 @@ Save any webpage to DOs 4 DOERs with a single click! This guide covers installat
 #### Option 2: Manual Installation (Current Method)
 
 1. **Download the Extension**
-   - Go to [DOs 4 DOERs Settings](https://DOs 4 DOERs.snagdev.in/settings)
+   - Go to [DOs 4 DOERs Settings](https://dos4doers.n1k-tech.com/settings)
    - Scroll to **Browser Extension**
    - Click **"Download for Chrome/Edge"**
    - Save the `.zip` file
@@ -83,7 +83,7 @@ Save any webpage to DOs 4 DOERs with a single click! This guide covers installat
 #### Option 2: Manual Installation (Current Method)
 
 1. **Download the Extension**
-   - Go to [DOs 4 DOERs Settings](https://DOs 4 DOERs.snagdev.in/settings)
+   - Go to [DOs 4 DOERs Settings](https://dos4doers.n1k-tech.com/settings)
    - Scroll to **Browser Extension**
    - Click **"Download for Firefox"**
    - Save the `.xpi` file
@@ -109,7 +109,7 @@ Save any webpage to DOs 4 DOERs with a single click! This guide covers installat
 
 ### Get Your API Token
 
-1. Open [DOs 4 DOERs Settings](https://DOs 4 DOERs.snagdev.in/settings)
+1. Open [DOs 4 DOERs Settings](https://dos4doers.n1k-tech.com/settings)
 2. Scroll to **Developer Access**
 3. Click **"Generate Token"** (if you don't have one)
 4. Click **"Show"** to reveal your token

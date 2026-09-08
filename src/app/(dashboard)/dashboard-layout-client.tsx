@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Sidebar } from '@/components/sidebar';
 import { MobileNav } from '@/components/mobile-nav';
-import { Menu } from 'lucide-react';
 import Image from 'next/image';
-import { UserButton } from '@clerk/nextjs';
+import { useSession } from '@/lib/auth-client';
 import { SearchTrigger } from '@/components/search-trigger';
 
 export default function DashboardLayoutClient({
@@ -14,6 +14,8 @@ export default function DashboardLayoutClient({
     children: React.ReactNode;
 }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { data: session } = useSession();
+    const user = session?.user;
 
     return (
         <div className="flex h-[100dvh] bg-zinc-50 dark:bg-black overflow-hidden">
@@ -37,15 +39,20 @@ export default function DashboardLayoutClient({
                     </div>
                     <div className="flex items-center gap-1">
                         <SearchTrigger variant="compact" />
-                        <UserButton>
-                            <UserButton.MenuItems>
-                                <UserButton.Action
-                                    label="Accounts"
-                                    labelIcon={<Menu className="w-4 h-4" />}
-                                    onClick={() => window.location.href = '/settings'}
+                        <Link href="/settings" className="relative h-8 w-8 shrink-0" aria-label="Account settings">
+                            {user?.image ? (
+                                <Image
+                                    src={user.image}
+                                    alt={user.name || 'Account'}
+                                    fill
+                                    className="rounded-full object-cover border border-zinc-200 dark:border-zinc-700"
                                 />
-                            </UserButton.MenuItems>
-                        </UserButton>
+                            ) : (
+                                <div className="flex h-full w-full items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 text-xs font-semibold text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+                                    {(user?.name || user?.email || '?').charAt(0).toUpperCase()}
+                                </div>
+                            )}
+                        </Link>
                     </div>
                 </header>
 

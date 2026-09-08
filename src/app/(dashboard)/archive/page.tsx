@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/auth';
 import { fetchItems } from '@/app/actions';
 import { ItemGrid } from '@/components/item-grid';
 import { EmptyState } from '@/components/empty-state';
@@ -10,10 +10,10 @@ export default async function ArchivePage({
 }: {
     searchParams: Promise<{ search?: string; type?: 'all' | 'article' | 'video' }>;
 }) {
-    const user = await currentUser();
+    const session = await getSession();
     const { search, type } = await searchParams;
 
-    if (!user) return null;
+    if (!session) return null;
 
     const { items: initialItems, hasMore } = await fetchItems({
         page: 1,

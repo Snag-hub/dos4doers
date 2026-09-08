@@ -1,11 +1,11 @@
-﻿import { currentUser } from "@clerk/nextjs/server";
-import { SignedOut, SignInButton as ClerkSignInButton, SignUpButton } from "@clerk/nextjs";
+﻿import { getSession } from "@/lib/auth";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, BookOpen, CheckCircle, Bell, Zap, Globe, Github, Twitter, Mail, ArrowRight, Shield, Command, Linkedin, Clock } from "lucide-react";
 
 export default async function Home() {
-  const user = await currentUser();
+  const session = await getSession();
+  const user = session?.user;
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-black font-sans selection:bg-blue-100 dark:selection:bg-blue-900/30">
@@ -32,18 +32,18 @@ export default async function Home() {
               </Link>
             ) : (
               <>
-                <SignedOut>
-                  <ClerkSignInButton mode="redirect" forceRedirectUrl="/inbox">
-                    <button className="hidden sm:inline-block text-sm font-semibold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors">
-                      Log in
-                    </button>
-                  </ClerkSignInButton>
-                  <SignUpButton mode="redirect" forceRedirectUrl="/inbox">
-                    <button className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 active:scale-95 shadow-lg shadow-black/10">
-                      Get Started
-                    </button>
-                  </SignUpButton>
-                </SignedOut>
+                <Link
+                  href="/sign-in"
+                  className="hidden sm:inline-block text-sm font-semibold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 active:scale-95 shadow-lg shadow-black/10"
+                >
+                  Get Started
+                </Link>
               </>
             )}
           </div>
@@ -80,12 +80,13 @@ export default async function Home() {
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               ) : (
-                <SignUpButton mode="redirect" forceRedirectUrl="/inbox">
-                  <button className="group rounded-2xl bg-blue-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-blue-500/20 transition-all hover:bg-blue-500 hover:-translate-y-1 active:scale-95 flex items-center gap-2">
-                    Start Saving Now — Free
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </SignUpButton>
+                <Link
+                  href="/sign-up"
+                  className="group rounded-2xl bg-blue-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-blue-500/20 transition-all hover:bg-blue-500 hover:-translate-y-1 active:scale-95 flex items-center gap-2"
+                >
+                  Start Saving Now — Free
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
               )}
               <a href="#features" className="rounded-2xl border border-zinc-200 bg-white px-8 py-4 text-lg font-bold text-zinc-600 transition-all hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-900">
                 See Features
@@ -159,7 +160,7 @@ export default async function Home() {
                   <div className="flex-1 flex justify-center">
                     <div className="w-full max-w-md h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center px-3 gap-2">
                       <Globe className="w-3 h-3 text-zinc-400" />
-                      <span className="text-[10px] text-zinc-500 font-medium whitespace-nowrap">dos4doers.snagdev.in/inbox</span>
+                      <span className="text-[10px] text-zinc-500 font-medium whitespace-nowrap">dos4doers.n1k-tech.com/inbox</span>
                     </div>
                   </div>
                 </div>
@@ -417,11 +418,12 @@ export default async function Home() {
                       Launch Application
                     </Link>
                   ) : (
-                    <SignUpButton mode="redirect" forceRedirectUrl="/inbox">
-                      <button className="w-full rounded-xl bg-blue-600 py-4 font-bold text-white shadow-xl shadow-blue-500/20 transition-all hover:bg-blue-500 active:scale-95 text-lg">
-                        Create Account Free
-                      </button>
-                    </SignUpButton>
+                    <Link
+                      href="/sign-up"
+                      className="block w-full text-center rounded-xl bg-blue-600 py-4 font-bold text-white shadow-xl shadow-blue-500/20 transition-all hover:bg-blue-500 active:scale-95 text-lg"
+                    >
+                      Create Account Free
+                    </Link>
                   )}
                   <p className="mt-4 text-center text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-widest leading-loose">
                     Free tier includes unlimited storage <br /> & basic notifications.

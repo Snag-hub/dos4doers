@@ -89,7 +89,7 @@ export default function GuidePage() {
                                 </p>
                                 <div className="space-y-8">
                                     <Step number="01" title="Sign In & Connect">
-                                        Create an account using Clerk. Your data is isolated and encrypted from day one.
+                                        Create an account with your email and password. Your data is isolated and encrypted from day one.
                                     </Step>
                                     <Step number="02" title="Desktop: Browser Extension">
                                         The fastest way to save. Click the DOs 4 DOERs icon in your browser to instantly capture the current page.

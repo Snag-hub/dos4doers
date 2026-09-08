@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     console.log(`📊 [DIGEST] Processing digest for ${subscribers.length} users`);
 
     const results = [];
-    const appUrl = (process.env.NEXTAUTH_URL || 'https://dos4doers.app').replace(/\/$/, "");
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://dos4doers.n1k-tech.com').replace(/\/$/, "");
 
     for (const user of subscribers) {
       // 2. Atomic Lock: Try to "claim" this day for the user

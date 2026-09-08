@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
   // Default Base URL
-  let API_BASE = 'https://dos4doers.snagdev.in/api';
+  let API_BASE = 'https://dos4doers.n1k-tech.com/api';
 
   // --- Helpers ---
 

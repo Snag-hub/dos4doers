@@ -1,6 +1,6 @@
 'use server';
 
-import { auth, clerkClient } from '@clerk/nextjs/server';
+import { getUserId } from '@/lib/auth';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -8,9 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { revalidatePath } from 'next/cache';
 
 export async function generateApiToken(userId: string) {
-    const { userId: clerkUserId } = await auth();
+    const currentUserId = await getUserId();
 
-    if (!clerkUserId || clerkUserId !== userId) {
+    if (!currentUserId || currentUserId !== userId) {
         throw new Error('Unauthorized');
     }
 
@@ -26,22 +26,15 @@ export async function generateApiToken(userId: string) {
 }
 
 export async function deleteAccount() {
-    const { userId } = await auth();
+    const userId = await getUserId();
 
     if (!userId) {
         throw new Error('Unauthorized');
     }
 
     try {
-        // 1. Delete from Clerk (Auth)
-        // We do this first or parallel. If it fails, we shouldn't delete local data 
-        // ideally, but for personal tools, ensuring local deletion is key too.
-        // Let's try Clerk first.
-        const client = await clerkClient();
-        await client.users.deleteUser(userId);
-
-        // 2. Delete from Database (Cascade will handle related data)
-        // Note: verified users table has onDelete: cascade for everything else
+        // Cascade deletes the user's Better Auth sessions/accounts and all
+        // app data (items, reminders, etc.) via onDelete: 'cascade' FKs.
         await db.delete(users).where(eq(users.id, userId));
 
         return { success: true };
@@ -56,7 +49,7 @@ import { pushSubscriptions } from '@/db/schema';
 import { withNotificationLogging } from '@/lib/notification-logger';
 
 export async function sendTestNotification() {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
 
     if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {

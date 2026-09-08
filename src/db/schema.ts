@@ -5,71 +5,82 @@ import {
   boolean,
   pgEnum,
   integer,
-  primaryKey,
   index,
   jsonb,
   uuid,
 } from 'drizzle-orm/pg-core';
-import type { AdapterAccount } from 'next-auth/adapters';
 
 export const statusEnum = pgEnum('status', ['inbox', 'reading', 'archived', 'trash']);
 export const itemTypeEnum = pgEnum('item_type', ['article', 'video', 'social', 'other']);
 export const recurrenceEnum = pgEnum('recurrence', ['none', 'daily', 'weekly', 'monthly']);
 export const userStatusEnum = pgEnum('user_status', ['active', 'waitlist']);
 
+// Core Better Auth tables (user/session/account/verification). Shape follows
+// Better Auth's Drizzle adapter conventions: https://www.better-auth.com/docs/adapters/drizzle
 export const users = pgTable('user', {
   id: text('id').notNull().primaryKey(),
   name: text('name'),
-  email: text('email').notNull(),
-  emailVerified: timestamp('emailVerified', { mode: 'date' }),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('emailVerified').default(false).notNull(),
   image: text('image'),
-  apiToken: text('apiToken'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt')
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+  // App-specific fields (declared as Better Auth `additionalFields` in src/lib/auth.ts)
+  apiToken: text('apiToken'),
   emailNotifications: boolean('emailNotifications').default(true).notNull(),
   pushNotifications: boolean('pushNotifications').default(true).notNull(),
   status: userStatusEnum('status').default('active').notNull(),
   lastDailyDigestAt: timestamp('lastDailyDigestAt'),
 });
 
-export const accounts = pgTable(
-  'account',
-  {
-    userId: text('userId')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    type: text('type').$type<AdapterAccount['type']>().notNull(),
-    provider: text('provider').notNull(),
-    providerAccountId: text('providerAccountId').notNull(),
-    refresh_token: text('refresh_token'),
-    access_token: text('access_token'),
-    expires_at: integer('expires_at'),
-    token_type: text('token_type'),
-    scope: text('scope'),
-    id_token: text('id_token'),
-    session_state: text('session_state'),
-  },
-  (account) => [
-    primaryKey({ columns: [account.provider, account.providerAccountId] }),
-  ]
-);
-
 export const sessions = pgTable('session', {
-  sessionToken: text('sessionToken').primaryKey(),
+  id: text('id').notNull().primaryKey(),
+  expiresAt: timestamp('expiresAt').notNull(),
+  token: text('token').notNull().unique(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt')
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+  ipAddress: text('ipAddress'),
+  userAgent: text('userAgent'),
   userId: text('userId')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  expires: timestamp('expires', { mode: 'date' }).notNull(),
 });
 
-export const verificationTokens = pgTable(
-  'verificationToken',
-  {
-    identifier: text('identifier').notNull(),
-    token: text('token').notNull(),
-    expires: timestamp('expires', { mode: 'date' }).notNull(),
-  },
-  (vt) => [primaryKey({ columns: [vt.identifier, vt.token] })]
-);
+export const accounts = pgTable('account', {
+  id: text('id').notNull().primaryKey(),
+  accountId: text('accountId').notNull(),
+  providerId: text('providerId').notNull(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  accessToken: text('accessToken'),
+  refreshToken: text('refreshToken'),
+  idToken: text('idToken'),
+  accessTokenExpiresAt: timestamp('accessTokenExpiresAt'),
+  refreshTokenExpiresAt: timestamp('refreshTokenExpiresAt'),
+  scope: text('scope'),
+  password: text('password'),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt')
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+export const verifications = pgTable('verification', {
+  id: text('id').notNull().primaryKey(),
+  identifier: text('identifier').notNull(),
+  value: text('value').notNull(),
+  expiresAt: timestamp('expiresAt').notNull(),
+  createdAt: timestamp('createdAt').defaultNow(),
+  updatedAt: timestamp('updatedAt').defaultNow(),
+});
 
 export const items = pgTable(
   'items',

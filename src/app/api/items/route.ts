@@ -1,6 +1,6 @@
 import { getMetadata } from '@/lib/metadata';
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getUserId, getCurrentUserId } from '@/lib/auth';
 import { db } from '@/db';
 import { users, items } from '@/db/schema';
 import { eq, and, or, ilike, desc } from 'drizzle-orm';
@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { createItemSchema } from '@/lib/validations';
 import { extractContent } from '@/lib/reader';
 import { rateLimit } from '@/lib/rate-limit';
-import { ensureUser } from '@/lib/user';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
 // CORS headers for browser extension
@@ -27,10 +26,10 @@ export async function POST(req: Request) {
   let userId: string | null = null;
 
   try {
-    // Try Clerk auth first
-    userId = await ensureUser();
+    // Try session auth first
+    userId = await getCurrentUserId();
   } catch (error) {
-    // Fallback to API Token if Clerk auth fails
+    // Fallback to API Token if session auth fails
     const authHeader = req.headers.get('Authorization');
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
@@ -143,7 +142,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const { userId } = await auth();
+  const userId = await getUserId();
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });

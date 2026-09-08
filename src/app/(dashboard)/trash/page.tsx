@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/auth';
 import { fetchItems } from '@/app/actions';
 import { ItemGrid } from '@/components/item-grid';
 import { EmptyState } from '@/components/empty-state';
@@ -6,9 +6,9 @@ import { Trash } from 'lucide-react';
 import { EmptyTrashButton } from '@/components/empty-trash-button';
 
 export default async function TrashPage() {
-    const user = await currentUser();
+    const session = await getSession();
 
-    if (!user) return null;
+    if (!session) return null;
 
     const { items: initialItems, hasMore } = await fetchItems({
         page: 1,

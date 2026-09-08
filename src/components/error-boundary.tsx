@@ -143,7 +143,7 @@ export class ErrorBoundary extends Component<Props, State> {
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center mt-6">
                                 If this problem persists, please{' '}
                                 <a
-                                    href="mailto:support@DOs 4 DOERs.snagdev.in"
+                                    href="mailto:support@dos4doers.n1k-tech.com"
                                     className="text-blue-600 dark:text-blue-400 hover:underline"
                                 >
                                     contact support
