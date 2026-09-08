@@ -49,7 +49,7 @@
 - **Fast & Responsive**: Smooth 60fps scrolling
 
 ### 🔐 Privacy & Security
-- **Secure Authentication**: Powered by Clerk
+- **Secure Authentication**: Self-hosted email/password auth powered by Better Auth
 - **API Token Access**: Secure extension integration
 - **Data Export**: Download all your data anytime
 - **Privacy First**: Your data stays yours
@@ -66,7 +66,7 @@
 
 1. **Visit the App**
    ```
-   https://dos4doers.snagdev.in
+   https://dos4doers.n1k-tech.com
    ```
 
 2. **Create an Account**
@@ -96,7 +96,6 @@
 #### Prerequisites
 - Node.js 18+ and npm
 - PostgreSQL database
-- Clerk account (for authentication)
 
 #### Installation
 
@@ -121,9 +120,9 @@
    # Database
    DATABASE_URL="postgresql://..."
    
-   # Clerk Authentication
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
-   CLERK_SECRET_KEY="sk_..."
+   # Better Auth
+   BETTER_AUTH_SECRET="..."
+   BETTER_AUTH_URL="http://localhost:3000"
    
    # Email (Resend)
    RESEND_API_KEY="re_..."
@@ -221,7 +220,7 @@ The DOs 4 DOERs browser extension lets you save any webpage with a single click.
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Database**: [PostgreSQL](https://www.postgresql.org/) with [Drizzle ORM](https://orm.drizzle.team/)
-- **Authentication**: [Clerk](https://clerk.com/)
+- **Authentication**: [Better Auth](https://www.better-auth.com/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [Radix UI](https://www.radix-ui.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
@@ -255,7 +254,7 @@ This means:
 ## 🙏 Acknowledgments
 
 - Built with [Next.js](https://nextjs.org/)
-- Authentication by [Clerk](https://clerk.com/)
+- Authentication by [Better Auth](https://www.better-auth.com/)
 - Icons by [Lucide](https://lucide.dev/)
 - Hosted on [Vercel](https://vercel.com/)
 

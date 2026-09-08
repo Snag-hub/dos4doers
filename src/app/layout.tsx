@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ClerkProvider } from '@clerk/nextjs';
-import { dark } from '@clerk/themes';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -52,47 +50,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider
-      signInUrl="/sign-in"
-      signUpUrl="/sign-up"
-      signInForceRedirectUrl="/inbox"
-      signUpForceRedirectUrl="/inbox"
-      appearance={{
-        baseTheme: dark,
-        elements: {
-          logoBox: 'flex justify-center items-center',
-          logoImage: 'h-12 w-12',
-        },
-        layout: {
-          logoImageUrl: '/icon-192.png',
-        },
-        variables: {
-          colorPrimary: '#00D4FF',
-        }
-      }}
-    >
-      <html lang="en" suppressHydrationWarning>
-        <head>
-          <link rel="preconnect" href="https://clerk.dos4doers.snagdev.in" />
-          <link rel="preconnect" href="https://img.clerk.com" />
-          <link rel="dns-prefetch" href="https://clerk.dos4doers.snagdev.in" />
-          <link rel="dns-prefetch" href="https://img.clerk.com" />
-        </head>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-          suppressHydrationWarning
-        >
-          <ErrorBoundary>
-            <LoadingProvider>
-              <ServiceWorkerRegistration />
-              <OfflineBanner />
-              <Omnisearch />
-              {children}
-            </LoadingProvider>
-            <Toaster position="bottom-right" theme="system" />
-          </ErrorBoundary>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
+      >
+        <ErrorBoundary>
+          <LoadingProvider>
+            <ServiceWorkerRegistration />
+            <OfflineBanner />
+            <Omnisearch />
+            {children}
+          </LoadingProvider>
+          <Toaster position="bottom-right" theme="system" />
+        </ErrorBoundary>
+      </body>
+    </html>
   );
 }

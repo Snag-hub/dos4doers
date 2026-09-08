@@ -7,6 +7,13 @@ vi.mock('open-graph-scraper', () => ({
     default: vi.fn(),
 }));
 
+// The SSRF guard does a real DNS lookup (Node's dns/promises) before any
+// fetch — mock it out so these tests don't depend on network/DNS, and don't
+// pull a Node builtin into vitest's happy-dom environment.
+vi.mock('@/lib/ssrf-guard', () => ({
+    assertPublicHttpUrl: vi.fn().mockResolvedValue(undefined),
+}));
+
 describe('getMetadata', () => {
     it('should return safe fallback for invalid URL', async () => {
         const result = await getMetadata('not-a-url');

@@ -1,14 +1,13 @@
 import { getMetadata } from '@/lib/metadata';
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getUserIdFromBearerToken } from '@/lib/api-token';
 import { db } from '@/db';
-import { users, items } from '@/db/schema';
+import { items } from '@/db/schema';
 import { eq, and, or, ilike, desc } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 import { createItemSchema } from '@/lib/validations';
 import { extractContent } from '@/lib/reader';
 import { rateLimit } from '@/lib/rate-limit';
-import { ensureUser } from '@/lib/user';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
 // CORS headers for browser extension
@@ -24,24 +23,11 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
-  let userId: string | null = null;
-
-  try {
-    // Try Clerk auth first
-    userId = await ensureUser();
-  } catch (error) {
-    // Fallback to API Token if Clerk auth fails
-    const authHeader = req.headers.get('Authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.split(' ')[1];
-      const user = await db.query.users.findFirst({
-        where: eq(users.apiToken, token),
-      });
-      if (user) {
-        userId = user.id;
-      }
-    }
-  }
+  // This route is CORS-open (Access-Control-Allow-Origin: '*') for the
+  // browser extension, so it only accepts the extension's bearer token —
+  // never falls back to the session cookie, to avoid mixing wildcard CORS
+  // with cookie-based auth on a mutating endpoint.
+  const userId = await getUserIdFromBearerToken(req);
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized: Invalid or missing token' }, { status: 401, headers: corsHeaders });
@@ -143,7 +129,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const { userId } = await auth();
+  const userId = await getUserIdFromBearerToken(req);
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });

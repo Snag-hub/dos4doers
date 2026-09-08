@@ -14,7 +14,7 @@ export default function PrivacyPage() {
             <div className="prose prose-zinc dark:prose-invert max-w-none space-y-12">
                 <section>
                     <p className="lead">
-                        DOs 4 DOERs collects your name, email address, and profile picture via Clerk for authentication purposes. We also store the URLs, metadata, and extracted content of any items you save to the platform.
+                        DOs 4 DOERs collects your name, email address, and profile picture directly for authentication purposes. We also store the URLs, metadata, and extracted content of any items you save to the platform.
                     </p>
                     <div className="mt-4 bg-zinc-50 dark:bg-zinc-900/50 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800">
                         <h3 className="text-sm font-semibold mb-2 uppercase tracking-wider text-zinc-500">Specifically, we collect:</h3>
@@ -51,7 +51,7 @@ export default function PrivacyPage() {
                         Data Storage & Security
                     </h2>
                     <p>
-                        Your data is stored securely in a managed PostgreSQL database. Authentication is handled by Clerk, a leader in user identity management. We implement industry-standard security measures to protect your information.
+                        Your data is stored securely in a managed PostgreSQL database, including your authentication credentials, which are handled directly by our own self-hosted authentication system rather than a third party. We implement industry-standard security measures to protect your information.
                     </p>
                 </section>
 
@@ -63,11 +63,7 @@ export default function PrivacyPage() {
                     <p>
                         We use the following third-party services to operate DOs 4 DOERs:
                     </p>
-                    <div className="grid sm:grid-cols-3 gap-4 mt-4">
-                        <div className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-                            <strong>Clerk</strong>
-                            <p className="text-xs text-zinc-500 mt-1">Authentication</p>
-                        </div>
+                    <div className="grid sm:grid-cols-2 gap-4 mt-4">
                         <div className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
                             <strong>Resend</strong>
                             <p className="text-xs text-zinc-500 mt-1">Email Delivery</p>
@@ -133,12 +129,12 @@ export default function PrivacyPage() {
             <footer className="pt-12 mt-12 border-t border-zinc-200 dark:border-zinc-800 text-center">
                 <p className="text-zinc-500 mb-2">Have questions?</p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm">
-                    <a href="mailto:privacy@support.dos4doers.snagdev.in" className="text-blue-600 hover:underline">
-                        privacy@support.dos4doers.snagdev.in
+                    <a href="mailto:dos4doers@n1k-tech.com" className="text-blue-600 hover:underline">
+                        dos4doers@n1k-tech.com
                     </a>
                     <span className="hidden sm:inline text-zinc-300">•</span>
-                    <a href="mailto:support@support.dos4doers.snagdev.in" className="text-blue-600 hover:underline">
-                        support@support.dos4doers.snagdev.in
+                    <a href="mailto:dos4doers@n1k-tech.com" className="text-blue-600 hover:underline">
+                        dos4doers@n1k-tech.com
                     </a>
                 </div>
             </footer>

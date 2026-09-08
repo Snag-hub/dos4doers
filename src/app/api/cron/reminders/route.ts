@@ -4,6 +4,7 @@ import { eq, and, lt, lte, isNotNull, isNull, or, notExists } from 'drizzle-orm'
 import { NextResponse } from 'next/server';
 import webpush from 'web-push';
 import { withNotificationLogging } from '@/lib/notification-logger';
+import { isValidCronRequest } from '@/lib/cron-auth';
 
 function getItemReminderTitle(item: { type: string; title: string | null; url: string }) {
   const prefix = item.type === 'video' ? 'Watch' : 'Read';
@@ -24,8 +25,7 @@ export async function GET(req: Request) {
   const cronStartTime = Date.now();
   console.log(`🔔 [CRON] Reminder job started at ${new Date().toISOString()}`);
 
-  const authHeader = req.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!isValidCronRequest(req)) {
     return new NextResponse('Unauthorized', { status: 401 });
   }
 

@@ -1,12 +1,13 @@
 'use client';
-import { useUser, useClerk } from '@clerk/nextjs';
+import { useSession, authClient } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 
 export function UserManagementMenu() {
-    const { user } = useUser();
-    const { signOut, openUserProfile } = useClerk();
+    const { data: session } = useSession();
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -23,7 +24,8 @@ export function UserManagementMenu() {
         };
     }, [menuRef]);
 
-    if (!user) return null;
+    if (!session) return null;
+    const user = session.user;
 
     return (
         <div className="relative" ref={menuRef}>
@@ -32,19 +34,25 @@ export function UserManagementMenu() {
                 className="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all text-left group"
             >
                 <div className="relative h-10 w-10 shrink-0">
-                    <Image
-                        src={user.imageUrl}
-                        alt={user.fullName || 'User'}
-                        fill
-                        className="rounded-full object-cover border border-zinc-200 dark:border-zinc-700"
-                    />
+                    {user.image ? (
+                        <Image
+                            src={user.image}
+                            alt={user.name || 'User'}
+                            fill
+                            className="rounded-full object-cover border border-zinc-200 dark:border-zinc-700"
+                        />
+                    ) : (
+                        <div className="flex h-full w-full items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 text-sm font-semibold text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+                            {(user.name || user.email || '?').charAt(0).toUpperCase()}
+                        </div>
+                    )}
                 </div>
                 <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
-                        {user.fullName || 'User'}
+                        {user.name || 'User'}
                     </p>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-                        {user.primaryEmailAddress?.emailAddress}
+                        {user.email}
                     </p>
                 </div>
                 <div className="text-zinc-400 group-hover:text-zinc-600 dark:text-zinc-500 dark:group-hover:text-zinc-300">
@@ -57,16 +65,6 @@ export function UserManagementMenu() {
             {/* Dropdown */}
             {isOpen && (
                 <div className="absolute bottom-full left-0 w-full mb-2 p-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl animate-in slide-in-from-bottom-2 fade-in duration-200 z-50">
-                    <button
-                        onClick={() => {
-                            setIsOpen(false);
-                            openUserProfile();
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
-                    >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                        Manage Account
-                    </button>
                     <Link
                         href="/settings"
                         onClick={() => setIsOpen(false)}
@@ -77,7 +75,14 @@ export function UserManagementMenu() {
                     </Link>
                     <div className="h-px bg-zinc-100 dark:bg-zinc-800 my-1" />
                     <button
-                        onClick={() => signOut({ redirectUrl: '/' })}
+                        onClick={() => {
+                            setIsOpen(false);
+                            authClient.signOut({
+                                fetchOptions: {
+                                    onSuccess: () => router.push('/'),
+                                },
+                            });
+                        }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors"
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>

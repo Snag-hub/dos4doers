@@ -3,14 +3,16 @@ import { items, reminders, users } from '@/db/schema';
 import { sendEmail } from '@/lib/email';
 import { and, eq, lte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
+import { isValidCronRequest } from '@/lib/cron-auth';
+import { escapeHtml } from '@/lib/html-escape';
 
 export const dynamic = 'force-dynamic'; // Ensure this endpoint is not cached
 
 export async function GET(request: Request) {
     try {
-        // In production, check for Authorization header (CRON_SECRET)
-        // const authHeader = request.headers.get('authorization');
-        // if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) return new NextResponse('Unauthorized', { status: 401 });
+        if (!isValidCronRequest(request)) {
+            return new NextResponse('Unauthorized', { status: 401 });
+        }
 
         const now = new Date();
 
@@ -40,19 +42,19 @@ export async function GET(request: Request) {
 
             // Construct Email Content
             const subject = item
-                ? `Reminder: Time to read "${item.title || item.url}"`
-                : `Reminder: ${reminder.title || 'General Task'}`;
+                ? `Reminder: Time to read "${escapeHtml(item.title || item.url)}"`
+                : `Reminder: ${escapeHtml(reminder.title || 'General Task')}`;
 
             const html = `
                 <div style="font-family: sans-serif; padding: 20px;">
                     <h2>${subject}</h2>
                     ${item ? `
                         <p>You asked us to remind you about this link:</p>
-                        <p><a href="${item.url}" style="color: blue; text-decoration: underline; font-size: 16px;">${item.title || item.url}</a></p>
-                        ${item.description ? `<p style="color: #666; font-style: italic;">"${item.description}"</p>` : ''}
+                        <p><a href="${escapeHtml(item.url)}" style="color: blue; text-decoration: underline; font-size: 16px;">${escapeHtml(item.title || item.url)}</a></p>
+                        ${item.description ? `<p style="color: #666; font-style: italic;">"${escapeHtml(item.description)}"</p>` : ''}
                     ` : `
                         <p>This is your scheduled reminder.</p>
-                        <p><strong>${reminder.title || 'Untitled Task'}</strong></p>
+                        <p><strong>${escapeHtml(reminder.title || 'Untitled Task')}</strong></p>
                     `}
                     <hr />
                     <p style="font-size: 12px; color: #888;">Sent by Link Locker</p>

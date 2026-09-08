@@ -1,9 +1,15 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
-// Mock auth from Clerk
-vi.mock('@clerk/nextjs/server', () => ({
-    auth: vi.fn(() => Promise.resolve({ userId: 'test-user-id' })),
+// Mock our auth helpers (avoids initializing Better Auth/DB during tests)
+vi.mock('@/lib/auth', () => ({
+    getUserId: vi.fn(() => Promise.resolve('test-user-id')),
+    getCurrentUserId: vi.fn(() => Promise.resolve('test-user-id')),
+    getSession: vi.fn(() =>
+        Promise.resolve({
+            user: { id: 'test-user-id', email: 'test@example.com', name: 'Test User', status: 'active' },
+        })
+    ),
 }));
 
 // Mock next/navigation

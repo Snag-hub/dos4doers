@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/auth';
 import { fetchItems } from '@/app/actions';
 import { ItemGrid } from '@/components/item-grid';
 import Link from 'next/link';
@@ -11,10 +11,10 @@ export default async function InboxPage({
 }: {
   searchParams: Promise<{ search?: string; type?: 'all' | 'article' | 'video' }>;
 }) {
-  const user = await currentUser();
+  const session = await getSession();
   const { search, type } = await searchParams; // Next.js 15+ needs await
 
-  if (!user) {
+  if (!session) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-24 bg-zinc-50 dark:bg-black">
         <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">

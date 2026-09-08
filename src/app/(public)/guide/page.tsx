@@ -89,7 +89,7 @@ export default function GuidePage() {
                                 </p>
                                 <div className="space-y-8">
                                     <Step number="01" title="Sign In & Connect">
-                                        Create an account using Clerk. Your data is isolated and encrypted from day one.
+                                        Create an account with your email and password. Your data is isolated and encrypted from day one.
                                     </Step>
                                     <Step number="02" title="Desktop: Browser Extension">
                                         The fastest way to save. Click the DOs 4 DOERs icon in your browser to instantly capture the current page.
@@ -332,7 +332,7 @@ export default function GuidePage() {
                     <div>
                         <h4 className="font-black text-lg mb-6 tracking-tight">Community</h4>
                         <div className="space-y-2">
-                            <a href="mailto:imsnag.1@gmail.com" className="block text-sm text-zinc-500 hover:text-blue-600 transition-colors">Support Email</a>
+                            <a href="mailto:dos4doers@n1k-tech.com" className="block text-sm text-zinc-500 hover:text-blue-600 transition-colors">Support Email</a>
                             <Link href="/extensions" className="block text-sm text-zinc-500 hover:text-blue-600 transition-colors">Developer Program</Link>
                         </div>
                     </div>

@@ -1,8 +1,19 @@
 import { z } from 'zod';
 
 // Item Validations
+const httpUrl = z
+  .string()
+  .url('Invalid URL format')
+  .refine((val) => {
+    try {
+      return ['http:', 'https:'].includes(new URL(val).protocol);
+    } catch {
+      return false;
+    }
+  }, 'Only http/https URLs are allowed');
+
 export const createItemSchema = z.object({
-  url: z.string().url('Invalid URL format'),
+  url: httpUrl,
   title: z.string().optional(),
   description: z.string().optional(),
 });

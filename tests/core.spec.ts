@@ -12,7 +12,7 @@ test.describe('Core Application Flow', () => {
     test('protected route redirects to sign-in', async ({ page }) => {
         await page.goto('/inbox');
 
-        // Should redirect to Clerk sign-in
+        // Should redirect to sign-in
         await expect(page).toHaveURL(/.*sign-in.*/);
     });
 });

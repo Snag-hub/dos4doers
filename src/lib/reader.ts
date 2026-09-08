@@ -1,6 +1,7 @@
 ﻿import { Readability } from '@mozilla/readability';
 import { Window } from 'happy-dom';
 import createDOMPurify from 'dompurify';
+import { assertPublicHttpUrl } from '@/lib/ssrf-guard';
 
 export interface ExtractedContent {
     content: string;
@@ -8,11 +9,27 @@ export interface ExtractedContent {
     excerpt: string;
 }
 
+/**
+ * Re-sanitizes stored article HTML immediately before rendering it. Content
+ * is already sanitized once at extraction time (below), but this is a cheap
+ * backstop: if any future write path (import, edit, admin tool) ever stores
+ * `items.content` without going through extractContent(), this still keeps
+ * the render path safe on its own.
+ */
+export function sanitizeHtml(html: string): string {
+    const window = new Window();
+    const DOMPurify = createDOMPurify(window as unknown as any);
+    return DOMPurify.sanitize(html);
+}
+
 export async function extractContent(url: string): Promise<ExtractedContent | null> {
     try {
+        // Block requests to internal/private network targets (SSRF).
+        await assertPublicHttpUrl(url);
+
         const response = await fetch(url, {
             headers: {
-                'User-Agent': 'DOs 4 DOERs-Bot/1.0 (+https://DOs 4 DOERs.app)',
+                'User-Agent': 'DOs4DOERs-Bot/1.0 (+https://dos4doers.n1k-tech.com)',
             }
         });
 

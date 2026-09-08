@@ -3,13 +3,16 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { createItem } from '../actions';
-import { SignInButton, useUser, SignedOut } from '@clerk/nextjs';
+import { useSession } from '@/lib/auth-client';
+import Link from 'next/link';
 import Image from 'next/image';
 
 function ShareContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { isLoaded, isSignedIn } = useUser();
+    const { data: session, isPending } = useSession();
+    const isLoaded = !isPending;
+    const isSignedIn = !!session;
     const [status, setStatus] = useState<'saving' | 'success' | 'error'>('saving');
     const [message, setMessage] = useState('');
 
@@ -118,13 +121,9 @@ function ShareContent() {
 
                     {!isSignedIn && isLoaded && (
                         <div className="mt-4">
-                            <SignedOut>
-                                <SignInButton mode="redirect" forceRedirectUrl="/inbox">
-                                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium">
-                                        Sign In
-                                    </button>
-                                </SignInButton>
-                            </SignedOut>
+                            <Link href="/sign-in" className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium">
+                                Sign In
+                            </Link>
                         </div>
                     )}
                     <button

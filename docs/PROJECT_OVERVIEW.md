@@ -37,7 +37,7 @@ This keeps the product intentionally narrow and fast.
 - Frontend: Next.js App Router + React + Tailwind
 - Backend: Next.js server actions + API routes
 - Database: PostgreSQL via Drizzle ORM
-- Auth: Clerk
+- Auth: Better Auth (self-hosted)
 - Notifications: Web Push (VAPID) + Email (Resend)
 - Extension: Manifest-based browser extension (Chrome/Firefox)
 

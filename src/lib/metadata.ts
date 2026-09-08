@@ -1,5 +1,6 @@
 ﻿import ogs from 'open-graph-scraper';
 import nodeFetch from 'node-fetch';
+import { assertPublicHttpUrl } from '@/lib/ssrf-guard';
 
 export interface Metadata {
   title?: string;
@@ -64,6 +65,19 @@ export async function getMetadata(url: string): Promise<Metadata> {
     };
   }
 
+  // Block requests to internal/private network targets (SSRF).
+  try {
+    await assertPublicHttpUrl(url);
+  } catch (error) {
+    console.error(`Blocked potentially unsafe URL: ${url}`, error);
+    return {
+      title: 'Invalid URL',
+      description: 'This URL cannot be fetched',
+      type: 'other',
+      image: PLACEHOLDER_IMAGE,
+    };
+  }
+
   const timeoutMs = 5000; // 5 second timeout
   const maxRetries = 2;
   let lastError: any = null;
@@ -79,7 +93,7 @@ export async function getMetadata(url: string): Promise<Metadata> {
         return nodeFetch(input, {
           signal: controller.signal as any,
           headers: {
-            'User-Agent': 'DOs 4 DOERs-Bot/1.0 (+https://DOs 4 DOERs.app)',
+            'User-Agent': 'DOs4DOERs-Bot/1.0 (+https://dos4doers.n1k-tech.com)',
           }
         });
       };

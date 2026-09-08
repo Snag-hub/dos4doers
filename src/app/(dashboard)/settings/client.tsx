@@ -97,18 +97,22 @@ const ActionRow = ({ icon, label, description, action, buttonText, disabled = fa
 // --- Main Client Component ---
 
 export default function SettingsClient({
-    apiToken,
+    hasApiToken,
     userId,
     initialPreferences,
     initialStats,
 }: {
-    apiToken?: string | null;
+    hasApiToken?: boolean;
     userId: string;
     initialPreferences?: { emailNotifications: boolean; pushNotifications: boolean };
     initialStats?: UserStats;
 }) {
     // State
-    const [token, setToken] = useState(apiToken);
+    // The plaintext token is only ever known right after generation (the
+    // server stores just a hash) — so on load we only know WHETHER one
+    // exists, not its value.
+    const [token, setToken] = useState<string | null>(null);
+    const [hasToken, setHasToken] = useState(!!hasApiToken);
     const [loadingToken, setLoadingToken] = useState(false);
     const [emailEnabled, setEmailEnabled] = useState(initialPreferences?.emailNotifications ?? true);
     const [pushEnabled, setPushEnabled] = useState(initialPreferences?.pushNotifications ?? true);
@@ -143,7 +147,9 @@ export default function SettingsClient({
         try {
             const newToken = await generateApiToken(userId);
             setToken(newToken);
-            toast.success('API Token generated');
+            setHasToken(true);
+            setShowToken(true);
+            toast.success('API Token generated — copy it now, it won\'t be shown again');
         } catch (e) {
             toast.error('Failed to generate token');
         } finally {
@@ -474,7 +480,11 @@ export default function SettingsClient({
                             <div className="space-y-4">
                                 <div className="p-3 bg-zinc-900 text-zinc-400 font-mono text-xs rounded-xl overflow-hidden relative group">
                                     <div className="break-all pr-8">
-                                        {token ? (showToken ? token : '•'.repeat(Math.min(token.length, 32))) : 'No active token generated'}
+                                        {token
+                                            ? (showToken ? token : '•'.repeat(Math.min(token.length, 32)))
+                                            : hasToken
+                                                ? 'Token generated — hidden for security. Regenerate to get a new one.'
+                                                : 'No active token generated'}
                                     </div>
                                     <div className="absolute right-2 top-2 flex gap-1">
                                         {token && (
@@ -495,7 +505,7 @@ export default function SettingsClient({
                                         disabled={loadingToken}
                                         className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                                     >
-                                        {loadingToken ? 'Generating...' : 'Regenerate Token'}
+                                        {loadingToken ? 'Generating...' : hasToken ? 'Regenerate Token' : 'Generate Token'}
                                     </button>
                                 </div>
                             </div>

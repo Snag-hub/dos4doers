@@ -1,10 +1,16 @@
 import { db } from '@/db';
 import { items, reminders } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
+import { getUserId } from '@/lib/auth';
 
 export async function POST(request: Request) {
     try {
+        const userId = await getUserId();
+        if (!userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const { action, itemId, reminderId, type } = await request.json();
 
         // Support both field names for compatibility
@@ -23,17 +29,17 @@ export async function POST(request: Request) {
             if (type === 'reminder') {
                 await db.update(reminders)
                     .set({ scheduledAt: newTime, lockedAt: null })
-                    .where(eq(reminders.id, id));
+                    .where(and(eq(reminders.id, id), eq(reminders.userId, userId)));
             } else if (type === 'item') {
                 await db.update(items)
                     .set({ reminderAt: newTime, lockedAt: null })
-                    .where(eq(items.id, id));
+                    .where(and(eq(items.id, id), eq(items.userId, userId)));
             }
 
         } else if (action === 'mark-read') {
             if (type === 'reminder') {
                 const reminder = await db.query.reminders.findFirst({
-                    where: eq(reminders.id, id)
+                    where: and(eq(reminders.id, id), eq(reminders.userId, userId))
                 });
 
                 if (reminder && reminder.recurrence && reminder.recurrence !== 'none') {
@@ -55,25 +61,25 @@ export async function POST(request: Request) {
 
                     await db.update(reminders)
                         .set({ scheduledAt: nextDate, lockedAt: null })
-                        .where(eq(reminders.id, id));
+                        .where(and(eq(reminders.id, id), eq(reminders.userId, userId)));
 
                     console.log(`🔁 [PUSH ACTION] Rescheduled recurring reminder ${id} to ${nextDate.toISOString()}`);
-                } else {
-                    await db.delete(reminders).where(eq(reminders.id, id));
+                } else if (reminder) {
+                    await db.delete(reminders).where(and(eq(reminders.id, id), eq(reminders.userId, userId)));
                 }
             } else if (type === 'item') {
                 await db.update(items)
                     .set({ read: true, reminderAt: null, lockedAt: null }) // clear reminder too
-                    .where(eq(items.id, id));
+                    .where(and(eq(items.id, id), eq(items.userId, userId)));
             }
 
         } else if (action === 'delete') {
             if (type === 'reminder') {
-                await db.delete(reminders).where(eq(reminders.id, id));
+                await db.delete(reminders).where(and(eq(reminders.id, id), eq(reminders.userId, userId)));
             } else if (type === 'item') {
                 // Should we delete the item or just the reminder?
                 // "Delete" usually implies full deletion.
-                await db.delete(items).where(eq(items.id, id));
+                await db.delete(items).where(and(eq(items.id, id), eq(items.userId, userId)));
             }
         }
 

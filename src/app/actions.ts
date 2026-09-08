@@ -1,6 +1,6 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
+import { getUserId, getCurrentUserId } from '@/lib/auth';
 import { db } from '@/db';
 import { eq, and, desc, sql, ilike, or, inArray } from 'drizzle-orm';
 import { items, reminders, users, pushSubscriptions } from '@/db/schema';
@@ -11,7 +11,6 @@ import webpush from 'web-push';
 import { createItemSchema, updateItemSchema, addReminderSchema } from '@/lib/validations';
 import { extractContent } from '@/lib/reader';
 import { rateLimit } from '@/lib/rate-limit';
-import { ensureUser } from '@/lib/user';
 
 // Configure Web Push (Global scope for actions)
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
@@ -100,7 +99,7 @@ const getCachedUserStats = async (userId: string) => {
 // --- Server Actions ---
 
 export async function fetchItems(params: any) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) return { items: [], hasMore: false };
     return getCachedItems(userId, params.page || 1, params.limit || 12, params.status || 'inbox', params.isFavorite, params.search, params.type || 'all');
 }
@@ -111,7 +110,7 @@ export async function addReminder(
     itemId?: string,
     title?: string
 ) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
 
     const validated = addReminderSchema.parse({ date, recurrence, itemId, title });
@@ -134,7 +133,7 @@ export async function addReminder(
 }
 
 export async function deleteReminder(reminderId: string) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
 
     const [reminder] = await db.select({ itemId: reminders.itemId })
@@ -155,7 +154,7 @@ export async function deleteReminder(reminderId: string) {
 }
 
 export async function snoozeReminder(reminderId: string, minutes: number) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
 
     const newTime = new Date(Date.now() + minutes * 60000);
@@ -178,7 +177,7 @@ export async function snoozeReminder(reminderId: string, minutes: number) {
 }
 
 export async function updateReminder(reminderId: string, date: Date, recurrence: 'none' | 'daily' | 'weekly' | 'monthly' = 'none', title?: string) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
 
     const [reminder] = await db.select({ itemId: reminders.itemId })
@@ -199,19 +198,19 @@ export async function updateReminder(reminderId: string, date: Date, recurrence:
 }
 
 export async function getReminders(itemId: string) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) return [];
     return await db.select().from(reminders).where(and(eq(reminders.itemId, itemId), eq(reminders.userId, userId))).orderBy(desc(reminders.scheduledAt));
 }
 
 export async function getGeneralReminders() {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) return [];
     return await db.select().from(reminders).where(and(eq(reminders.userId, userId), sql`${reminders.itemId} IS NULL`)).orderBy(desc(reminders.scheduledAt));
 }
 
 export async function toggleFavorite(itemId: string, isFavorite: boolean) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
 
     await db.update(items).set({ isFavorite, updatedAt: new Date() }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
@@ -222,7 +221,7 @@ export async function toggleFavorite(itemId: string, isFavorite: boolean) {
 }
 
 export async function updateStatus(itemId: string, status: 'inbox' | 'reading' | 'archived' | 'trash') {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
 
     await db.update(items).set({ status, updatedAt: new Date() }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
@@ -234,7 +233,7 @@ export async function updateStatus(itemId: string, status: 'inbox' | 'reading' |
 }
 
 export async function updateItem(itemId: string, data: any) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
 
     const validated = updateItemSchema.parse(data);
@@ -246,7 +245,7 @@ export async function updateItem(itemId: string, data: any) {
 }
 
 export async function deleteItem(itemId: string) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
 
     await db.delete(items).where(and(eq(items.id, itemId), eq(items.userId, userId)));
@@ -258,7 +257,7 @@ export async function deleteItem(itemId: string) {
 }
 
 export async function emptyTrash() {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
 
     await db.delete(items).where(and(eq(items.userId, userId), eq(items.status, 'trash')));
@@ -269,7 +268,7 @@ export async function emptyTrash() {
 }
 
 export async function createItem(url: string, title?: string, description?: string) {
-    const userId = await ensureUser();
+    const userId = await getCurrentUserId();
 
     try {
         const { success } = await rateLimit(`createItem:${userId}`, 5);
@@ -343,7 +342,7 @@ export async function createItem(url: string, title?: string, description?: stri
 }
 
 export async function savePushSubscription(subscription: string) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
     if (!subscription) return;
     try {
@@ -355,7 +354,7 @@ export async function savePushSubscription(subscription: string) {
 }
 
 export async function sendTestNotification(subscription: string) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
     if (!process.env.VAPID_PRIVATE_KEY) throw new Error('VAPID_PRIVATE_KEY missing');
     if (!subscription) throw new Error('Subscription missing');
@@ -372,20 +371,30 @@ export async function sendTestNotification(subscription: string) {
 }
 
 export async function getPreferences() {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) return null;
     return await db.query.users.findFirst({ where: eq(users.id, userId), columns: { emailNotifications: true, pushNotifications: true } });
 }
 
-export async function updatePreferences(data: any) {
-    const { userId } = await auth();
+export async function updatePreferences(data: { emailNotifications?: boolean; pushNotifications?: boolean }) {
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
-    await db.update(users).set(data).where(eq(users.id, userId));
+
+    // Whitelist explicitly — never spread arbitrary client input into a
+    // `.set()` call, or a crafted request could overwrite columns like
+    // `status`, `apiToken`, or `email`.
+    const update: { emailNotifications?: boolean; pushNotifications?: boolean } = {};
+    if (typeof data.emailNotifications === 'boolean') update.emailNotifications = data.emailNotifications;
+    if (typeof data.pushNotifications === 'boolean') update.pushNotifications = data.pushNotifications;
+
+    if (Object.keys(update).length === 0) return;
+
+    await db.update(users).set(update).where(eq(users.id, userId));
     revalidatePath('/settings');
 }
 
 export async function trackItemView(itemId: string) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) return;
     try {
         await db.update(items).set({ viewCount: sql`${items.viewCount} + 1`, lastViewedAt: new Date() }).where(and(eq(items.id, itemId), eq(items.userId, userId)));
@@ -396,20 +405,20 @@ export async function trackItemView(itemId: string) {
 }
 
 export async function getUserStats() {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
     return getCachedUserStats(userId);
 }
 
 export async function getItem(itemId: string) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) return null;
     const result = await db.select().from(items).where(and(eq(items.id, itemId), eq(items.userId, userId))).limit(1);
     return result[0] || null;
 }
 
 export async function globalSearch(query: string) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId || !query) return { items: [] };
 
     const { success } = await rateLimit(`search:${userId}`, 20);
@@ -422,7 +431,7 @@ export async function globalSearch(query: string) {
 }
 
 export async function batchUpdateStatus(itemIds: string[], status: 'inbox' | 'reading' | 'archived' | 'trash') {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
     await db.update(items).set({ status, updatedAt: new Date() }).where(and(inArray(items.id, itemIds), eq(items.userId, userId)));
     revalidateTag(`items-${userId}`, 'default' as any);
@@ -430,7 +439,7 @@ export async function batchUpdateStatus(itemIds: string[], status: 'inbox' | 're
 }
 
 export async function batchDeleteItems(itemIds: string[]) {
-    const { userId } = await auth();
+    const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
     await db.delete(items).where(and(inArray(items.id, itemIds), eq(items.userId, userId)));
     revalidateTag(`items-${userId}`, 'default' as any);

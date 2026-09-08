@@ -2,6 +2,7 @@ import { getItem } from '@/app/actions';
 import { notFound } from 'next/navigation';
 import { BookOpen, Calendar, User, CornerUpLeft } from 'lucide-react';
 import Link from 'next/link';
+import { sanitizeHtml } from '@/lib/reader';
 
 export default async function ReaderPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -11,8 +12,8 @@ export default async function ReaderPage({ params }: { params: Promise<{ id: str
         notFound();
     }
 
-    // Narrowing for TypeScript
-    const content = item.content;
+    // Re-sanitized at render time too, as a backstop (see sanitizeHtml doc comment).
+    const content = sanitizeHtml(item.content);
     const title = item.title || item.url;
     const author = item.author;
     const createdAt = item.createdAt;

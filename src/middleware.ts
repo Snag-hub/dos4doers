@@ -1,28 +1,32 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getSessionCookie } from 'better-auth/cookies';
 
-const isProtectedRoute = createRouteMatcher([
-  '/inbox(.*)',
-  '/settings(.*)',
-  '/archive(.*)',
-  '/favorites(.*)',
-  '/trash(.*)',
-  '/reader(.*)',
-  '/share(.*)',
-]);
+const protectedPaths = [
+  '/inbox',
+  '/settings',
+  '/archive',
+  '/favorites',
+  '/trash',
+  '/reader',
+  '/share',
+];
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  // Optimistic check only (cookie presence, no DB call) — actual session
+  // validity is enforced server-side via auth.api.getSession() in each page.
+  const sessionCookie = getSessionCookie(req);
 
-  // If user is logged in and trying to access landing page, redirect to inbox
-  if (userId && req.nextUrl.pathname === '/') {
+  if (sessionCookie && pathname === '/') {
     return NextResponse.redirect(new URL('/inbox', req.url));
   }
 
-  if (isProtectedRoute(req)) {
-    await auth.protect();
+  if (!sessionCookie && protectedPaths.some((path) => pathname.startsWith(path))) {
+    return NextResponse.redirect(new URL('/sign-in', req.url));
   }
-});
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
