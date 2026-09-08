@@ -15,12 +15,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [checkEmail, setCheckEmail] = useState(false);
+  const [unverified, setUnverified] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const isSignUp = mode === 'sign-up';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setUnverified(false);
 
     const { error } = isSignUp
       ? await authClient.signUp.email({ name, email, password })
@@ -29,7 +32,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
     setLoading(false);
 
     if (error) {
-      toast.error(error.message || 'Something went wrong');
+      if (error.code === 'EMAIL_NOT_VERIFIED') {
+        setUnverified(true);
+      } else {
+        toast.error(error.message || 'Something went wrong');
+      }
       return;
     }
 
@@ -45,14 +52,39 @@ export function AuthForm({ mode }: { mode: Mode }) {
     router.refresh();
   }
 
-  if (checkEmail) {
+  async function handleResend() {
+    setResending(true);
+    const { error } = await authClient.sendVerificationEmail({
+      email,
+      callbackURL: '/inbox',
+    });
+    setResending(false);
+
+    if (error) {
+      toast.error(error.message || 'Something went wrong');
+      return;
+    }
+    toast.success('Verification email sent — check your inbox');
+  }
+
+  if (checkEmail || unverified) {
     return (
       <div className="w-full max-w-sm rounded-2xl border border-zinc-800 bg-zinc-900 p-8 text-center shadow-xl">
-        <h1 className="mb-2 text-2xl font-bold text-white">Check your email</h1>
-        <p className="text-sm text-zinc-400">
-          We sent a verification link to <span className="text-white">{email}</span>. Click it to
-          finish setting up your account.
+        <h1 className="mb-2 text-2xl font-bold text-white">
+          {unverified ? 'Verify your email to continue' : 'Check your email'}
+        </h1>
+        <p className="mb-6 text-sm text-zinc-400">
+          {unverified
+            ? <>Your account exists but <span className="text-white">{email}</span> hasn&apos;t been verified yet.</>
+            : <>We sent a verification link to <span className="text-white">{email}</span>. Click it to finish setting up your account.</>}
         </p>
+        <button
+          onClick={handleResend}
+          disabled={resending}
+          className="w-full rounded-lg bg-[#00D4FF] px-4 py-2 font-semibold text-zinc-950 transition hover:opacity-90 disabled:opacity-50"
+        >
+          {resending ? 'Sending…' : 'Resend verification email'}
+        </button>
       </div>
     );
   }
