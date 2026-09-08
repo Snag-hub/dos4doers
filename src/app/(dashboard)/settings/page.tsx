@@ -28,7 +28,7 @@ export default async function SettingsPage() {
             {/* Settings Content */}
             <div className="max-w-4xl mx-auto w-full">
                 <SettingsClient
-                    apiToken={session.user.apiToken ?? null}
+                    hasApiToken={!!session.user.apiToken}
                     userId={session.user.id}
                     initialPreferences={{
                         emailNotifications: session.user.emailNotifications ?? true,

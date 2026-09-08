@@ -1,6 +1,7 @@
 ﻿import { Readability } from '@mozilla/readability';
 import { Window } from 'happy-dom';
 import createDOMPurify from 'dompurify';
+import { assertPublicHttpUrl } from '@/lib/ssrf-guard';
 
 export interface ExtractedContent {
     content: string;
@@ -10,9 +11,12 @@ export interface ExtractedContent {
 
 export async function extractContent(url: string): Promise<ExtractedContent | null> {
     try {
+        // Block requests to internal/private network targets (SSRF).
+        await assertPublicHttpUrl(url);
+
         const response = await fetch(url, {
             headers: {
-                'User-Agent': 'DOs 4 DOERs-Bot/1.0 (+https://DOs 4 DOERs.app)',
+                'User-Agent': 'DOs4DOERs-Bot/1.0 (+https://dos4doers.n1k-tech.com)',
             }
         });
 

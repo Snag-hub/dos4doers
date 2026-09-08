@@ -6,6 +6,7 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 import { revalidatePath } from 'next/cache';
+import { hashApiToken } from '@/lib/api-token';
 
 export async function generateApiToken(userId: string) {
     const currentUserId = await getUserId();
@@ -16,9 +17,11 @@ export async function generateApiToken(userId: string) {
 
     const newToken = uuidv4();
 
+    // Store only the hash — the plaintext is returned once, here, and never
+    // persisted or readable again.
     await db
         .update(users)
-        .set({ apiToken: newToken })
+        .set({ apiToken: hashApiToken(newToken) })
         .where(eq(users.id, userId));
 
     revalidatePath('/settings');

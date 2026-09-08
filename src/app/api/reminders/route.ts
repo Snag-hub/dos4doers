@@ -1,9 +1,9 @@
 import { db } from '@/db';
-import { reminders, users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { reminders } from '@/db/schema';
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import { rateLimit } from '@/lib/rate-limit';
+import { getUserIdFromBearerToken } from '@/lib/api-token';
 
 // CORS headers for browser extension
 const corsHeaders = {
@@ -18,24 +18,13 @@ export async function OPTIONS() {
 
 export async function POST(request: Request) {
     try {
-        const authHeader = request.headers.get('authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        const userId = await getUserIdFromBearerToken(request);
+        if (!userId) {
             return NextResponse.json({ error: 'Missing or invalid token' }, { status: 401, headers: corsHeaders });
         }
 
-        const token = authHeader.split(' ')[1];
-
-        // Find user by token
-        const user = await db.query.users.findFirst({
-            where: eq(users.apiToken, token),
-        });
-
-        if (!user) {
-            return NextResponse.json({ error: 'Invalid token' }, { status: 401, headers: corsHeaders });
-        }
-
         // Rate Limiting (3 requests per minute per user)
-        const { success: rateSuccess } = await rateLimit(`api:createReminder:${user.id}`, 3);
+        const { success: rateSuccess } = await rateLimit(`api:createReminder:${userId}`, 3);
         if (!rateSuccess) {
             return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429, headers: corsHeaders });
         }
@@ -43,8 +32,13 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { title, scheduledAt, recurrence } = body;
 
-        if (!title) {
-            return NextResponse.json({ error: 'Title is required' }, { status: 400, headers: corsHeaders });
+        if (!title || typeof title !== 'string' || title.length > 500) {
+            return NextResponse.json({ error: 'Title is required (max 500 chars)' }, { status: 400, headers: corsHeaders });
+        }
+
+        const allowedRecurrence = ['none', 'daily', 'weekly', 'monthly'];
+        if (recurrence !== undefined && !allowedRecurrence.includes(recurrence)) {
+            return NextResponse.json({ error: 'Invalid recurrence value' }, { status: 400, headers: corsHeaders });
         }
 
         // Validate date
@@ -55,11 +49,11 @@ export async function POST(request: Request) {
 
         const newReminder = {
             id: uuidv4(),
-            userId: user.id,
+            userId,
             itemId: null, // General reminder
             title,
             scheduledAt: date,
-            recurrence: recurrence || 'none',
+            recurrence: (recurrence || 'none') as 'none' | 'daily' | 'weekly' | 'monthly',
         };
 
         await db.insert(reminders).values(newReminder);

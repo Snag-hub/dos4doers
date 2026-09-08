@@ -3,6 +3,8 @@ import { items, reminders, users } from '@/db/schema';
 import { sendEmail } from '@/lib/email';
 import { and, eq, gte, lt, lte, sql, or, isNull } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
+import { isValidCronRequest } from '@/lib/cron-auth';
+import { escapeHtml } from '@/lib/html-escape';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,8 +13,7 @@ export async function GET(request: Request) {
     const cronStartTime = Date.now();
     console.log(`📧 [DIGEST] Daily Digest job started at ${new Date().toISOString()}`);
 
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!isValidCronRequest(request)) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -147,7 +148,7 @@ export async function GET(request: Request) {
                         <img src="${appUrl}/icon-192.png" width="48" height="48" style="border-radius: 10px; margin-bottom: 12px;" alt="Logo" />
                         <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700;">Daily Briefing</h1>
                         <p style="color: #a1a1aa; margin: 4px 0 0 0; font-size: 14px;">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-                        <p style="color: #71717a; margin: 4px 0 0 0; font-size: 13px;">for ${user.name || 'Friend'}</p>
+                        <p style="color: #71717a; margin: 4px 0 0 0; font-size: 13px;">for ${escapeHtml(user.name || 'Friend')}</p>
                     </div>
 
                     <div class="content">
@@ -159,12 +160,12 @@ export async function GET(request: Request) {
                             <div class="card">
                             <div style="display: flex; align-items: flex-start; gap: 12px;">
                                 <div style="flex: 1;">
-                                <div style="font-weight: 600; color: #18181b;">${r.title || r.itemTitle || 'Untitled Reminder'}</div>
+                                <div style="font-weight: 600; color: #18181b;">${escapeHtml(r.title || r.itemTitle || 'Untitled Reminder')}</div>
                                 <div style="font-size: 13px; color: #71717a; margin-top: 4px;">
                                     Due: ${new Date(r.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </div>
                                 </div>
-                                ${r.itemUrl ? `<a href="${r.itemUrl}" style="text-decoration: none; font-size: 18px;">🔗</a>` : ''}
+                                ${r.itemUrl ? `<a href="${escapeHtml(r.itemUrl)}" style="text-decoration: none; font-size: 18px;">🔗</a>` : ''}
                             </div>
                             </div>
                         `).join('')}
@@ -177,9 +178,9 @@ export async function GET(request: Request) {
                         <h2 class="section-title">📥 Recently Saved</h2>
                         ${newInboxItems.map(i => `
                             <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f4f4f5;">
-                            <a href="${i.url}" style="text-decoration: none; color: inherit; display: block;">
-                                <div style="font-weight: 500; color: #18181b; font-size: 15px;">${i.title || i.url}</div>
-                                ${i.siteName ? `<div style="font-size: 12px; color: #71717a; margin-top: 2px;">${i.siteName}</div>` : ''}
+                            <a href="${escapeHtml(i.url)}" style="text-decoration: none; color: inherit; display: block;">
+                                <div style="font-weight: 500; color: #18181b; font-size: 15px;">${escapeHtml(i.title || i.url)}</div>
+                                ${i.siteName ? `<div style="font-size: 12px; color: #71717a; margin-top: 2px;">${escapeHtml(i.siteName)}</div>` : ''}
                             </a>
                             </div>
                         `).join('')}

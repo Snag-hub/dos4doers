@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { items } from '@/db/schema';
 import { eq, lt, and } from 'drizzle-orm';
+import { isValidCronRequest } from '@/lib/cron-auth';
 
 export async function GET(req: Request) {
     // Simple auth check via secret header to prevent unauthorized access
-    const authHeader = req.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!isValidCronRequest(req)) {
         return new NextResponse('Unauthorized', { status: 401 });
     }
 

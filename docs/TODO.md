@@ -1,5 +1,74 @@
 # Project Todos & Fixes
 
+## 🛡️ Security audit + fixes (2026-09-08)
+
+A full-codebase security pass (3 parallel audits: API/authz, XSS/injection, infra/session/extension)
+found several **actively exploitable, unauthenticated** issues live on production. Fixed in this
+session (`npx tsc --noEmit`, `npm test`, `npm run build` all pass after these changes):
+
+### Fixed
+- [x] **`/api/notifications/action` had zero authentication** — anyone could delete/mutate any
+  user's items/reminders. Now requires a session and every query is scoped to the caller's
+  `userId` (`src/app/api/notifications/action/route.ts`).
+- [x] **`/api/test-reminder-email` and `/api/test-email` were unauthenticated** — the former leaked
+  arbitrary users' saved-item data to any attacker-supplied email address; the latter was an open
+  email-relay/spam vector. Both deleted (dead dev-testing routes, unreferenced anywhere else).
+- [x] **`/api/cron/send-reminders`'s `CRON_SECRET` check was commented out** — uncommented. Also
+  fixed the same class of issue (constant-time comparison) across all 4 cron routes via a new
+  shared `src/lib/cron-auth.ts` (`isValidCronRequest`).
+- [x] **Extension API tokens (`users.apiToken`) were stored in plaintext, no expiry** — now hashed
+  (SHA-256, `src/lib/api-token.ts`) before storage; only shown to the user once, at generation
+  time. Settings UI (`settings/client.tsx`) updated to a "shown once" pattern instead of persisting
+  and re-displaying the plaintext token.
+- [x] **Mass assignment in `updatePreferences`** (`src/app/actions.ts`) — `data: any` spread
+  directly into `.set()`, letting a crafted call overwrite `status`/`apiToken`/`email` on the
+  caller's row. Now whitelists only `emailNotifications`/`pushNotifications`.
+- [x] **SSRF via URL metadata/content fetching** — saving an item pointing at
+  `http://169.254.169.254/...` or an internal address made the server fetch it. New
+  `src/lib/ssrf-guard.ts` (`assertPublicHttpUrl`) resolves the hostname and blocks
+  private/loopback/link-local ranges before `src/lib/metadata.ts` or `src/lib/reader.ts` fetch a
+  user-submitted URL. **Known residual gap**: redirect targets aren't re-validated after the
+  initial check.
+- [x] **`javascript:` URLs could be saved as an item's URL** (self-XSS via the rendered link) —
+  `createItemSchema` (`src/lib/validations.ts`) now restricts `url` to `http`/`https`.
+- [x] **HTML/email injection via unescaped scraped metadata** — item titles/descriptions/site
+  names (attacker-controlled via a saved page's `<title>`) and user feedback text went raw into
+  HTML emails. New `src/lib/html-escape.ts` (`escapeHtml`) applied in
+  `src/app/api/cron/daily-digest/route.ts`, `src/app/api/cron/send-reminders/route.ts`, and
+  `src/app/feedback-actions.ts`.
+- [x] **Wildcard CORS mixed with session-cookie auth on `/api/items`** — `/api/items` is
+  CORS-open (`Access-Control-Allow-Origin: '*'`) for the extension but was also accepting the
+  Better Auth session cookie as a fallback. Simplified to bearer-token-only (matches
+  `/api/reminders`; nothing in the web app itself calls `/api/items`, confirmed by grep), via a new
+  shared `getUserIdFromBearerToken()` helper in `src/lib/api-token.ts`.
+- [x] **Unvalidated body on `/api/reminders`** — added basic length/enum checks on `title`/
+  `recurrence` before insert.
+- [x] **`next`/`sharp` had known CVEs with patches available** — bumped `next` 16.1.1 → 16.3.4,
+  `sharp` 0.34.5 → 0.35.x. `npm audit`: 41 → 37 vulnerabilities (remainder are dev-only transitive
+  deps — vitest/vite/rollup/happy-dom/next-pwa's workbox toolchain — not shipped to production).
+
+### Not fixed yet — needs a decision or bigger effort
+- [ ] **`/api/cron/send-reminders` vs `/api/cron/reminders` look like duplicate/superseded
+  implementations** (the latter is more complete: push notifications + proper locking). Re-secured
+  both rather than deleting one, since it's unclear whether `send-reminders` is still externally
+  scheduled — worth confirming and removing whichever is dead.
+- [ ] CSP still allows `'unsafe-inline' 'unsafe-eval'` in `script-src` (`next.config.ts`) — removes
+  XSS defense-in-depth. Tightening to nonce/hash-based CSP is a bigger, riskier change (needs
+  testing against every inline script the app currently relies on) — not attempted in this pass.
+- [ ] Reader-mode HTML sanitization (`src/lib/reader.ts`, DOMPurify) happens only once, at
+  extraction time — correct today (verified single write path to `items.content`), but no
+  re-sanitization at render time as a backstop for future code paths.
+- [ ] Better Auth's rate limiter defaults to in-memory storage (`src/lib/auth.ts`), inconsistent
+  with the app's own DB-backed limiter (`src/lib/rate-limit.ts`) — won't hold up across serverless
+  instances. Consider `rateLimit: { storage: 'database' }`.
+- [ ] Missing `Strict-Transport-Security` header in `next.config.ts`.
+- [ ] No password-reset flow, no required email verification (`src/lib/auth.ts`) — already tracked
+  below under the Better Auth migration section.
+- [ ] `next-pwa` is effectively unmaintained; consider Serwist (`@serwist/next`) or
+  `@ducanh2912/next-pwa` next time the PWA setup needs touching.
+- [ ] Extension `host_permissions` (`extension/manifest.json`) is broader (`http://*/*`,
+  `https://*/*`) than needed given it only calls a fixed `API_BASE`.
+
 ## 🔐 Clerk → Better Auth migration (done in code; DB + prod deploy steps remain)
 
 **Code migration completed 2026-09-08** (`npm run build`, `npm test`, `npx tsc --noEmit` all pass).

@@ -2,6 +2,7 @@
 
 import { getSession } from '@/lib/auth';
 import { sendEmail } from '@/lib/email';
+import { escapeHtml } from '@/lib/html-escape';
 
 export async function submitFeedback(message: string, path: string) {
     const session = await getSession();
@@ -10,8 +11,10 @@ export async function submitFeedback(message: string, path: string) {
         throw new Error('Unauthorized');
     }
 
-    const email = session.user.email;
-    const name = session.user.name || email;
+    const email = escapeHtml(session.user.email);
+    const name = escapeHtml(session.user.name || session.user.email);
+    const safeMessage = escapeHtml(message);
+    const safePath = escapeHtml(path);
 
     // Send email to admin (using the defined admin email or same as sender for now if not config)
     // Assuming admin email is configured or just hardcoded for beta.
@@ -29,9 +32,9 @@ export async function submitFeedback(message: string, path: string) {
                 <div style="font-family: sans-serif;">
                     <h2>New Feedback Received</h2>
                     <p><strong>User:</strong> ${name} (${email})</p>
-                    <p><strong>Path:</strong> ${path}</p>
+                    <p><strong>Path:</strong> ${safePath}</p>
                     <hr />
-                    <p style="white-space: pre-wrap;">${message}</p>
+                    <p style="white-space: pre-wrap;">${safeMessage}</p>
                 </div>
             `
         })

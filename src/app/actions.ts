@@ -376,10 +376,20 @@ export async function getPreferences() {
     return await db.query.users.findFirst({ where: eq(users.id, userId), columns: { emailNotifications: true, pushNotifications: true } });
 }
 
-export async function updatePreferences(data: any) {
+export async function updatePreferences(data: { emailNotifications?: boolean; pushNotifications?: boolean }) {
     const userId = await getUserId();
     if (!userId) throw new Error('Unauthorized');
-    await db.update(users).set(data).where(eq(users.id, userId));
+
+    // Whitelist explicitly — never spread arbitrary client input into a
+    // `.set()` call, or a crafted request could overwrite columns like
+    // `status`, `apiToken`, or `email`.
+    const update: { emailNotifications?: boolean; pushNotifications?: boolean } = {};
+    if (typeof data.emailNotifications === 'boolean') update.emailNotifications = data.emailNotifications;
+    if (typeof data.pushNotifications === 'boolean') update.pushNotifications = data.pushNotifications;
+
+    if (Object.keys(update).length === 0) return;
+
+    await db.update(users).set(update).where(eq(users.id, userId));
     revalidatePath('/settings');
 }
 

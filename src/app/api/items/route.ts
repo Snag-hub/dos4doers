@@ -1,8 +1,8 @@
 import { getMetadata } from '@/lib/metadata';
 import { NextResponse } from 'next/server';
-import { getUserId, getCurrentUserId } from '@/lib/auth';
+import { getUserIdFromBearerToken } from '@/lib/api-token';
 import { db } from '@/db';
-import { users, items } from '@/db/schema';
+import { items } from '@/db/schema';
 import { eq, and, or, ilike, desc } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 import { createItemSchema } from '@/lib/validations';
@@ -23,24 +23,11 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
-  let userId: string | null = null;
-
-  try {
-    // Try session auth first
-    userId = await getCurrentUserId();
-  } catch (error) {
-    // Fallback to API Token if session auth fails
-    const authHeader = req.headers.get('Authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.split(' ')[1];
-      const user = await db.query.users.findFirst({
-        where: eq(users.apiToken, token),
-      });
-      if (user) {
-        userId = user.id;
-      }
-    }
-  }
+  // This route is CORS-open (Access-Control-Allow-Origin: '*') for the
+  // browser extension, so it only accepts the extension's bearer token —
+  // never falls back to the session cookie, to avoid mixing wildcard CORS
+  // with cookie-based auth on a mutating endpoint.
+  const userId = await getUserIdFromBearerToken(req);
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized: Invalid or missing token' }, { status: 401, headers: corsHeaders });
@@ -142,7 +129,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const userId = await getUserId();
+  const userId = await getUserIdFromBearerToken(req);
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
