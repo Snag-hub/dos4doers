@@ -5,6 +5,7 @@ import {
   boolean,
   pgEnum,
   integer,
+  bigint,
   index,
   jsonb,
   uuid,
@@ -149,6 +150,16 @@ export const rateLimits = pgTable('rate_limits', {
   key: text('key').notNull().primaryKey(),
   count: integer('count').notNull().default(0),
   reset: timestamp('reset').notNull(),
+});
+
+// Better Auth's own rate limiter storage (separate from the app's custom
+// `rate_limits` table above) — required for `rateLimit.storage: "database"`
+// in src/lib/auth.ts so limits survive across serverless instances.
+export const authRateLimits = pgTable('auth_rate_limit', {
+  id: text('id').notNull().primaryKey(),
+  key: text('key').notNull(),
+  count: integer('count').notNull(),
+  lastRequest: bigint('lastRequest', { mode: 'number' }).notNull(),
 });
 
 export const systemLogs = pgTable('system_logs', {

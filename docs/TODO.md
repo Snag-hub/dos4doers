@@ -47,6 +47,20 @@ session (`npx tsc --noEmit`, `npm test`, `npm run build` all pass after these ch
   `sharp` 0.34.5 → 0.35.x. `npm audit`: 41 → 37 vulnerabilities (remainder are dev-only transitive
   deps — vitest/vite/rollup/happy-dom/next-pwa's workbox toolchain — not shipped to production).
 
+### Also fixed (second pass, same session)
+- [x] **Reader-mode re-sanitization backstop** — `src/lib/reader.ts` now exports `sanitizeHtml()`,
+  called again in `src/app/(dashboard)/reader/[id]/page.tsx` right before render, independent of
+  the extraction-time sanitization.
+- [x] **Better Auth rate limiter now DB-backed** — added an `auth_rate_limit` table
+  (`src/db/schema.ts` → `authRateLimits`, migrated live) and set
+  `rateLimit: { storage: 'database', modelName: 'authRateLimit' }` in `src/lib/auth.ts`, alongside
+  `minPasswordLength: 10`.
+- [x] **`Strict-Transport-Security` header added** in `next.config.ts` (production only — omitted
+  in dev so it doesn't force HTTPS on localhost).
+- [x] **Extension `host_permissions` scoped down** to `https://dos4doers.n1k-tech.com/*` only, in
+  both `extension/manifest.json` (MV3) and `extension/manifest.v2.json` (Firefox) — confirmed via
+  grep that `background.js` makes no other network calls.
+
 ### Not fixed yet — needs a decision or bigger effort
 - [ ] **`/api/cron/send-reminders` vs `/api/cron/reminders` look like duplicate/superseded
   implementations** (the latter is more complete: push notifications + proper locking). Re-secured
@@ -55,19 +69,10 @@ session (`npx tsc --noEmit`, `npm test`, `npm run build` all pass after these ch
 - [ ] CSP still allows `'unsafe-inline' 'unsafe-eval'` in `script-src` (`next.config.ts`) — removes
   XSS defense-in-depth. Tightening to nonce/hash-based CSP is a bigger, riskier change (needs
   testing against every inline script the app currently relies on) — not attempted in this pass.
-- [ ] Reader-mode HTML sanitization (`src/lib/reader.ts`, DOMPurify) happens only once, at
-  extraction time — correct today (verified single write path to `items.content`), but no
-  re-sanitization at render time as a backstop for future code paths.
-- [ ] Better Auth's rate limiter defaults to in-memory storage (`src/lib/auth.ts`), inconsistent
-  with the app's own DB-backed limiter (`src/lib/rate-limit.ts`) — won't hold up across serverless
-  instances. Consider `rateLimit: { storage: 'database' }`.
-- [ ] Missing `Strict-Transport-Security` header in `next.config.ts`.
 - [ ] No password-reset flow, no required email verification (`src/lib/auth.ts`) — already tracked
   below under the Better Auth migration section.
 - [ ] `next-pwa` is effectively unmaintained; consider Serwist (`@serwist/next`) or
   `@ducanh2912/next-pwa` next time the PWA setup needs touching.
-- [ ] Extension `host_permissions` (`extension/manifest.json`) is broader (`http://*/*`,
-  `https://*/*`) than needed given it only calls a fixed `API_BASE`.
 
 ## 🔐 Clerk → Better Auth migration (done in code; DB + prod deploy steps remain)
 

@@ -4,7 +4,7 @@ import { nextCookies } from 'better-auth/next-js';
 import { headers } from 'next/headers';
 import { count } from 'drizzle-orm';
 import { db } from '@/db';
-import { users, sessions, accounts, verifications } from '@/db/schema';
+import { users, sessions, accounts, verifications, authRateLimits } from '@/db/schema';
 
 const MAX_BETA_USERS = 50;
 
@@ -16,10 +16,18 @@ export const auth = betterAuth({
       session: sessions,
       account: accounts,
       verification: verifications,
+      authRateLimit: authRateLimits,
     },
   }),
   emailAndPassword: {
     enabled: true,
+    minPasswordLength: 10,
+  },
+  // Database-backed so limits survive across serverless instances, unlike
+  // the default in-memory storage.
+  rateLimit: {
+    storage: 'database',
+    modelName: 'authRateLimit',
   },
   session: {
     // Long-lived, PWA-friendly sessions: an active user keeps getting

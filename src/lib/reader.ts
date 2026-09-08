@@ -9,6 +9,19 @@ export interface ExtractedContent {
     excerpt: string;
 }
 
+/**
+ * Re-sanitizes stored article HTML immediately before rendering it. Content
+ * is already sanitized once at extraction time (below), but this is a cheap
+ * backstop: if any future write path (import, edit, admin tool) ever stores
+ * `items.content` without going through extractContent(), this still keeps
+ * the render path safe on its own.
+ */
+export function sanitizeHtml(html: string): string {
+    const window = new Window();
+    const DOMPurify = createDOMPurify(window as unknown as any);
+    return DOMPurify.sanitize(html);
+}
+
 export async function extractContent(url: string): Promise<ExtractedContent | null> {
     try {
         // Block requests to internal/private network targets (SSRF).
