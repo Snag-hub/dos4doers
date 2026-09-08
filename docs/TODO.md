@@ -107,8 +107,24 @@ session (`npx tsc --noEmit`, `npm test`, `npm run build` all pass after these ch
 - [ ] CSP still allows `'unsafe-inline' 'unsafe-eval'` in `script-src` (`next.config.ts`) — removes
   XSS defense-in-depth. Tightening to nonce/hash-based CSP is a bigger, riskier change (needs
   testing against every inline script the app currently relies on) — not attempted in this pass.
-- [ ] `next-pwa` is effectively unmaintained; consider Serwist (`@serwist/next`) or
-  `@ducanh2912/next-pwa` next time the PWA setup needs touching.
+- [x] **`next-pwa` → Serwist migration done.** `next-pwa` (archived Aug 2023) replaced with
+  `@serwist/next`. New `src/app/sw.ts` is a single self-contained service worker source (Serwist's
+  model, unlike next-pwa's `importScripts` bolt-on) — ported over 1:1: all 5 `runtimeCaching`
+  rules, next-pwa's undocumented default `start-url` `NetworkFirst` route (confirmed via reading
+  the previously-generated `public/sw.js`, not just the config), and the push/`notificationclick`
+  listeners from the now-deleted `public/push-sw.js`. `src/components/sw-registration.tsx` (the
+  client-side `.register('/sw.js')` call) and `public/manifest.json` needed **no changes** — Serwist
+  still outputs to the same `/sw.js` path. Verified: generated `public/sw.js` contains all runtime
+  cache rules + push logic (grepped for each), precache manifest has 75 entries, `next start` serves
+  `/sw.js` with the right content-type, `tsc`/`test`/`lint`/`build` all pass.
+  `public/sw.js` (and the old `workbox-*.js` chunk) are no longer committed to git — added to
+  `.gitignore` as build output, consistent with normal practice (they were previously tracked by
+  mistake). Also removed `next-pwa`'s entire dependency tree, including the unmaintained
+  `workbox-webpack-plugin`/`rollup-plugin-terser`/`serialize-javascript` chain the earlier security
+  audit flagged — `npm audit`: 38 → 30 vulnerabilities.
+  **Not yet done**: no in-browser test of an actual push notification round-trip (subscribe →
+  server sends via `web-push` → SW shows notification → click → `/api/notifications/action`) —
+  code-level verification only in this pass.
 
 ## 🔐 Clerk → Better Auth migration (done in code; DB + prod deploy steps remain)
 
