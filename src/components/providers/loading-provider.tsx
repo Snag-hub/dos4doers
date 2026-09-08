@@ -36,25 +36,28 @@ export function LoadingProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    // Automatic route change detection
+    // Detect route change during render (React's documented pattern for
+    // deriving state from a prop change without an extra render/effect pass).
+    if (pathname !== prevPathnameRef.current) {
+        prevPathnameRef.current = pathname;
+        setIsLoading(true);
+    }
+
+    // Once a route change has shown the loader, ensure it stays up for a
+    // minimum 300ms before hiding it again.
     useEffect(() => {
-        if (pathname !== prevPathnameRef.current) {
-            // Route changed - show loader
-            setIsLoading(true);
+        if (!isLoading) return;
 
-            // Ensure loader shows for minimum 300ms
-            const startTime = Date.now();
-            minDisplayTimeRef.current = setTimeout(() => {
-                const elapsed = Date.now() - startTime;
-                const remaining = Math.max(0, 300 - elapsed);
+        const startTime = Date.now();
+        minDisplayTimeRef.current = setTimeout(() => {
+            const elapsed = Date.now() - startTime;
+            const remaining = Math.max(0, 300 - elapsed);
 
-                loadingTimerRef.current = setTimeout(() => {
-                    setIsLoading(false);
-                }, remaining);
-            }, 0);
-
-            prevPathnameRef.current = pathname;
-        }
+            loadingTimerRef.current = setTimeout(() => {
+                setIsLoading(false);
+            }, remaining);
+        }, 0);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname]);
 
     // Cleanup on unmount
