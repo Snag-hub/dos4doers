@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 
 const emailFrom = process.env.EMAIL_FROM || 'DOs 4 DOERs <noreply@dos4doers.n1k-tech.com>';
+const emailReplyTo = process.env.EMAIL_REPLY_TO || 'dos4doers@n1k-tech.com';
 
 // Lazy initialization - only create client when needed
 function getResendClient() {
@@ -21,10 +22,12 @@ export async function sendEmail({
     to,
     subject,
     html,
+    replyTo = emailReplyTo,
 }: {
     to: string;
     subject: string;
     html: string;
+    replyTo?: string;
 }) {
     // Validate inputs
     if (!to || !subject || !html) {
@@ -52,6 +55,7 @@ export async function sendEmail({
             to: [to],
             subject,
             html,
+            replyTo,
         });
 
         const duration = Date.now() - startTime;
