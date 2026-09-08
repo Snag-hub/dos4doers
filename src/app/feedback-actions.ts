@@ -22,7 +22,7 @@ export async function submitFeedback(message: string, path: string) {
     // But requirement was "Email to admin".
     // I'll assume `process.env.ADMIN_EMAIL` or send to self.
     // Send email to admins
-    const adminEmails = ['imsnag.1@gmail.com', 'contact.dos4doers@gmail.com'];
+    const adminEmails = ['imsnag.1@gmail.com', 'contact.dos4doers@gmail.com', 'dos4doers@n1k-tech.com'];
 
     await Promise.all(adminEmails.map(to =>
         sendEmail({
