@@ -160,13 +160,8 @@ long-lived PWA-friendly sessions) per the decision recorded in this session.
   verified build/typecheck/unit tests only, not an interactive browser session.
 - [ ] Decide whether to add social login (Google/GitHub) via Better Auth plugins later — not
   needed today since nothing in the app currently depends on it.
-- [ ] **No password-reset flow yet.** `emailAndPassword.sendResetPassword` isn't configured in
-  `src/lib/auth.ts` — a user who forgets their password currently has no self-service recovery.
-  `src/lib/email.ts` (Resend) is already wired up elsewhere, so this is a small addition when
-  needed, just not done in this pass.
-- [ ] **No email verification required.** `requireEmailVerification` is left at its default
-  (`false`), so sign-up doesn't confirm the email is real/owned by the signer — fine for a
-  single-user/tiny-beta app, worth revisiting before opening signups more broadly.
+- [x] ~~No password-reset flow~~ / ~~no email verification~~ — both built in the security-audit
+  pass above (see "third pass" section).
 
 ### Dependency upgrades available (not yet applied, unrelated to auth)
 - Safe minor/patch bumps: `next` 16.1.1 → 16.3.4, `react`/`react-dom` 19.2.3 → 19.2.8,
