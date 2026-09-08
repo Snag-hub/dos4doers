@@ -14,6 +14,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checkEmail, setCheckEmail] = useState(false);
 
   const isSignUp = mode === 'sign-up';
 
@@ -32,8 +33,28 @@ export function AuthForm({ mode }: { mode: Mode }) {
       return;
     }
 
+    // Email/password sign-up never returns a session while email
+    // verification is required — show a "check your inbox" state instead
+    // of redirecting somewhere the middleware would just bounce back from.
+    if (isSignUp) {
+      setCheckEmail(true);
+      return;
+    }
+
     router.push('/inbox');
     router.refresh();
+  }
+
+  if (checkEmail) {
+    return (
+      <div className="w-full max-w-sm rounded-2xl border border-zinc-800 bg-zinc-900 p-8 text-center shadow-xl">
+        <h1 className="mb-2 text-2xl font-bold text-white">Check your email</h1>
+        <p className="text-sm text-zinc-400">
+          We sent a verification link to <span className="text-white">{email}</span>. Click it to
+          finish setting up your account.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -77,16 +98,23 @@ export function AuthForm({ mode }: { mode: Mode }) {
         </div>
 
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-zinc-300">
-            Password
-          </label>
+          <div className="mb-1 flex items-center justify-between">
+            <label htmlFor="password" className="block text-sm font-medium text-zinc-300">
+              Password
+            </label>
+            {!isSignUp && (
+              <Link href="/forgot-password" className="text-xs text-[#00D4FF] hover:underline">
+                Forgot password?
+              </Link>
+            )}
+          </div>
           <input
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            minLength={8}
+            minLength={10}
             className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-[#00D4FF]"
           />
         </div>

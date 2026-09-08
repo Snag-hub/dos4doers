@@ -61,6 +61,28 @@ session (`npx tsc --noEmit`, `npm test`, `npm run build` all pass after these ch
   both `extension/manifest.json` (MV3) and `extension/manifest.v2.json` (Firefox) — confirmed via
   grep that `background.js` makes no other network calls.
 
+### Also fixed (third pass) — password reset + required email verification
+- [x] **Password reset flow built**: `src/lib/auth.ts` now configures `sendResetPassword` (via new
+  `src/lib/auth-emails.ts`, reusing the existing Resend `sendEmail`). New pages
+  `/forgot-password` (`src/app/forgot-password`, `src/components/forgot-password-form.tsx`) and
+  `/reset-password` (`src/app/reset-password`, `src/components/reset-password-form.tsx`, reads
+  `?token=` from the emailed link). `AuthForm`'s sign-in mode links to `/forgot-password`.
+  `requestPasswordReset` always shows the same "check your email" state regardless of whether the
+  address exists, to avoid email enumeration.
+- [x] **Required email verification**: `requireEmailVerification: true` +
+  `emailVerification: { sendVerificationEmail, sendOnSignUp: true, sendOnSignIn: true,
+  autoSignInAfterVerification: true }` in `src/lib/auth.ts`. Sign-up no longer creates a session
+  until the link is clicked — `AuthForm` now shows a "check your email" state after sign-up
+  instead of redirecting to `/inbox`. Verified end-to-end via curl against `/api/auth/sign-up/email`
+  (no session cookie / `token: null` returned pre-verification) and
+  `/api/auth/sign-in/email` (existing account still logs in fine).
+  **One-time fix applied**: the existing `nadduanwar.99@gmail.com` test account had
+  `emailVerified: false` (predates this change) — manually marked verified in the DB so enabling
+  this requirement didn't lock it out. Any other pre-existing accounts would need the same fix if
+  they ever sign in again without it.
+- [x] Password minimum length bumped to 10 in the actual `<input minLength>` on both the sign-up
+  and reset-password forms, matching the server-side `minPasswordLength: 10`.
+
 ### Not fixed yet — needs a decision or bigger effort
 - [ ] **`/api/cron/send-reminders` vs `/api/cron/reminders` look like duplicate/superseded
   implementations** (the latter is more complete: push notifications + proper locking). Re-secured
@@ -69,8 +91,6 @@ session (`npx tsc --noEmit`, `npm test`, `npm run build` all pass after these ch
 - [ ] CSP still allows `'unsafe-inline' 'unsafe-eval'` in `script-src` (`next.config.ts`) — removes
   XSS defense-in-depth. Tightening to nonce/hash-based CSP is a bigger, riskier change (needs
   testing against every inline script the app currently relies on) — not attempted in this pass.
-- [ ] No password-reset flow, no required email verification (`src/lib/auth.ts`) — already tracked
-  below under the Better Auth migration section.
 - [ ] `next-pwa` is effectively unmaintained; consider Serwist (`@serwist/next`) or
   `@ducanh2912/next-pwa` next time the PWA setup needs touching.
 

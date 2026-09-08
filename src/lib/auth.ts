@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { count } from 'drizzle-orm';
 import { db } from '@/db';
 import { users, sessions, accounts, verifications, authRateLimits } from '@/db/schema';
+import { sendVerificationEmail, sendPasswordResetEmail } from '@/lib/auth-emails';
 
 const MAX_BETA_USERS = 50;
 
@@ -22,6 +23,20 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 10,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      void sendPasswordResetEmail(user.email, url);
+    },
+    resetPasswordTokenExpiresIn: 3600,
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      void sendVerificationEmail(user.email, url);
+    },
+    sendOnSignUp: true,
+    sendOnSignIn: true,
+    autoSignInAfterVerification: true,
+    expiresIn: 3600,
   },
   // Database-backed so limits survive across serverless instances, unlike
   // the default in-memory storage.
