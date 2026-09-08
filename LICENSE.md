@@ -28,7 +28,7 @@ We want DOs 4 DOERs to be:
 ## Commercial Use
 
 If you want to use DOs 4 DOERs commercially, please contact us for a commercial license:
-- Email: legal@dos4doers.n1k-tech.com
+- Email: dos4doers@n1k-tech.com
 - Website: https://dos4doers.n1k-tech.com
 
 ## Full License Text

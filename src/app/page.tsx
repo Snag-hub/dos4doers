@@ -452,7 +452,7 @@ export default async function Home() {
               <Link href="/terms" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">Terms</Link>
               <Link href="/guide" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">Guide</Link>
               <Link href="/extensions" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">Extensions</Link>
-              <a href="mailto:imsnag.1@gmail.com" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">Support</a>
+              <a href="mailto:dos4doers@n1k-tech.com" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">Support</a>
             </div>
 
             {/* Social Icons */}
@@ -466,7 +466,7 @@ export default async function Home() {
               <a href="https://linkedin.com/in/syednadeemhussain" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                 <Linkedin className="w-5 h-5 text-zinc-400 hover:text-blue-700 cursor-pointer transition-colors" />
               </a>
-              <a href="mailto:imsnag.1@gmail.com" aria-label="Email">
+              <a href="mailto:dos4doers@n1k-tech.com" aria-label="Email">
                 <Mail className="w-5 h-5 text-zinc-400 hover:text-orange-400 cursor-pointer transition-colors" />
               </a>
             </div>

@@ -120,7 +120,7 @@ export default function ExtensionsPage() {
 
                 <div className="mt-12 text-center">
                     <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em]">
-                        Need help? <a href="mailto:imsnag.1@gmail.com" className="text-blue-600 hover:underline">Contact Support</a>
+                        Need help? <a href="mailto:dos4doers@n1k-tech.com" className="text-blue-600 hover:underline">Contact Support</a>
                     </p>
                 </div>
             </div>

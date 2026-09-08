@@ -43,7 +43,7 @@ PROHIBITED USES:
 ✗ Selling modified versions
 ✗ Using to provide commercial services
 
-For commercial licensing inquiries, contact: legal@dos4doers.n1k-tech.com
+For commercial licensing inquiries, contact: dos4doers@n1k-tech.com
 
 ---
 

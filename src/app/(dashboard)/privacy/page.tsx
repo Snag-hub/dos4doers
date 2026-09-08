@@ -129,12 +129,12 @@ export default function PrivacyPage() {
             <footer className="pt-12 mt-12 border-t border-zinc-200 dark:border-zinc-800 text-center">
                 <p className="text-zinc-500 mb-2">Have questions?</p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm">
-                    <a href="mailto:privacy@dos4doers.n1k-tech.com" className="text-blue-600 hover:underline">
-                        privacy@dos4doers.n1k-tech.com
+                    <a href="mailto:dos4doers@n1k-tech.com" className="text-blue-600 hover:underline">
+                        dos4doers@n1k-tech.com
                     </a>
                     <span className="hidden sm:inline text-zinc-300">•</span>
-                    <a href="mailto:support@dos4doers.n1k-tech.com" className="text-blue-600 hover:underline">
-                        support@dos4doers.n1k-tech.com
+                    <a href="mailto:dos4doers@n1k-tech.com" className="text-blue-600 hover:underline">
+                        dos4doers@n1k-tech.com
                     </a>
                 </div>
             </footer>
