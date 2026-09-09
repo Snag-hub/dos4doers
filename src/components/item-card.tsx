@@ -9,6 +9,8 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useHaptic } from '@/hooks/use-haptic';
 import { toast } from 'sonner';
+import { OfflineToggleButton } from '@/components/offline-toggle-button';
+import { removeItemOffline } from '@/lib/offline-store';
 
 const ConfirmDialog = dynamic(() => import('@/components/confirm-dialog').then(mod => mod.ConfirmDialog), { ssr: false });
 const ReminderScheduler = dynamic(() => import('@/components/reminder-scheduler').then(mod => mod.ReminderScheduler), { ssr: false });
@@ -69,6 +71,7 @@ export function ItemCard({
         try {
             if (item.status === 'trash') {
                 await deleteItem(item.id);
+                removeItemOffline(item.id).catch(() => { });
                 toast.success('Deleted permanently');
             } else {
                 await updateStatus(item.id, 'trash');
@@ -245,6 +248,23 @@ export function ItemCard({
                             >
                                 <BookOpen className="w-4 h-4" />
                             </Link>
+                        )}
+
+                        {item.content && (
+                            <OfflineToggleButton
+                                item={{
+                                    id: item.id,
+                                    title: item.title,
+                                    content: item.content,
+                                    textContent: item.textContent,
+                                    url: item.url,
+                                    siteName: item.siteName,
+                                    favicon: item.favicon,
+                                    author: item.author,
+                                    image: item.image,
+                                    createdAt: item.createdAt.toISOString(),
+                                }}
+                            />
                         )}
 
                         {item.status === 'trash' ? (

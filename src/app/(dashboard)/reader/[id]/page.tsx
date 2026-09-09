@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { BookOpen, Calendar, User, CornerUpLeft } from 'lucide-react';
 import Link from 'next/link';
 import { sanitizeHtml } from '@/lib/reader';
+import { OfflineToggleButton } from '@/components/offline-toggle-button';
 
 export default async function ReaderPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -35,6 +36,21 @@ export default async function ReaderPage({ params }: { params: Promise<{ id: str
                         Back to Inbox
                     </Link>
                     <div className="flex items-center gap-4">
+                        <OfflineToggleButton
+                            variant="label"
+                            item={{
+                                id,
+                                title,
+                                content,
+                                textContent: item.textContent,
+                                url,
+                                siteName,
+                                favicon,
+                                author,
+                                image: heroImage,
+                                createdAt: createdAt.toISOString(),
+                            }}
+                        />
                         <a
                             href={url}
                             target="_blank"

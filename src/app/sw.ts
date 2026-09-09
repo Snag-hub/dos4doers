@@ -43,6 +43,17 @@ const serwist = new Serwist({
             handler: new NetworkOnly(),
         },
         {
+            // Reader pages are rendered per-item on the server (RSC), so there's
+            // nothing safe to cache here — one item's response can't stand in for
+            // another's. This rule exists purely so the `fallbacks` option below
+            // can attach a handlerDidError plugin to it: when a saved article's
+            // reader page fails to load (offline), Serwist serves the precached
+            // offline-reader-shell.html instead, which reads the article straight
+            // from IndexedDB (see src/lib/offline-store.ts).
+            matcher: ({ request, url }) => request.mode === 'navigate' && url.pathname.startsWith('/reader/'),
+            handler: new NetworkOnly(),
+        },
+        {
             matcher: ({ url }) => /\.(?:eot|otf|ttc|ttf|woff|woff2|font\.css)$/i.test(url.pathname),
             handler: new StaleWhileRevalidate({
                 cacheName: 'static-font-assets',
@@ -77,6 +88,14 @@ const serwist = new Serwist({
             }),
         },
     ],
+    fallbacks: {
+        entries: [
+            {
+                url: '/offline-reader-shell.html',
+                matcher: ({ request }) => request.mode === 'navigate' && new URL(request.url).pathname.startsWith('/reader/'),
+            },
+        ],
+    },
 });
 
 serwist.addEventListeners();

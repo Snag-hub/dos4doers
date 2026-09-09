@@ -9,6 +9,7 @@ import { reminders } from '@/db/schema';
 import { toast } from 'sonner';
 import { NotificationLogs } from './notification-logs';
 import Link from 'next/link';
+import { getAllOfflineIds, clearAllOffline } from '@/lib/offline-store';
 
 // --- Types ---
 type Reminder = InferSelectModel<typeof reminders>;
@@ -272,6 +273,20 @@ export default function SettingsClient({
     };
 
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    const [offlineCount, setOfflineCount] = useState(0);
+    const [isClearOfflineDialogOpen, setIsClearOfflineDialogOpen] = useState(false);
+
+    useEffect(() => {
+        getAllOfflineIds().then((ids) => setOfflineCount(ids.length)).catch(() => { });
+    }, []);
+
+    const confirmClearOffline = async () => {
+        setIsClearOfflineDialogOpen(false);
+        await clearAllOffline();
+        setOfflineCount(0);
+        toast.success('Cleared offline articles');
+    };
 
     const handleDeleteAccount = async () => {
         // Open the custom dialog instead of window.confirm
@@ -571,6 +586,26 @@ export default function SettingsClient({
                                 </a>
                             </div>
                         </SettingCard>
+
+                        {/* Offline Reading */}
+                        <SettingCard>
+                            <SectionHeader
+                                icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3M3 15a4 4 0 004 4h10a4 4 0 004-4V9a4 4 0 00-4-4H7a4 4 0 00-4 4v6z" /></svg>}
+                                title="Offline Reading"
+                                description="Articles you've saved for offline reading stay on this device." />
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                    {offlineCount} {offlineCount === 1 ? 'article' : 'articles'} saved offline
+                                </p>
+                                <button
+                                    onClick={() => setIsClearOfflineDialogOpen(true)}
+                                    disabled={offlineCount === 0}
+                                    className="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Clear all
+                                </button>
+                            </div>
+                        </SettingCard>
                     </div>
 
                     {/* Legal & About */}
@@ -678,6 +713,15 @@ export default function SettingsClient({
                 title="Delete Account"
                 description="Are you absolutely sure? This action cannot be undone. This will permanently delete your account and remove your data from our servers."
                 confirmText="Delete Account"
+                variant="danger"
+            />
+            <ConfirmDialog
+                isOpen={isClearOfflineDialogOpen}
+                onCancel={() => setIsClearOfflineDialogOpen(false)}
+                onConfirm={confirmClearOffline}
+                title="Clear Offline Articles"
+                description="This removes every article saved for offline reading on this device. They'll still be in your library online."
+                confirmText="Clear All"
                 variant="danger"
             />
         </>

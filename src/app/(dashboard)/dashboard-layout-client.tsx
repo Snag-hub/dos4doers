@@ -7,6 +7,7 @@ import { MobileNav } from '@/components/mobile-nav';
 import Image from 'next/image';
 import { useSession } from '@/lib/auth-client';
 import { SearchTrigger } from '@/components/search-trigger';
+import { OfflineStoreProvider } from '@/lib/offline-store-context';
 
 export default function DashboardLayoutClient({
     children,
@@ -18,6 +19,7 @@ export default function DashboardLayoutClient({
     const user = session?.user;
 
     return (
+        <OfflineStoreProvider>
         <div className="flex h-[100dvh] bg-zinc-50 dark:bg-black overflow-hidden">
             {/* Sidebar */}
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
@@ -65,5 +67,6 @@ export default function DashboardLayoutClient({
             {/* Bottom Navigation for Mobile */}
             <MobileNav />
         </div>
+        </OfflineStoreProvider>
     );
 }
