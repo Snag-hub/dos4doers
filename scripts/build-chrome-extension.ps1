@@ -1,9 +1,10 @@
 # Create Chrome/Edge extension zip
 # Chrome/Edge uses Manifest V3
 
-$extensionDir = "d:\Git\unnamed_tool\extension"
-$outputZip = "d:\Git\unnamed_tool\public\dos4doers-extension-chromium.zip"
-$tempDir = "d:\Git\unnamed_tool\extension\temp-chrome-build"
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$extensionDir = Join-Path $repoRoot "extension"
+$outputZip = Join-Path $repoRoot "public\dos4doers-extension-chromium.zip"
+$tempDir = Join-Path $extensionDir "temp-chrome-build"
 
 # Clean up any existing temp directory and output zip
 if (Test-Path $tempDir) {

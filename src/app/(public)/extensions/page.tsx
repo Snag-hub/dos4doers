@@ -28,7 +28,7 @@ export default function ExtensionsPage() {
                         <h3 className="text-2xl font-bold mb-2">Firefox</h3>
                         <p className="text-zinc-500 text-sm mb-8">Official build for Firefox users (XPI).</p>
                         <a
-                            href="/24db911f6eb143cc8f61-1.0.xpi"
+                            href="/dos4doers-extension-firefox.xpi"
                             download
                             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                         >
@@ -45,7 +45,7 @@ export default function ExtensionsPage() {
                         <h3 className="text-2xl font-bold mb-2">Edge</h3>
                         <p className="text-zinc-500 text-sm mb-8">Optimized V3 build for Microsoft Edge.</p>
                         <a
-                            href="/DOs 4 DOERs-extension-chromium.zip"
+                            href="/dos4doers-extension-chromium.zip"
                             download
                             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-blue-500"
                         >

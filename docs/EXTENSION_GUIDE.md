@@ -284,10 +284,8 @@ If you're developing or testing:
 
 ## 📚 Additional Resources
 
-- **[Extension Quick Start](./extension/QUICK_START.md)** - 5-minute setup guide
-- **[Troubleshooting Guide](./extension/TROUBLESHOOTING.md)** - Detailed problem solving
-- **[Main Documentation](./README.md)** - Full DOs 4 DOERs documentation
-- **[Getting Started](./docs/GETTING_STARTED.md)** - New user guide
+- **[Main Documentation](../README.md)** - Full DOs 4 DOERs documentation
+- **[Getting Started](./GETTING_STARTED.md)** - New user guide
 
 ---
 

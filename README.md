@@ -208,11 +208,6 @@ The DOs 4 DOERs browser extension lets you save any webpage with a single click.
 - **[Database Schema](./docs/DATABASE.md)** - Database structure
 - **[Deployment Guide](./docs/DEPLOYMENT.md)** - Production deployment
 
-### Extension Development
-- **[Extension README](./extension/README.md)** - Extension overview
-- **[Quick Start](./extension/QUICK_START.md)** - 5-minute setup
-- **[Troubleshooting](./extension/TROUBLESHOOTING.md)** - Common issues
-
 ---
 
 ## 🛠️ Tech Stack

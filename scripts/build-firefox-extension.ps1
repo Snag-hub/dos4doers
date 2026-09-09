@@ -1,9 +1,10 @@
 # Create Firefox extension zip with Unix-style paths (forward slashes)
 # Firefox Add-ons requires forward slashes in zip archives
 
-$extensionDir = "d:\Git\unnamed_tool\extension"
-$outputZip = "d:\Git\unnamed_tool\public\dos4doers-extension-firefox.zip"
-$tempDir = "d:\Git\unnamed_tool\extension\temp-firefox-build"
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$extensionDir = Join-Path $repoRoot "extension"
+$outputZip = Join-Path $repoRoot "public\dos4doers-extension-firefox.zip"
+$tempDir = Join-Path $extensionDir "temp-firefox-build"
 
 # Clean up any existing temp directory and output zip
 if (Test-Path $tempDir) {
