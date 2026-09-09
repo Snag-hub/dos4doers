@@ -50,7 +50,13 @@ const serwist = new Serwist({
             }),
         },
         {
-            matcher: ({ url }) => /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i.test(url.pathname),
+            // Same-origin only: this used to match by extension alone, which also
+            // caught cross-origin link thumbnails (blog/YouTube preview images).
+            // Those requests come back as opaque no-cors responses that this
+            // strategy can't safely revalidate, which was breaking thumbnail
+            // rendering on item cards. Third-party images should just hit the
+            // network directly instead of going through this cache.
+            matcher: ({ url }) => url.origin === self.location.origin && /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i.test(url.pathname),
             handler: new StaleWhileRevalidate({
                 cacheName: 'static-image-assets',
                 plugins: [new ExpirationPlugin({ maxEntries: 64, maxAgeSeconds: 24 * 60 * 60 })],
