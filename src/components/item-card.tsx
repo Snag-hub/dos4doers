@@ -262,7 +262,7 @@ export function ItemCard({
                                     favicon: item.favicon,
                                     author: item.author,
                                     image: item.image,
-                                    createdAt: item.createdAt.toISOString(),
+                                    createdAt: new Date(item.createdAt).toISOString(),
                                 }}
                             />
                         )}

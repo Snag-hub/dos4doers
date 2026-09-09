@@ -48,7 +48,7 @@ export default async function ReaderPage({ params }: { params: Promise<{ id: str
                                 favicon,
                                 author,
                                 image: heroImage,
-                                createdAt: createdAt.toISOString(),
+                                createdAt: new Date(createdAt).toISOString(),
                             }}
                         />
                         <a
